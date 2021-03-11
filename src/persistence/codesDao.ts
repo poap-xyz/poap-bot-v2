@@ -1,6 +1,6 @@
 import {inject, injectable} from "inversify";
-import {ExtendedProtocol, TYPES} from "../types";
-import {Code} from "../models/code";
+import {ExtendedProtocol, TYPES} from "../config/types";
+import {Code} from "../models/core/code";
 
 @injectable()
 export class CodesDao {

@@ -2,7 +2,7 @@ import "reflect-metadata";
 import 'mocha';
 import {expect} from 'chai';
 import {PingFinder} from "../../src/commands/ping-finder";
-import {MessageResponder} from "../../src/services/message-responder";
+import {MessageHandler} from "../../src/services/events/message-handler";
 import {instance, mock, verify, when} from "ts-mockito";
 import {Message} from "discord.js";
 
@@ -12,7 +12,7 @@ describe('MessageResponder', () => {
     let mockedMessageClass: Message;
     let mockedMessageInstance: Message;
 
-    let service: MessageResponder;
+    let service: MessageHandler;
 
     beforeEach(() => {
         mockedPingFinderClass = mock(PingFinder);
@@ -21,7 +21,7 @@ describe('MessageResponder', () => {
         mockedMessageInstance = instance(mockedMessageClass);
         setMessageContents();
 
-        service = new MessageResponder(mockedPingFinderInstance);
+        service = new MessageHandler(mockedPingFinderInstance);
     })
 
     it('should reply', async () => {
