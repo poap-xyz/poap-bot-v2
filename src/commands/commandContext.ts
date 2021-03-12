@@ -1,7 +1,7 @@
 /* https://github.com/hopskipnfall/discord-typescript-bot/blob/master/src/models/command_context.ts */
 import {Message} from "discord.js";
 import {inject} from "inversify";
-import {BotConfig} from "../../config/bot.config";
+import {BotConfig} from "../config/bot.config";
 
 export class CommandContext {
     /** Command name in all lowercase. */

@@ -1,6 +1,6 @@
 import {inject, injectable} from "inversify";
 import {ExtendedProtocol, TYPES} from "../config/types";
-import {Event} from "../models/core/event";
+import {Event} from "../models/event";
 
 @injectable()
 export class EventsDao {
