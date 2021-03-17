@@ -4,9 +4,9 @@
   "description": "Poap Discord Bot",
   "main": "index.js",
   "scripts": {
-    "start": "node src/index.js",
+    "start": "tsc && node dist/src/index.js",
     "watch": "tsc -p tsconfig.json -w",
-    "test": "mocha -r ts-node/register \"tests/**/*.spec.ts\""
+    "test": "tsc && mocha -r ts-node/register \"dist/tests/**/*.test.js\""
   },
   "repository": {
     "type": "git",
@@ -28,6 +28,7 @@
     "discord.js": "^12.5.1",
     "dotenv": "^8.2.0",
     "inversify": "^5.0.5",
+    "inversify-inject-decorators": "^3.1.0",
     "pg-promise": "^10.9.4",
     "pino": "^6.11.1",
     "pino-pretty": "^4.7.1",

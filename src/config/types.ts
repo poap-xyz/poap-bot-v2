@@ -11,7 +11,7 @@ export const TYPES = {
     Client: Symbol("Client"),
     Token: Symbol("Token"),
     /* Services Types */
-    MessageResponder: Symbol("MessageResponder"),
+    MessageHandler: Symbol("MessageHandler"),
     /* Commands Types */
     PingFinder: Symbol("PingFinder"),
 };

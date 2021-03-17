@@ -3,7 +3,7 @@ import {Container} from "inversify";
 import {TYPES} from "./types";
 import {Bot} from "../bot";
 import {Client} from "discord.js";
-import {MessageHandler} from "../services/events/message-handler";
+import {MessageHandler} from "../services/events/messageHandler";
 import {PingFinder} from "../commands/ping-finder";
 import * as pino from "pino";
 import * as pgPromise from 'pg-promise';
@@ -26,7 +26,7 @@ container.bind<Client>(TYPES.Client).toConstantValue(new Client());
 container.bind<string>(TYPES.Token).toConstantValue(process.env.TOKEN);
 
 /* Services binds */
-container.bind<MessageHandler>(TYPES.MessageResponder).to(MessageHandler).inSingletonScope();
+container.bind<MessageHandler>(TYPES.MessageHandler).to(MessageHandler).inSingletonScope();
 
 /* Commands binds */
 container.bind<PingFinder>(TYPES.PingFinder).to(PingFinder).inSingletonScope();

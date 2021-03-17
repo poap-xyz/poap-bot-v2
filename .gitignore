@@ -17,7 +17,7 @@ lib-cov
 # Coverage directory used by tools like istanbul
 coverage
 
-# nyc test coverage
+# nyc tests coverage
 .nyc_output
 
 # Grunt intermediate storage (https://gruntjs.com/creating-plugins#storing-task-files)
@@ -74,3 +74,8 @@ typings/
 
 # FuseBox cache
 .fusebox/
+
+#Dist folder
+dist/
+**/*.js
+**/*.js.map
