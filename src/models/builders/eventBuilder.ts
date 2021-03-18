@@ -15,6 +15,9 @@ export class EventBuilder{
     private _is_whitelisted: boolean | null;
     private _whitelist_file_url: string | null;
 
+    constructor() {
+    }
+
     build(): Event{
         return {
             id: this._id,
@@ -33,55 +36,68 @@ export class EventBuilder{
         }
     }
 
-    set id(value: number) {
+    setId(value: number) {
         this._id = value;
+        return this;
     }
 
-    set server(value: string) {
+    setServer(value: string) {
         this._server = value;
+        return this;
     }
 
-    set channel(value: string) {
+    setChannel(value: string) {
         this._channel = value;
+        return this;
     }
 
-    set start_date(value: Date) {
+    setStartDate(value: Date) {
         this._start_date = value;
+        return this;
     }
 
-    set end_date(value: Date) {
+    setEndDate(value: Date) {
         this._end_date = value;
+        return this;
     }
 
-    set response_message(value: string) {
+    setResponseMessage(value: string) {
         this._response_message = value;
+        return this;
     }
 
-    set pass(value: string) {
+    setPass(value: string) {
         this._pass = value;
+        return this;
     }
 
-    set created_by(value: string) {
+    setCreatedBy(value: string) {
         this._created_by = value;
+        return this;
     }
 
-    set created_date(value: Date) {
+    setCreatedDate(value: Date) {
         this._created_date = value;
+        return this;
     }
 
-    set file_url(value: string) {
+    setFileUrl(value: string) {
         this._file_url = value;
+        return this;
     }
 
-    set is_active(value: boolean) {
+    setIsActive(value: boolean) {
         this._is_active = value;
+        return this;
     }
 
-    set is_whitelisted(value: boolean | null) {
+    setIsWhitelisted(value: boolean | null) {
         this._is_whitelisted = value;
+        return this;
     }
 
-    set whitelist_file_url(value: string | null) {
+    setWhitelistFileUrl(value: string | null) {
         this._whitelist_file_url = value;
+        return this;
     }
 }

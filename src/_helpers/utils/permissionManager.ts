@@ -1,6 +1,6 @@
 import {GuildMember, Message, PermissionResolvable} from "discord.js";
 import {CommandOptions} from "../../commands/commandOptions";
-import {MessageChannelManager} from "./messageChannelManager";
+import {ChannelManager} from "./channelManager";
 
 export type PermissionType = 'GUILD_LACK_OF_PERMISSIONS' | 'MEMBER_LACK_OF_PERMISSIONS' | 'UNSUPPORTED_CHANNEL' | 'PERMISSION_OK';
 
@@ -11,7 +11,7 @@ export type PermissionStatus = {permissionType: PermissionType,
 export class PermissionManager {
 
     public static checkPermissions(message: Message, commandOptions: CommandOptions): PermissionStatus{
-        if(MessageChannelManager.getMessageChannel(message) === 'DM_COMMAND') {
+        if(ChannelManager.getMessageChannel(message) === 'DM_COMMAND') {
             return this.checkPermissionsStatus(commandOptions.commandType.DMCommand, [], []);
         }
         return this.checkGuildPermissions(message, commandOptions);
