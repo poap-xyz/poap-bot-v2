@@ -1,7 +1,7 @@
 import {DMChannel, GuildMember, Message, PermissionResolvable} from "discord.js";
 import {CommandOptions} from "./commandOptions";
 import {CommandContext} from "./commandContext";
-import {PermissionManager} from "../_helpers/commandUtils/permissionManager";
+import {PermissionManager} from "../_helpers/utils/permissionManager";
 
 export abstract class Command {
     readonly name: string;
@@ -12,25 +12,26 @@ export abstract class Command {
         this.commandOptions = commandOptions;
     }
 
-    protected abstract execute(commandContext: CommandContext): Promise<Message>;
+    protected abstract execute(commandContext: CommandContext): Promise<Message | Message[]>;
 
     public isCommandCalledByMessage(message: Message): boolean{
         const commandContext = new CommandContext(message, this.name, this.commandOptions);
         return commandContext.isCommandCalledByMessage();
     }
 
-    public async run(message: Message): Promise<Message | Message[]> {
+    public run(message: Message): Promise<Message | Message[]> {
         const commandContext = new CommandContext(message, this.name, this.commandOptions);
 
         if (commandContext.hasPermissionToRun()) {
-            return await this.execute(commandContext);
+            return this.execute(commandContext);
         }
 
-        this.showError(commandContext.getCommandPermissions());
+        return this.showError(message, commandContext.getCommandPermissions());
     };
 
-    private showError(commandPermissions: PermissionManager){
-        //TODO
+    private showError(message:Message, commandPermissions: PermissionManager): Promise<Message | Message[]>{
+        //todo
+        return message.reply(`Error in command permissions`);
     }
 
 

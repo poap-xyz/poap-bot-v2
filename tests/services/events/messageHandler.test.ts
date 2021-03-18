@@ -7,10 +7,11 @@ import {instance, mock, reset, verify, when} from "ts-mockito";
 import {Message, User} from "discord.js";
 import {Bot} from "../../../src/bot";
 import {Command} from "../../../src/commands/command";
+import {CommandLoader} from "../../../src/services/loaders/commandLoader";
 
 describe('MessageResponder', () => {
-    let mockedBotClass: Bot;
-    let mockedBotInstance: Bot;
+    let mockedCommandLoaderClass: CommandLoader;
+    let mockedCommandLoaderInstance: CommandLoader;
     let mockedCommandClass: Command;
     let mockedCommandInstance: Command;
     let mockedAuthorClass: User;
@@ -21,8 +22,8 @@ describe('MessageResponder', () => {
     let service: MessageHandler;
 
     beforeEach(() => {
-        mockedBotClass = mock(Bot);
-        mockedBotInstance = instance(mockedBotClass);
+        mockedCommandLoaderClass = mock(CommandLoader);
+        mockedCommandLoaderInstance = instance(mockedCommandLoaderClass);
         mockedCommandClass = mock(Command);
         mockedCommandInstance = instance(mockedCommandClass);
         mockedAuthorClass = mock(User);
@@ -32,7 +33,7 @@ describe('MessageResponder', () => {
 
         setMessageContents();
 
-        service = new MessageHandler();
+        service = new MessageHandler(mockedCommandLoaderInstance);
     });
 
     it('should run', async () => {
@@ -72,11 +73,11 @@ describe('MessageResponder', () => {
     }
 
     function whenIsCommandByMessage(result: boolean) {
-        when(mockedBotClass.commands).thenReturn(new Map([[mockedCommandInstance.name, mockedCommandInstance]]));
+        when(mockedCommandLoaderClass.commands).thenReturn(new Map([[mockedCommandInstance.name, mockedCommandInstance]]));
         when(mockedCommandClass.isCommandCalledByMessage(mockedMessageInstance)).thenReturn(result);
     }
 
     function whenCommandEmpty(){
-        when(mockedBotClass.commands).thenReturn(new Map());
+        when(mockedCommandLoaderClass.commands).thenReturn(new Map());
     }
 });

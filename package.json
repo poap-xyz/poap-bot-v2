@@ -5,6 +5,7 @@
   "main": "index.js",
   "scripts": {
     "start": "tsc && node dist/src/index.js",
+    "debug": "set DEBUG=* && npm start",
     "watch": "tsc -p tsconfig.json -w",
     "test": "tsc && mocha -r ts-node/register \"dist/tests/**/*.test.js\""
   },

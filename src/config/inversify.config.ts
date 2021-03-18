@@ -10,7 +10,7 @@ import * as pgPromise from 'pg-promise';
 
 import {loggerConfig} from "./logger.config";
 import {DBConfig} from "./db.config";
-import {BotConfig} from "./bot.config";
+import {CommandLoader} from "../services/loaders/commandLoader";
 
 let container = new Container();
 /* Logger Bind */
@@ -23,10 +23,11 @@ container.bind<pgPromise.IDatabase<any>>(TYPES.DB).toConstantValue(pgPromise()(D
 /* Core binds */
 container.bind<Bot>(TYPES.Bot).to(Bot).inSingletonScope();
 container.bind<Client>(TYPES.Client).toConstantValue(new Client());
-container.bind<string>(TYPES.Token).toConstantValue(process.env.TOKEN);
+container.bind<string>(TYPES.Token).toConstantValue(process.env.BOT_TOKEN);
 
 /* Services binds */
 container.bind<MessageHandler>(TYPES.MessageHandler).to(MessageHandler).inSingletonScope();
+container.bind<CommandLoader>(TYPES.CommandLoader).to(CommandLoader).inSingletonScope();
 
 /* Commands binds */
 container.bind<PingFinder>(TYPES.PingFinder).to(PingFinder).inSingletonScope();

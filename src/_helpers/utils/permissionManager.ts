@@ -1,6 +1,6 @@
 import {GuildMember, Message, PermissionResolvable} from "discord.js";
 import {CommandOptions} from "../../commands/commandOptions";
-import {MessageChannelHandler} from "./messageChannelHandler";
+import {MessageChannelManager} from "./messageChannelManager";
 
 export type PermissionType = 'GUILD_LACK_OF_PERMISSIONS' | 'MEMBER_LACK_OF_PERMISSIONS' | 'UNSUPPORTED_CHANNEL' | 'PERMISSION_OK';
 
@@ -11,15 +11,18 @@ export type PermissionStatus = {permissionType: PermissionType,
 export class PermissionManager {
 
     public static checkPermissions(message: Message, commandOptions: CommandOptions): PermissionStatus{
-        const guild = message.guild.me;
+        if(MessageChannelManager.getMessageChannel(message) === 'DM_COMMAND') {
+            return this.checkPermissionsStatus(commandOptions.commandType.DMCommand, [], []);
+        }
+        return this.checkGuildPermissions(message, commandOptions);
+    }
+
+    private static checkGuildPermissions(message: Message, commandOptions: CommandOptions){
+        const guild = message.guild && message.guild.me;
         const member = message.member;
 
         const botInsufficientPermissions = this.getInsufficientPermissions(guild, commandOptions.botPermissions);
         const memberInsufficientPermissions = this.getInsufficientPermissions(member, commandOptions.memberPermissions);
-
-        if(MessageChannelHandler.getMessageChannel(message) === 'DM_COMMAND') {
-            return this.checkPermissionsStatus(commandOptions.commandType.DMCommand, [], memberInsufficientPermissions);
-        }
 
         return this.checkPermissionsStatus(commandOptions.commandType.GuildCommand, botInsufficientPermissions, memberInsufficientPermissions);
     }

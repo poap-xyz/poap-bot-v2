@@ -2,7 +2,7 @@ import {DMChannel, GuildChannel, Message, TextChannel} from "discord.js";
 
 export type ChannelType = 'DM_COMMAND' | 'GUILD_COMMAND' | 'UNKNOWN';
 
-export class MessageChannelHandler {
+export class MessageChannelManager {
     public static getMessageChannel(message: Message): ChannelType{
         if (message.channel instanceof DMChannel) {
             return 'DM_COMMAND';

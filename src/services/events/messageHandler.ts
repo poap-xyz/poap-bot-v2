@@ -1,42 +1,41 @@
 import {Message} from "discord.js";
 import {Command} from "../../commands/command";
-import container from "../../config/inversify.config";
 import {inject, injectable} from "inversify";
-import getDecorators from "inversify-inject-decorators";
-const { lazyInject } = getDecorators(container);
-
 import {TYPES} from "../../config/types";
-import {Bot} from "../../bot";
-
+import {CommandLoader} from "../loaders/commandLoader";
+import * as pino from "pino";
 
 @injectable()
 export class MessageHandler {
-    @lazyInject(TYPES.Bot) private bot: Bot;
-    constructor() {
+    private readonly commandLoader: CommandLoader;
+
+    constructor(@inject(TYPES.CommandLoader) commandLoader: CommandLoader) {
+        this.commandLoader = commandLoader;
     }
 
     async handle(message: Message): Promise<Message | Message[]> {
         if (message.author.bot) {
-            console.log('Ignoring bot message!')
-            return;
+            return Promise.reject('Ignoring bot message!');
         }
+
         /* Obtain guild if not cached */
         await MessageHandler.cacheMemberOnGuild(message);
 
         const command = this.getCommandByMessage(message);
         if(command){
             try {
-                return await command.run(message);
+                return command.run(message);
             }catch (e){
+                console.log(e); //TODO remove this line
                 return Promise.reject(e);
             }
         }
 
-        return Promise.reject();
+        return Promise.reject("No command matched by message");
     }
 
     private getCommandByMessage(message: Message): Command | null{
-        for (const [name, cmd] of this.bot.commands) {
+        for (const [name, cmd] of this.commandLoader.commands) {
             if(cmd.isCommandCalledByMessage(message))
                 return cmd;
         }

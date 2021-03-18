@@ -6,5 +6,4 @@ export interface CommandOptions{
     memberPermissions: PermissionResolvable[];
     botPermissions: PermissionResolvable[];
     commandType: CommandType;
-    disabled: boolean;
 }
