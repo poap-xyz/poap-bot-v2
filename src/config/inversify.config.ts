@@ -5,16 +5,12 @@ import {Bot} from "../bot";
 import {Client} from "discord.js";
 import {MessageHandler} from "../services/events/messageHandler";
 import {PingFinder} from "../commands/ping-finder";
-import * as pino from "pino";
-import * as pgPromise from 'pg-promise';
-
 import {loggerConfig} from "./logger.config";
 import {DBConfig} from "./db.config";
 import {CommandLoader} from "../services/loaders/commandLoader";
+import * as pgPromise from 'pg-promise';
 
 let container = new Container();
-/* Logger Bind */
-container.bind<pino.Logger>(TYPES.Logger).toConstantValue(pino(loggerConfig));
 
 /* DB Binds */
 container.bind<pgPromise.IMain>(TYPES.PgPromise).toConstantValue(pgPromise());

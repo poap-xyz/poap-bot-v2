@@ -2,6 +2,12 @@ import {Command} from "../command";
 import {CommandContext} from "../commandContext";
 import {Channel, ClientUser, DMChannel, Guild, GuildChannel, Message, Permissions, Snowflake, User} from "discord.js";
 import {EventBuilder} from "../../models/builders/eventBuilder";
+import {inject, injectable} from "inversify";
+import {TYPES} from "../../config/types";
+import {logger} from "../../logger";
+import {BotConfig} from "../../config/bot.config";
+import {ChannelManager} from "../../_helpers/utils/channelManager";
+
 export type SetupStepsType = 'NONE' | 'CHANNEL' | 'START' | 'END' | 'START_MSG' | 'END_MSG' | 'RESPONSE' |'REACTION' | 'PASS' | 'FILE';
 
 export type SetupState = {
@@ -14,6 +20,7 @@ export type SetupState = {
     expire: number,
 }
 
+@injectable()
 export default class Setup extends Command{
     private setupUsers: Map<Snowflake, SetupState>;
 
@@ -78,7 +85,7 @@ export default class Setup extends Command{
 
     private async sendInitialDM(initializedSetup: SetupState){
         await initializedSetup.dmChannel.send(`Hi ${initializedSetup.user.username}! You want to set me up for an event in ${initializedSetup.guild}? I'll ask for the details, one at a time.`);
-        await initializedSetup.dmChannel.send(`To accept the suggested value, respond with "-"`);
+        await initializedSetup.dmChannel.send(`To accept the suggested value, respond with "${BotConfig.defaultOptionMessage}"`);
         await initializedSetup.dmChannel.send(`First: which channel should I speak in public? (${initializedSetup.channel || ""}) *Hint: only for start and end event`);
     }
 
@@ -86,12 +93,13 @@ export default class Setup extends Command{
         /* We set the collector to collect all the user messages */
         const collector = dmChannel.createMessageCollector((m: Message) => m.author.id === user.id, {});
         collector.on('collect', m => this.DMChannelHandler(m, user));
+
         return dmChannel;
     }
 
     private DMChannelHandler(message: Message, user: User){
         const setupState: SetupState = this.setupUsers.get(user.id);
-        console.log(`Guacho ${message.content} ${setupState.step}`)
+        logger.debug(`DM Handler, message content: ${message.content}, step: ${setupState.step}`)
         switch (setupState.step){
             case "CHANNEL":
                 this.channelStepHandler(message, setupState);
@@ -100,8 +108,21 @@ export default class Setup extends Command{
     }
 
     private channelStepHandler(message: Message, setupState: SetupState){
-        setupState.dmChannel.send(`Eyy ${message.content}`);
-        setupState.step = "START_MSG";
+        const messageContent = message.content;
+        let selectedChannel: Channel;
+
+        if (messageContent === BotConfig.defaultOptionMessage)
+            selectedChannel = setupState.channel;
+
+        // Confirm that channel exists
+        selectedChannel = ChannelManager.getChannelFromGuild(setupState.guild, messageContent);
+        if (!selectedChannel) {
+            const channels = ChannelManager.getChannelsString(setupState.guild)
+            return setupState.dmChannel.send(`I can't find a channel named ${messageContent}. Try again -> ${channels}`);
+        }
+        setupState.event = setupState.event.setChannel(selectedChannel.id)
+        setupState.step = "START";
+        return setupState.dmChannel.send(`Date and time to START 🛫 ? *Hint: Time in UTC this format 👉  yyyy-mm-dd hh:mm`);
     }
 
 
