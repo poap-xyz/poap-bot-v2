@@ -2,7 +2,7 @@ import {Command} from "../command";
 import {CommandContext} from "../commandContext";
 import {CommandOptions} from "../commandOptions";
 import {Permissions} from "discord.js"
-export default class Ping extends Command{
+export default class PingCommand extends Command{
     constructor() {
         super("ping",
             {aliases: [],

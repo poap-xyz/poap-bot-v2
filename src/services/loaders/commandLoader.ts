@@ -4,6 +4,9 @@ import {TYPES} from "../../config/types";
 import {logger} from "../../logger";
 import * as path from "path";
 import {Command} from "../../commands/command";
+import {BotConfig} from "../../config/bot.config";
+
+const commandsPath = __dirname + `${path.sep}..${path.sep}..${path.sep}` + `commands` + path.sep;
 
 @injectable()
 export class CommandLoader{
@@ -18,8 +21,7 @@ export class CommandLoader{
     }
 
     private loadCommandsFromDefaultPath(){
-        const folderPath = __dirname + `${path.sep}..${path.sep}..${path.sep}` + `commands` + path.sep;
-        const commandsFolder = this.getCommandFolders(folderPath);
+        const commandsFolder = this.getCommandFolders(commandsPath);
         logger.info(`Loading a total of ${commandsFolder.length} categories.`);
 
         commandsFolder.forEach((commandFilePath) => {
@@ -39,7 +41,10 @@ export class CommandLoader{
 
     private getCommandJSFiles(commandPath: string): string[]{
         return readdirSync(commandPath)
-            .filter(cmd => cmd.split(".").pop() === "js");
+            .filter(cmd => {
+                const split = cmd.split(".");
+                return split.pop() === "js" && split.pop() === BotConfig.commandPrefix;
+            });
         //.map(dir => commandPath + dir + path.sep);
     }
 

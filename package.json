@@ -7,6 +7,7 @@
     "start": "tsc && node dist/src/index.js",
     "debug": "set DEBUG=* && npm start",
     "watch": "tsc -p tsconfig.json -w",
+    "clean": "rm -rf dist/",
     "test": "tsc && mocha -r ts-node/register \"dist/tests/**/*.test.js\""
   },
   "repository": {
@@ -30,6 +31,7 @@
     "dotenv": "^8.2.0",
     "inversify": "^5.0.5",
     "inversify-inject-decorators": "^3.1.0",
+    "moment": "^2.29.1",
     "pg-promise": "^10.9.4",
     "pino": "^6.11.1",
     "pino-pretty": "^4.7.1",
@@ -39,6 +41,7 @@
   "devDependencies": {
     "@types/chai": "^4.2.15",
     "@types/mocha": "^8.2.1",
+    "@types/moment": "^2.13.0",
     "@types/pg-promise": "^5.4.3",
     "@types/pino": "^6.3.6",
     "chai": "^4.3.3",

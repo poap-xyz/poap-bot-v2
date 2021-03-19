@@ -4,16 +4,16 @@ export class EventBuilder{
     private _id: number;
     private _server: string;
     private _channel: string;
-    private _start_date: Date;
-    private _end_date: Date;
-    private _response_message: string;
+    private _startDate: Date;
+    private _endDate: Date;
+    private _responseMessage: string;
     private _pass: string;
-    private _created_by: string;
-    private _created_date: Date;
-    private _file_url: string;
-    private _is_active: boolean;
-    private _is_whitelisted: boolean | null;
-    private _whitelist_file_url: string | null;
+    private _createdBy: string;
+    private _createdDate: Date;
+    private _fileUrl: string;
+    private _isActive: boolean;
+    private _isWhitelisted: boolean | null;
+    private _whitelistFileUrl: string | null;
 
     constructor() {
     }
@@ -24,15 +24,15 @@ export class EventBuilder{
             channel: this._channel,
             server: this._server,
             pass: this._pass,
-            created_by: this._created_by,
-            created_date: this._created_date,
-            start_date: this._start_date,
-            end_date: this._end_date,
-            file_url: this._file_url,
-            is_active: this._is_active,
-            response_message: this._response_message,
-            is_whitelisted: this._is_whitelisted,
-            whitelist_file_url: this._whitelist_file_url
+            created_by: this._createdBy,
+            created_date: this._createdDate,
+            start_date: this._startDate,
+            end_date: this._endDate,
+            file_url: this._fileUrl,
+            is_active: this._isActive,
+            response_message: this._responseMessage,
+            is_whitelisted: this._isWhitelisted,
+            whitelist_file_url: this._whitelistFileUrl
         }
     }
 
@@ -52,17 +52,17 @@ export class EventBuilder{
     }
 
     setStartDate(value: Date) {
-        this._start_date = value;
+        this._startDate = value;
         return this;
     }
 
     setEndDate(value: Date) {
-        this._end_date = value;
+        this._endDate = value;
         return this;
     }
 
     setResponseMessage(value: string) {
-        this._response_message = value;
+        this._responseMessage = value;
         return this;
     }
 
@@ -72,32 +72,36 @@ export class EventBuilder{
     }
 
     setCreatedBy(value: string) {
-        this._created_by = value;
+        this._createdBy = value;
         return this;
     }
 
     setCreatedDate(value: Date) {
-        this._created_date = value;
+        this._createdDate = value;
         return this;
     }
 
     setFileUrl(value: string) {
-        this._file_url = value;
+        this._fileUrl = value;
         return this;
     }
 
     setIsActive(value: boolean) {
-        this._is_active = value;
+        this._isActive = value;
         return this;
     }
 
     setIsWhitelisted(value: boolean | null) {
-        this._is_whitelisted = value;
+        this._isWhitelisted = value;
         return this;
     }
 
     setWhitelistFileUrl(value: string | null) {
-        this._whitelist_file_url = value;
+        this._whitelistFileUrl = value;
         return this;
+    }
+
+    get start_date(): Date {
+        return this._startDate;
     }
 }

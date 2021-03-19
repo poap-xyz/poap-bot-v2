@@ -2,13 +2,15 @@ import {Command} from "../command";
 import {CommandContext} from "../commandContext";
 import {Channel, ClientUser, DMChannel, Guild, GuildChannel, Message, Permissions, Snowflake, User} from "discord.js";
 import {EventBuilder} from "../../models/builders/eventBuilder";
-import {inject, injectable} from "inversify";
-import {TYPES} from "../../config/types";
 import {logger} from "../../logger";
 import {BotConfig} from "../../config/bot.config";
+import {SetupDateStepHandler} from "./setupDateStepHandler";
+import {SetupChannelStepHandler} from "./setupChannelStepHandler";
+import {SetupResponseStepHandler} from "./setupResponseStepHandler";
 import {ChannelManager} from "../../_helpers/utils/channelManager";
 
-export type SetupStepsType = 'NONE' | 'CHANNEL' | 'START' | 'END' | 'START_MSG' | 'END_MSG' | 'RESPONSE' |'REACTION' | 'PASS' | 'FILE';
+export type SetupStepsType = 'NONE' | 'CHANNEL' | 'START' | 'END' | 'START_MSG' |
+                             'END_MSG' | 'RESPONSE' |'REACTION' | 'PASS' | 'FILE';
 
 export type SetupState = {
     step: SetupStepsType,
@@ -20,7 +22,6 @@ export type SetupState = {
     expire: number,
 }
 
-@injectable()
 export default class Setup extends Command{
     private setupUsers: Map<Snowflake, SetupState>;
 
@@ -75,54 +76,34 @@ export default class Setup extends Command{
 
     private async initializeDMChannel(defaultSetup: SetupState): Promise<SetupState>{
         const {user} = defaultSetup;
-        const dmChannel = await user.createDM();
+        const dmChannel = await ChannelManager.createDMAndAddHandler(user, this.DMChannelHandler);
         const initializedSetup: SetupState = {...defaultSetup, dmChannel: dmChannel};
 
-        this.addHandlerToDMChannel(dmChannel, user);
-        await this.sendInitialDM(initializedSetup);
+        await Setup.sendInitialDM(initializedSetup);
         return initializedSetup;
     }
 
-    private async sendInitialDM(initializedSetup: SetupState){
+    private static async sendInitialDM(initializedSetup: SetupState){
         await initializedSetup.dmChannel.send(`Hi ${initializedSetup.user.username}! You want to set me up for an event in ${initializedSetup.guild}? I'll ask for the details, one at a time.`);
         await initializedSetup.dmChannel.send(`To accept the suggested value, respond with "${BotConfig.defaultOptionMessage}"`);
         await initializedSetup.dmChannel.send(`First: which channel should I speak in public? (${initializedSetup.channel || ""}) *Hint: only for start and end event`);
     }
 
-    private addHandlerToDMChannel(dmChannel: DMChannel, user: User){
-        /* We set the collector to collect all the user messages */
-        const collector = dmChannel.createMessageCollector((m: Message) => m.author.id === user.id, {});
-        collector.on('collect', m => this.DMChannelHandler(m, user));
-
-        return dmChannel;
-    }
-
-    private DMChannelHandler(message: Message, user: User){
+    private async DMChannelHandler(message: Message, user: User): Promise<Message>{
         const setupState: SetupState = this.setupUsers.get(user.id);
-        logger.debug(`DM Handler, message content: ${message.content}, step: ${setupState.step}`)
+        const messageContent = message.content.trim();
+        logger.debug(`DM Handler, message content: ${message.content}, step: ${setupState.step}`);
         switch (setupState.step){
             case "CHANNEL":
-                this.channelStepHandler(message, setupState);
-                break;
+                return SetupChannelStepHandler.channelStepHandler(messageContent, setupState);
+            case "START":
+                return SetupDateStepHandler.startDateStepHandler(messageContent, setupState);
+            case "END":
+                return SetupDateStepHandler.endDateStepHandler(messageContent, setupState);
+            case "RESPONSE":
+                return SetupResponseStepHandler.responseStepHandler(messageContent, setupState);
+
         }
-    }
-
-    private channelStepHandler(message: Message, setupState: SetupState){
-        const messageContent = message.content;
-        let selectedChannel: Channel;
-
-        if (messageContent === BotConfig.defaultOptionMessage)
-            selectedChannel = setupState.channel;
-
-        // Confirm that channel exists
-        selectedChannel = ChannelManager.getChannelFromGuild(setupState.guild, messageContent);
-        if (!selectedChannel) {
-            const channels = ChannelManager.getChannelsString(setupState.guild)
-            return setupState.dmChannel.send(`I can't find a channel named ${messageContent}. Try again -> ${channels}`);
-        }
-        setupState.event = setupState.event.setChannel(selectedChannel.id)
-        setupState.step = "START";
-        return setupState.dmChannel.send(`Date and time to START 🛫 ? *Hint: Time in UTC this format 👉  yyyy-mm-dd hh:mm`);
     }
 
 
