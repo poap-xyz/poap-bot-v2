@@ -1,10 +1,9 @@
 import {Command} from "../command";
 import {CommandContext} from "../commandContext";
-import {Channel, ClientUser, DMChannel, Guild, GuildChannel, Message, Permissions, Snowflake, User} from "discord.js";
+import {Guild, Message, Permissions, Snowflake, User} from "discord.js";
 import {EventBuilder} from "../../models/builders/eventBuilder";
 import {logger} from "../../logger";
 import {BotConfig} from "../../config/bot.config";
-import {SetupDateStepHandler} from "./setupDateStepHandler";
 import {SetupChannelStepHandler} from "./setupChannelStepHandler";
 import {SetupResponseStepHandler} from "./setupResponseStepHandler";
 import {ChannelManager} from "../../_helpers/utils/channelManager";
@@ -12,32 +11,40 @@ import {EventService} from "../../interfaces/services/eventService";
 import {TYPES} from "../../config/types";
 import getDecorators from "inversify-inject-decorators";
 import container from "../../config/inversify.config";
+import {SetupState, SetupStep} from "../../interfaces/command/setup/setup.interface";
+import {SetupDateStartStepHandler} from "./setupDateStartStepHandler";
+import {SetupDateEndStepHandler} from "./setupDateEndStepHandler";
+import {SetupPassStepHandler} from "./setupPassStepHandler";
+import {Event} from "../../models/event";
+import {SetupDMChannelHandler} from "./setupDMChannelHandler";
 
 const { lazyInject } = getDecorators(container);
-export type SetupStepsType = 'NONE' | 'CHANNEL' | 'START' | 'END' | 'START_MSG' |
-                             'END_MSG' | 'RESPONSE' |'REACTION' | 'PASS' | 'FILE';
-
-export type SetupState = {
-    step: SetupStepsType,
-    user: User,
-    guild: Guild,
-    channel: Channel,
-    dmChannel: DMChannel,
-    event: EventBuilder,
-    expire: number,
-}
 
 export default class Setup extends Command{
     private setupUsers: Map<Snowflake, SetupState>;
+    private readonly setupDMChannelHandler: SetupDMChannelHandler;
+    readonly setupSteps: SetupStep[];
     @lazyInject(TYPES.EventService) eventService: EventService;
 
     constructor() {
-        super("setup",
-            { aliases: [],
-            commandType: {DMCommand: false, GuildCommand: true},
-            botPermissions: [],
-            memberPermissions: [Permissions.FLAGS.MANAGE_GUILD]});
+        super("setup", {
+                                        aliases: [],
+                                        commandType: {DMCommand: false, GuildCommand: true},
+                                        botPermissions: [],
+                                        memberPermissions: [Permissions.FLAGS.MANAGE_GUILD]});
         this.setupUsers = new Map();
+        this.setupSteps = this.initializeSetupStepsList();
+        this.setupDMChannelHandler = new SetupDMChannelHandler(this, this.eventService);
+    }
+
+    private initializeSetupStepsList(): SetupStep[]{
+        return [
+            new SetupChannelStepHandler(),
+            new SetupDateStartStepHandler(),
+            new SetupDateEndStepHandler(),
+            new SetupResponseStepHandler(),
+            new SetupPassStepHandler(this.eventService),
+        ];
     }
 
     protected async execute(commandContext: CommandContext): Promise<Message | Message[]> {
@@ -45,7 +52,7 @@ export default class Setup extends Command{
         const user = message.member.user;
         const guild = message.guild;
 
-        if(this.userHasStartedSetup(user) || this.guildHasEventActive(guild)){
+        if(this.userHasStartedSetup(user)){
             return await message.reply("You already have another setup initialized.");
         }
         return this.initializeSetup(user, guild, message);
@@ -55,15 +62,10 @@ export default class Setup extends Command{
         return this.setupUsers.has(user.id);
     }
 
-    private guildHasEventActive(guild: Guild){
-        //TODO check for events in db
-        return false;
-    }
-
     //TODO expiry clear user from map
     private async initializeSetup(user: User, guild: Guild, message: Message) {
         const defaultSetup: SetupState = {
-            step: 'CHANNEL',
+            step: 0,
             user: user,
             guild: guild,
             channel: message.channel,
@@ -82,35 +84,43 @@ export default class Setup extends Command{
 
     private async initializeDMChannel(defaultSetup: SetupState): Promise<SetupState>{
         const {user} = defaultSetup;
-        const dmChannel = await ChannelManager.createDMWithHandler(user, this.DMChannelHandler);
+        const dmChannel = await ChannelManager.createDMWithHandler(user, this.setupDMChannelHandler.DMChannelHandler);
         const initializedSetup: SetupState = {...defaultSetup, dmChannel: dmChannel};
 
-        await Setup.sendInitialDM(initializedSetup);
+        await this.sendInitialDM(initializedSetup);
         return initializedSetup;
     }
 
-    private static async sendInitialDM(initializedSetup: SetupState){
-        await initializedSetup.dmChannel.send(`Hi ${initializedSetup.user.username}! You want to set me up for an event in ${initializedSetup.guild}? I'll ask for the details, one at a time.`);
-        await initializedSetup.dmChannel.send(`To accept the suggested value, respond with "${BotConfig.defaultOptionMessage}"`);
-        await initializedSetup.dmChannel.send(`First: which channel should I speak in public? (${initializedSetup.channel || ""}) *Hint: only for start and end event`);
+    private async sendInitialDM(setupState: SetupState){
+        await setupState.dmChannel.send(`Hi ${setupState.user.username}! You want to set me up for an event in ${setupState.guild}? I'll ask for the details, one at a time.`);
+        await setupState.dmChannel.send(`To accept the suggested value, respond with "${BotConfig.defaultOptionMessage}"`);
+        await this.setupSteps[setupState.step].sendInitMessage(setupState);
     }
 
-    private async DMChannelHandler(message: Message, user: User): Promise<Message>{
-        const setupState: SetupState = this.setupUsers.get(user.id);
-        const messageContent = message.content.trim();
-        logger.debug(`DM Handler, message content: ${message.content}, step: ${setupState.step}`);
-        switch (setupState.step){
-            case "CHANNEL":
-                return SetupChannelStepHandler.channelStepHandler(messageContent, setupState);
-            case "START":
-                return SetupDateStepHandler.startDateStepHandler(messageContent, setupState);
-            case "END":
-                return SetupDateStepHandler.endDateStepHandler(messageContent, setupState);
-            case "RESPONSE":
-                return SetupResponseStepHandler.responseStepHandler(messageContent, setupState);
+    public getSetupStateByUser(user: Snowflake): SetupState{
+        if(!this.setupUsers.has(user))
+            return undefined;
+        return this.setupUsers.get(user);
+    }
 
+    public async clearSetupState(setupState: SetupState): Promise<void>{
+        try {
+            await setupState.dmChannel.delete("Setup finished");
+            this.setupUsers.delete(setupState.user.id);
+        }catch (e){
+            logger.error(`ClearSetupState error: ${e}`);
         }
     }
 
+    public async saveEvent(setupState: SetupState): Promise<Message>{
+        logger.error(`Saving event: ${setupState.event}`);
+        const event: Event = setupState.event.build();
+        try {
+            await this.eventService.saveEvent(event, setupState.user.username);
+        }catch(e){
+            logger.error(`Error saving event, error: ${e}`);
+        }
 
+        return await setupState.dmChannel.send(`Thank you. That's everything. I'll start the event at the appointed time.`);
+    }
 }

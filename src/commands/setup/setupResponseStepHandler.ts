@@ -1,19 +1,27 @@
 import {BotConfig} from "../../config/bot.config";
-import {SetupState} from "./setup.command";
+import {SetupState, SetupStep, SetupStepId} from "../../interfaces/command/setup/setup.interface";
+import {Message} from "discord.js";
 
-export class SetupResponseStepHandler{
-    public static responseStepHandler(messageContent: string, setupState: SetupState){
+
+export class SetupResponseStepHandler implements SetupStep{
+    readonly stepId: SetupStepId = 'RESPONSE';
+
+    async sendInitMessage(setupState: SetupState): Promise<Message> {
+        return await setupState.dmChannel.send(`Response to send privately to members during the event? (${BotConfig.defaultResponseMessage})`);
+    }
+
+    async handler(messageContent:string, setupState: SetupState):Promise<string> {
         let responseMessage: string;
 
         if (messageContent === BotConfig.defaultOptionMessage)
             responseMessage = BotConfig.defaultResponseMessage;
 
-        if(!messageContent || !messageContent.length)
-            return setupState.dmChannel.send(`Please provide a response or send '-' for default `)
+        if(!messageContent || !messageContent.length){
+            await setupState.dmChannel.send(`Please provide a response or send '-' for default `);
+            return Promise.reject("Invalid response (null or empty)")
+        }
 
         setupState.event.setResponseMessage(responseMessage);
-        setupState.step = 'PASS';
-        return setupState.dmChannel.send(`Choose secret 🔒  pass (like a word, a hash from youtube or a complete link)
-         This pass is for your users.`);
+        return responseMessage;
     }
 }

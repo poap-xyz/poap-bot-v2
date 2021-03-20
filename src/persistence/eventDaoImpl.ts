@@ -50,7 +50,16 @@ export class EventDaoImpl implements EventDao{
         );
     }
 
-    private static isMsgTheSame(message: string, eventPass: Event['pass']) {
+    public async isPassAvailable(messageContent: string): Promise<boolean>{
+        const events = await this.getAllEvents();
+        const eventSelected = events.find((e) => EventDaoImpl.isMsgTheSame(messageContent, e.pass));
+
+        console.log(`[DB] exist event: ${eventSelected && eventSelected.id} for pass: ${messageContent}`);
+
+        return !!eventSelected;
+    }
+
+    static isMsgTheSame(message: string, eventPass: Event['pass']) {
         let messagePass = message.replace('!', '').replace(/ /g, "");
         return eventPass.toLowerCase().includes(messagePass.toLowerCase());
     }

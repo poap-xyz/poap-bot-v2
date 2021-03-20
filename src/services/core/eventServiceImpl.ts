@@ -42,4 +42,8 @@ export class EventServiceImpl implements EventService{
     public async saveEvent(event: Event, username: string){
         return await this.eventDao.saveEvent(event, username);
     }
+
+    isPassAvailable(messageContent: string): Promise<boolean> {
+        return this.eventDao.isPassAvailable(messageContent);
+    }
 }

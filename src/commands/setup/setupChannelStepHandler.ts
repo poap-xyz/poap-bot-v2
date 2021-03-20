@@ -1,10 +1,16 @@
 import {Channel, Message} from "discord.js";
 import {ChannelManager} from "../../_helpers/utils/channelManager";
 import {BotConfig} from "../../config/bot.config";
-import {SetupState} from "./setup.command";
+import {SetupState, SetupStep, SetupStepId} from "../../interfaces/command/setup/setup.interface";
 
-export class SetupChannelStepHandler{
-    public static channelStepHandler(messageContent: string, setupState: SetupState): Promise<Message>{
+export class SetupChannelStepHandler implements SetupStep{
+    readonly stepId: SetupStepId = 'CHANNEL';
+
+    async sendInitMessage(setupState: SetupState): Promise<Message>{
+        return await setupState.dmChannel.send(`Which channel should I speak in public? (${setupState.channel || ""}) *Hint: only for start and end event`);
+    }
+
+    async handler(messageContent:string, setupState: SetupState): Promise<string> {
         let selectedChannel: Channel;
 
         selectedChannel = ChannelManager.getChannelFromGuild(setupState.guild, messageContent);
@@ -14,11 +20,12 @@ export class SetupChannelStepHandler{
 
         if (!selectedChannel) {
             const channels = ChannelManager.getChannelsString(setupState.guild)
-            return setupState.dmChannel.send(`I can't find a channel named ${messageContent}. Try again -> ${channels}`);
+            await setupState.dmChannel.send(`I can't find a channel named ${messageContent}. Try again -> ${channels}`);
+            return Promise.reject(`Invalid channel, message content: ${messageContent}`);
         }
 
         setupState.event = setupState.event.setChannel(selectedChannel.id);
-        setupState.step = "START";
-        return setupState.dmChannel.send(`Date and time to START 🛫 ? *Hint: Time in UTC this format 👉  yyyy-mm-dd hh:mm`);
-    }
+        return selectedChannel.toString();
+    };
+
 }

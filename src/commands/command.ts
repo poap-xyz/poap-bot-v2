@@ -4,7 +4,6 @@ import {CommandContext} from "./commandContext";
 import {PermissionManager} from "../_helpers/utils/permissionManager";
 import {injectable} from "inversify";
 
-
 @injectable()
 export abstract class Command {
     readonly name: string;

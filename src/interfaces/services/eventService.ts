@@ -13,6 +13,8 @@ export interface EventService{
 
     getEventFromPass(messageContent: string): Promise<Event | null>;
 
+    isPassAvailable(messageContent: string): Promise<boolean>;
+
     checkCodeForEventUsername(event_id: Event['id'], username: string);
 
     saveEvent(event: Event, username: string): Promise<Event>;
