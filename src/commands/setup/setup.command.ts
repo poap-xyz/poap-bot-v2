@@ -84,7 +84,7 @@ export default class Setup extends Command{
 
     private async initializeDMChannel(defaultSetup: SetupState): Promise<SetupState>{
         const {user} = defaultSetup;
-        const dmChannel = await ChannelManager.createDMWithHandler(user, this.setupDMChannelHandler.DMChannelHandler);
+        const dmChannel = await ChannelManager.createDMWithHandler(user, this.setupDMChannelHandler);
         const initializedSetup: SetupState = {...defaultSetup, dmChannel: dmChannel};
 
         await this.sendInitialDM(initializedSetup);

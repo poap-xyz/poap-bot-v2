@@ -4,12 +4,13 @@ import {logger} from "../../logger";
 import {Event} from "../../models/event";
 import Setup from "./setup.command";
 import {EventService} from "../../interfaces/services/eventService";
+import {DMChannelHandler} from "../../interfaces/command/DMChannelHandler";
 
-export class SetupDMChannelHandler {
+export class SetupDMChannelHandler implements DMChannelHandler{
     private readonly setup: Setup;
     private readonly eventService: EventService;
 
-    constructor(setup: Setup, eventService: EventService) {
+    constructor(setup: Setup, eventService: EventService){
         this.setup = setup;
         this.eventService = eventService;
     }
