@@ -12,11 +12,16 @@ export const TYPES = {
     Token: Symbol("Token"),
 
     /* Services Types */
+    EventService: Symbol("EventService"),
+    CodeService: Symbol("CodeService"),
+    UserService: Symbol("UserService"),
     MessageHandler: Symbol("MessageHandler"),
     CommandLoader: Symbol("CommandLoader"),
 
-    /* Commands Types */
-    PingFinder: Symbol("PingFinder"),
+    /* Persistence Types */
+    EventDao: Symbol("EventDao"),
+    CodeDao: Symbol("CodeDao"),
+    UserDao: Symbol("UserDao"),
 };
 /* DB Protocol Type export */
 export type ExtendedProtocol = IDatabase<any>;

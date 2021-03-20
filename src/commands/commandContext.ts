@@ -4,7 +4,7 @@ import {inject} from "inversify";
 import {BotConfig} from "../config/bot.config";
 import {PermissionManager, PermissionStatus} from "../_helpers/utils/permissionManager";
 import {Command} from "./command";
-import {CommandOptions} from "./commandOptions";
+import {CommandOptions} from "../interfaces/command/commandOptions";
 
 export class CommandContext {
     readonly commandName: string;

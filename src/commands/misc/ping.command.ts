@@ -1,7 +1,7 @@
 import {Command} from "../command";
 import {CommandContext} from "../commandContext";
-import {CommandOptions} from "../commandOptions";
-import {Permissions} from "discord.js"
+import {injectable} from "inversify";
+
 export default class PingCommand extends Command{
     constructor() {
         super("ping",

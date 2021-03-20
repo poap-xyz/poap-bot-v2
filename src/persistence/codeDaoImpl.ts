@@ -1,16 +1,17 @@
 import {inject, injectable} from "inversify";
 import {ExtendedProtocol, TYPES} from "../config/types";
 import {Code} from "../models/code";
+import {CodeDao} from "../interfaces/persistence/codeDao";
 
 @injectable()
-export class CodesDao {
+export class CodeDaoImpl implements CodeDao{
     private db: ExtendedProtocol;
 
     constructor(@inject(TYPES.PgPromise) db) {
         this.db = db;
     }
 
-    public async addCode(uuid: Code['id'], code: Code['code']) {
+    public async addCode(uuid: Code['id'], code: Code['code']): Promise<Code> {
         const now = new Date();
         return await this.db.none(
             "INSERT INTO codes (code, event_id, created_date ) VALUES ( $1, $2, $3 );",

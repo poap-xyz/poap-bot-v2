@@ -1,9 +1,10 @@
 import {inject, injectable} from "inversify";
 import {ExtendedProtocol, TYPES} from "../config/types";
 import {User} from "../models/user";
+import {UserDao} from "../interfaces/persistence/userDao";
 
 @injectable()
-export class EventsDao {
+export class UserDaoImpl implements UserDao{
     private db: ExtendedProtocol;
 
     constructor(@inject(TYPES.PgPromise) db) {

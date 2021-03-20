@@ -3,7 +3,7 @@ import container from "./config/inversify.config";
 import {TYPES} from "./config/types";
 import {Bot} from "./bot";
 
-let bot = container.get<Bot>(TYPES.Bot);
+let bot: Bot = container.get<Bot>(TYPES.Bot);
 bot.init().then(() => {
     console.log('Logged in!')
 }).catch((error) => {

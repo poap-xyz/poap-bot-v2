@@ -1,10 +1,9 @@
 import "reflect-metadata";
 import 'mocha';
 import {expect} from 'chai';
-import {PingFinder} from "../../src/commands/ping-finder";
 import {CommandContext} from "../../src/commands/commandContext";
 import {Message} from "discord.js";
-import {CommandOptions} from "../../src/commands/commandOptions";
+import {CommandOptions} from "../../src/interfaces/command/commandOptions";
 import {instance, mock} from "ts-mockito";
 import {BotConfig} from "../../src/config/bot.config";
 

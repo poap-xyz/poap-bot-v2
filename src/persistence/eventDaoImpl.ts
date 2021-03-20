@@ -1,9 +1,10 @@
 import {inject, injectable} from "inversify";
 import {ExtendedProtocol, TYPES} from "../config/types";
 import {Event} from "../models/event";
+import {EventDao} from "../interfaces/persistence/eventDao";
 
 @injectable()
-export class EventsDao {
+export class EventDaoImpl implements EventDao{
     private db: ExtendedProtocol;
     constructor(@inject(TYPES.PgPromise) db){
         this.db = db;
@@ -45,7 +46,7 @@ export class EventsDao {
         const events = await this.getRealtimeActiveEvents();
 
         return events.find((e) =>
-            EventsDao.isMsgTheSame(messageContent, e.pass)
+            EventDaoImpl.isMsgTheSame(messageContent, e.pass)
         );
     }
 
@@ -79,7 +80,7 @@ export class EventsDao {
             });
     }
 
-    public async saveEvent(event: Event, username: string) {
+    public async saveEvent(event: Event, username: string): Promise<Event>{
         const now = new Date();
 
         return await this.db.none(

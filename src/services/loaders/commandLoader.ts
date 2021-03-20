@@ -5,6 +5,7 @@ import {logger} from "../../logger";
 import * as path from "path";
 import {Command} from "../../commands/command";
 import {BotConfig} from "../../config/bot.config";
+import container from "../../config/inversify.config";
 
 const commandsPath = __dirname + `${path.sep}..${path.sep}..${path.sep}` + `commands` + path.sep;
 
@@ -13,7 +14,10 @@ export class CommandLoader{
     private readonly _commands: Map<string, Command>;
     constructor() {
         this._commands = new Map();
-        this.loadCommandsFromDefaultPath();
+    }
+
+    init(){
+        return this.loadCommandsFromDefaultPath();
     }
 
     get commands(): Map<string, Command> {

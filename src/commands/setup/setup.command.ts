@@ -8,7 +8,12 @@ import {SetupDateStepHandler} from "./setupDateStepHandler";
 import {SetupChannelStepHandler} from "./setupChannelStepHandler";
 import {SetupResponseStepHandler} from "./setupResponseStepHandler";
 import {ChannelManager} from "../../_helpers/utils/channelManager";
+import {EventService} from "../../interfaces/services/eventService";
+import {TYPES} from "../../config/types";
+import getDecorators from "inversify-inject-decorators";
+import container from "../../config/inversify.config";
 
+const { lazyInject } = getDecorators(container);
 export type SetupStepsType = 'NONE' | 'CHANNEL' | 'START' | 'END' | 'START_MSG' |
                              'END_MSG' | 'RESPONSE' |'REACTION' | 'PASS' | 'FILE';
 
@@ -24,6 +29,7 @@ export type SetupState = {
 
 export default class Setup extends Command{
     private setupUsers: Map<Snowflake, SetupState>;
+    @lazyInject(TYPES.EventService) eventService: EventService;
 
     constructor() {
         super("setup",
@@ -76,7 +82,7 @@ export default class Setup extends Command{
 
     private async initializeDMChannel(defaultSetup: SetupState): Promise<SetupState>{
         const {user} = defaultSetup;
-        const dmChannel = await ChannelManager.createDMAndAddHandler(user, this.DMChannelHandler);
+        const dmChannel = await ChannelManager.createDMWithHandler(user, this.DMChannelHandler);
         const initializedSetup: SetupState = {...defaultSetup, dmChannel: dmChannel};
 
         await Setup.sendInitialDM(initializedSetup);

@@ -40,7 +40,7 @@ export class ChannelManager {
         return 'UNKNOWN';
     }
 
-    public static async createDMAndAddHandler(user: User, callback: (message: Message, user: User) => Promise<Message>) {
+    public static async createDMWithHandler(user: User, callback: (message: Message, user: User) => Promise<Message>) {
         const dmChannel = await user.createDM();
 
         /* We set the collector to collect all the user messages */

@@ -1,8 +1,11 @@
 import {DMChannel, GuildMember, Message, PermissionResolvable} from "discord.js";
-import {CommandOptions} from "./commandOptions";
+import {CommandOptions} from "../interfaces/command/commandOptions";
 import {CommandContext} from "./commandContext";
 import {PermissionManager} from "../_helpers/utils/permissionManager";
+import {injectable} from "inversify";
 
+
+@injectable()
 export abstract class Command {
     readonly name: string;
     readonly commandOptions: CommandOptions;

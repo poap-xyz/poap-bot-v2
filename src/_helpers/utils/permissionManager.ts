@@ -1,5 +1,5 @@
 import {GuildMember, Message, PermissionResolvable} from "discord.js";
-import {CommandOptions} from "../../commands/commandOptions";
+import {CommandOptions} from "../../interfaces/command/commandOptions";
 import {ChannelManager} from "./channelManager";
 
 export type PermissionType = 'GUILD_LACK_OF_PERMISSIONS' | 'MEMBER_LACK_OF_PERMISSIONS' | 'UNSUPPORTED_CHANNEL' | 'PERMISSION_OK';

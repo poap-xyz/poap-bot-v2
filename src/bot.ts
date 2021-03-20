@@ -5,22 +5,27 @@ import {MessageHandler} from "./services/events/messageHandler";
 import {logger} from "./logger";
 import * as pino from "pino";
 import * as path from "path";
+import {CommandLoader} from "./services/loaders/commandLoader";
 
 @injectable()
 export class Bot {
     private readonly client: Client;
     private readonly token: string;
     private readonly messageHandler: MessageHandler;
+    private readonly commandLoader: CommandLoader;
 
     constructor(@inject(TYPES.Client) client: Client,
                 @inject(TYPES.Token) token: string,
-                @inject(TYPES.MessageHandler) messageHandler) {
+                @inject(TYPES.MessageHandler) messageHandler: MessageHandler,
+                @inject(TYPES.CommandLoader) commandLoader: CommandLoader) {
         this.client = client;
         this.token = token;
         this.messageHandler = messageHandler;
+        this.commandLoader = commandLoader;
     }
 
     public async init(){
+        await this.commandLoader.init();
         await this.listen();
     }
 
