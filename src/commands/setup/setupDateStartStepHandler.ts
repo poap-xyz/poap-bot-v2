@@ -10,7 +10,8 @@ export class SetupDateStartStepHandler implements SetupStep{
         return await setupState.dmChannel.send(`Date and time to START 🛫 ? *Hint: Time in UTC this format 👉  yyyy-mm-dd hh:mm`);
     }
 
-    async handler(messageContent:string, setupState: SetupState): Promise<string> {
+    async handler(message: Message, setupState: SetupState):Promise<string> {
+        const messageContent:string = message.content.trim();
         let startDate = SetupDateStartStepHandler.validateStartDate(messageContent);
         if(!startDate){
             await setupState.dmChannel.send(`mmmm ${messageContent} It's a valid date? Try again 🙏`);

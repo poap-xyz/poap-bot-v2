@@ -10,7 +10,8 @@ export class SetupChannelStepHandler implements SetupStep{
         return await setupState.dmChannel.send(`Which channel should I speak in public? (${setupState.channel || ""}) *Hint: only for start and end event`);
     }
 
-    async handler(messageContent:string, setupState: SetupState): Promise<string> {
+    async handler(message: Message, setupState: SetupState):Promise<string> {
+        const messageContent:string = message.content;
         let selectedChannel: Channel;
 
         selectedChannel = ChannelManager.getChannelFromGuild(setupState.guild, messageContent);

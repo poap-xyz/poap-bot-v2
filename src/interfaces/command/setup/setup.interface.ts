@@ -7,7 +7,7 @@ export type SetupStepId = 'NONE' | 'CHANNEL' | 'START' | 'END' | 'START_MSG' |
 export interface SetupStep {
     stepId: SetupStepId;
     sendInitMessage(setupState: SetupState): Promise<Message>;
-    handler(message:string, setupState: SetupState): Promise<string>;
+    handler(message: Message, setupState: SetupState): Promise<string>;
 }
 
 export type SetupState = {

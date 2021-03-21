@@ -11,7 +11,8 @@ export class SetupDateEndStepHandler implements SetupStep {
         return await setupState.dmChannel.send(`Date and time to END 🛬  the event? (${hintDate})`);
     }
 
-    async handler(messageContent:string, setupState: SetupState): Promise<string> {
+    async handler(message: Message, setupState: SetupState):Promise<string> {
+        const messageContent:string = message.content.trim();
         let endDate = SetupDateEndStepHandler.validateEndDate(messageContent, setupState.event.start_date);
         if(!endDate){
             await setupState.dmChannel.send(`mmmm ${messageContent} It's a valid date? Try again 🙏`);
