@@ -1,10 +1,13 @@
 import * as moment from "moment";
-import {BotConfig} from "../../config/bot.config";
-import {SetupState, SetupStep, SetupStepId} from "../../interfaces/command/setup/setup.interface";
+import {BotConfig} from "../../../../config/bot.config";
+import {SetupState, SetupStep, SetupStepId} from "../../../../interfaces/command/setup/setup.interface";
 import {Message} from "discord.js";
+import {SetupAbstractHandler} from "./setupAbstractHandler";
 
-export class SetupDateStartStepHandler implements SetupStep{
-    readonly stepId: SetupStepId = 'START';
+export class SetupDateStartStepHandler extends SetupAbstractHandler{
+    constructor() {
+        super('START');
+    }
 
     async sendInitMessage(setupState: SetupState): Promise<Message>{
         return await setupState.dmChannel.send(`Date and time to START 🛫 ? *Hint: Time in UTC this format 👉  yyyy-mm-dd hh:mm`);

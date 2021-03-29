@@ -1,14 +1,17 @@
 import {Event} from "../../models/event";
 import {inject, injectable} from "inversify";
-import {EventService} from "../../interfaces/services/eventService";
+import {EventService} from "../../interfaces/services/core/eventService";
 import {TYPES} from "../../config/types";
 import {EventDao} from "../../interfaces/persistence/eventDao";
+import {CodeService} from "../../interfaces/services/core/codeService";
 @injectable()
 export class EventServiceImpl implements EventService{
     private eventDao: EventDao;
+    private codeService: CodeService;
 
-    constructor(@inject(TYPES.EventDao) eventDao: EventDao) {
+    constructor(@inject(TYPES.EventDao) eventDao: EventDao, @inject(TYPES.CodeService) codeService: CodeService) {
         this.eventDao = eventDao;
+        this.codeService = codeService;
     }
 
     public async getRealtimeActiveEvents(): Promise<Event[]>{
@@ -35,12 +38,11 @@ export class EventServiceImpl implements EventService{
         return await this.eventDao.getEventFromPass(messageContent);
     }
 
-    public async checkCodeForEventUsername(event_id: Event['id'], username: string){
-        return await this.eventDao.checkCodeForEventUsername(event_id, username);
-    }
-
     public async saveEvent(event: Event, username: string){
-        return await this.eventDao.saveEvent(event, username);
+        const savedEvent: Event = await this.eventDao.saveEvent(event);
+        if(event.codes)
+            savedEvent.codes = await this.codeService.addCodes(event.codes);
+        return savedEvent;
     }
 
     isPassAvailable(messageContent: string): Promise<boolean> {

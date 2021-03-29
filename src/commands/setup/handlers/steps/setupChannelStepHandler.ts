@@ -1,10 +1,13 @@
 import {Channel, Message} from "discord.js";
-import {ChannelManager} from "../../_helpers/utils/channelManager";
-import {BotConfig} from "../../config/bot.config";
-import {SetupState, SetupStep, SetupStepId} from "../../interfaces/command/setup/setup.interface";
+import {ChannelManager} from "../../../../_helpers/utils/channelManager";
+import {BotConfig} from "../../../../config/bot.config";
+import {SetupState, SetupStep, SetupStepId} from "../../../../interfaces/command/setup/setup.interface";
+import {SetupAbstractHandler} from "./setupAbstractHandler";
 
-export class SetupChannelStepHandler implements SetupStep{
-    readonly stepId: SetupStepId = 'CHANNEL';
+export class SetupChannelStepHandler extends SetupAbstractHandler {
+    constructor() {
+        super('CHANNEL');
+    }
 
     async sendInitMessage(setupState: SetupState): Promise<Message>{
         return await setupState.dmChannel.send(`Which channel should I speak in public? (${setupState.channel || ""}) *Hint: only for start and end event`);

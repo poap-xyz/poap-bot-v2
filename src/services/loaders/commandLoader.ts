@@ -66,8 +66,9 @@ export class CommandLoader{
 
     private loadCommand(command: Command): Command{
         if(!(command instanceof Command)){
-            logger.error(`Command is not instance of Command `)
+            logger.error(`Command is not instance of Command, instance: ${command}`)
         }
+
         logger.info(`Loading Command: ${command.name}. 👌`);
         this._commands.set(command.name, command);
         return command;

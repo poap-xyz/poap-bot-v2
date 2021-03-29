@@ -21,7 +21,7 @@ export class MessageHandler {
         /* Obtain guild if not cached */
         await MessageHandler.cacheMemberOnGuild(message);
 
-        const command = this.getCommandByMessage(message);
+        const command = await this.getCommandByMessage(message);
         if(command){
             try {
                 return command.run(message);
@@ -34,9 +34,9 @@ export class MessageHandler {
         return Promise.reject("No command matched by message");
     }
 
-    private getCommandByMessage(message: Message): Command | null{
+    private async getCommandByMessage(message: Message): Promise<Command | null> {
         for (const [name, cmd] of this.commandLoader.commands) {
-            if(cmd.isCommandCalledByMessage(message))
+            if (await cmd.isCommandCalledByMessage(message))
                 return cmd;
         }
         return null;

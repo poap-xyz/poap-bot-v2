@@ -1,7 +1,7 @@
-import {Event} from "../../models/event";
-import {EventInput} from "../../models/input/eventInput";
+import {Event} from "../../../models/event";
+import {EventInput} from "../../../models/input/eventInput";
 
-export interface EventDao{
+export interface EventService{
     /**
      * @method
      * Get events held right now
@@ -38,7 +38,7 @@ export interface EventDao{
      * @method
      * Get event using a specific pass
      * @param {string} messageContent
-     * @returns {Promise<Event> | null} Array of Events using the pass or null if pass does not exists
+     * @returns {Promise<Event> | null} Array of Events usign the pass or null if pass does not exists
      */
     getEventFromPass(messageContent: string): Promise<Event | null>;
     /**
@@ -51,9 +51,10 @@ export interface EventDao{
     /**
      * @method
      * Check if a pass is available to use in a new Event
-     * @param {EventInput} event to save
+     * @param {Event} event to save
+     * @param {string} username who is saving the Event
      * @returns {Promise<Event>} the saved Event
      */
-    saveEvent(event: EventInput): Promise<Event>;
+    saveEvent(event: EventInput, username: string): Promise<Event>;
 
 }

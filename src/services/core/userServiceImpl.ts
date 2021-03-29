@@ -1,4 +1,4 @@
-import {UserService} from "../../interfaces/services/userService";
+import {UserService} from "../../interfaces/services/core/userService";
 import {EventDao} from "../../interfaces/persistence/eventDao";
 import {inject} from "inversify";
 import {TYPES} from "../../config/types";

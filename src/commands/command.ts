@@ -4,21 +4,21 @@ import {CommandContext} from "./commandContext";
 import {PermissionManager} from "../_helpers/utils/permissionManager";
 import {injectable} from "inversify";
 
-@injectable()
+//@injectable()
 export abstract class Command {
     readonly name: string;
     readonly commandOptions: CommandOptions;
 
-    constructor(name: string, commandOptions: CommandOptions) {
+    protected constructor(name: string, commandOptions: CommandOptions) {
         this.name = name;
         this.commandOptions = commandOptions;
     }
 
     protected abstract execute(commandContext: CommandContext): Promise<Message | Message[]>;
 
-    public isCommandCalledByMessage(message: Message): boolean{
+    public isCommandCalledByMessage(message: Message): Promise<boolean>{
         const commandContext = new CommandContext(message, this.name, this.commandOptions);
-        return commandContext.isCommandCalledByMessage();
+        return Promise.resolve(commandContext.isCommandCalledByMessage());
     }
 
     public run(message: Message): Promise<Message | Message[]> {

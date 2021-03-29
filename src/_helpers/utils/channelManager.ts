@@ -1,12 +1,12 @@
-import {Channel, DMChannel, Guild, Message, TextChannel, User} from "discord.js";
-import {DMChannelHandler} from "../../interfaces/command/DMChannelHandler";
+import {Channel, DMChannel, Guild, GuildChannel, Message, TextChannel, User} from "discord.js";
+import {DMChannelCallback} from "../../interfaces/DMChannelCallback";
 import {BotConfig} from "../../config/bot.config";
 
 export type ChannelType = 'DM_COMMAND' | 'GUILD_COMMAND' | 'UNKNOWN';
 
 export class ChannelManager {
 
-    public static getChannelFromGuild(guild: Guild, channelName: string): Channel{
+    public static getChannelFromGuild(guild: Guild, channelName: string): GuildChannel{
         if(!guild || !channelName)
             return undefined;
 
@@ -41,12 +41,12 @@ export class ChannelManager {
         return 'UNKNOWN';
     }
 
-    public static async createDMWithHandler(user: User, dmChannelHandler: DMChannelHandler) {
+    public static async createDMWithHandler(user: User, dmChannelHandler: DMChannelCallback) {
         const dmChannel = await user.createDM();
 
         /* We set the collector to collect all the user messages */
         const collector = dmChannel.createMessageCollector((m: Message) => m.author.id === user.id, {});
-        collector.on('collect', async m => {return await dmChannelHandler.DMChannelHandler(m, user)});
+        collector.on('collect', async m => {return await dmChannelHandler.DMCallback(m, user)});
 
         return dmChannel;
     }

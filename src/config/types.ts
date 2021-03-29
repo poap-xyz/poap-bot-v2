@@ -3,7 +3,6 @@ import {CommandLoader} from "../services/loaders/commandLoader";
 
 export const TYPES = {
     /* DB Types */
-    PgPromise: Symbol("PgPromise"),
     DB: Symbol("DB"),
 
     /* Core Types */
@@ -13,8 +12,11 @@ export const TYPES = {
 
     /* Services Types */
     EventService: Symbol("EventService"),
+    EventScheduleService: Symbol("EventScheduleService"),
+    ScheduleService: Symbol("ScheduleService"),
     CodeService: Symbol("CodeService"),
     UserService: Symbol("UserService"),
+
     MessageHandler: Symbol("MessageHandler"),
     CommandLoader: Symbol("CommandLoader"),
 
@@ -22,6 +24,8 @@ export const TYPES = {
     EventDao: Symbol("EventDao"),
     CodeDao: Symbol("CodeDao"),
     UserDao: Symbol("UserDao"),
+
+    GuildManager: Symbol("GuildManager"),
 };
 /* DB Protocol Type export */
 export type ExtendedProtocol = IDatabase<any>;

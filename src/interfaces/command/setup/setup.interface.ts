@@ -1,12 +1,13 @@
 import {Channel, DMChannel, Guild, Message, User} from "discord.js";
-import {EventBuilder} from "../../../models/builders/eventBuilder";
+import {EventInputBuilder} from "../../../models/builders/eventInputBuilder";
 
 export type SetupStepId = 'NONE' | 'CHANNEL' | 'START' | 'END' | 'START_MSG' |
     'END_MSG' | 'RESPONSE' |'REACTION' | 'PASS' | 'FILE';
 
 export interface SetupStep {
-    stepId: SetupStepId;
+    readonly stepId: SetupStepId;
     sendInitMessage(setupState: SetupState): Promise<Message>;
+    sendErrorMessage(setupState: SetupState): Promise<Message>;
     handler(message: Message, setupState: SetupState): Promise<string>;
 }
 
@@ -16,6 +17,6 @@ export type SetupState = {
     guild: Guild,
     channel: Channel,
     dmChannel: DMChannel,
-    event: EventBuilder,
+    event: EventInputBuilder,
     expire: number,
 }

@@ -1,14 +1,15 @@
-import {BotConfig} from "../../config/bot.config";
-import {SetupState, SetupStep, SetupStepId} from "../../interfaces/command/setup/setup.interface";
+import {BotConfig} from "../../../../config/bot.config";
+import {SetupState, SetupStep, SetupStepId} from "../../../../interfaces/command/setup/setup.interface";
 import {Message} from "discord.js";
-import {EventService} from "../../interfaces/services/eventService";
+import {EventService} from "../../../../interfaces/services/core/eventService";
+import {SetupAbstractHandler} from "./setupAbstractHandler";
 
 
-export class SetupPassStepHandler implements SetupStep{
-    readonly stepId: SetupStepId = 'PASS';
+export class SetupPassStepHandler extends SetupAbstractHandler{
     readonly eventService: EventService;
 
     constructor(eventService: EventService) {
+        super('PASS');
         this.eventService = eventService;
     }
 

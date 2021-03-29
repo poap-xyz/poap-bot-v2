@@ -1,3 +1,5 @@
+import {Code} from "./code";
+
 export interface Event {
     id: number;
     server: string;
@@ -12,4 +14,5 @@ export interface Event {
     is_active: boolean;
     is_whitelisted: boolean | null;
     whitelist_file_url: string | null;
+    codes?: Code[];
 }

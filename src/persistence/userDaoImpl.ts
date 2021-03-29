@@ -7,7 +7,7 @@ import {UserDao} from "../interfaces/persistence/userDao";
 export class UserDaoImpl implements UserDao{
     private db: ExtendedProtocol;
 
-    constructor(@inject(TYPES.PgPromise) db) {
+    constructor(@inject(TYPES.DB) db) {
         this.db = db;
     }
 

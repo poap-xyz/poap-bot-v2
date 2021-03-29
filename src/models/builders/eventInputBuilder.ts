@@ -20,9 +20,8 @@ export class EventInputBuilder {
     constructor() {
     }
 
-    build(): Event{
+    build(): EventInput{
         return {
-            id: this._id,
             channel: this._channel,
             server: this._server,
             pass: this._pass,
@@ -35,13 +34,7 @@ export class EventInputBuilder {
             is_whitelisted: this._isWhitelisted,
             whitelist_file_url: this._whitelistFileUrl,
             codes: this._codes,
-            is_active: this._isActive,
         }
-    }
-
-    setId(value: number) {
-        this._id = value;
-        return this;
     }
 
     setServer(value: string) {
@@ -86,11 +79,6 @@ export class EventInputBuilder {
 
     setFileUrl(value: string) {
         this._fileUrl = value;
-        return this;
-    }
-
-    setIsActive(value: boolean) {
-        this._isActive = value;
         return this;
     }
 

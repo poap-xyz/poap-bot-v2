@@ -2,11 +2,13 @@ import {inject, injectable} from "inversify";
 import {ExtendedProtocol, TYPES} from "../config/types";
 import {Event} from "../models/event";
 import {EventDao} from "../interfaces/persistence/eventDao";
+import {CodeInput} from "../models/input/codeInput";
+import {EventInput} from "../models/input/eventInput";
 
 @injectable()
 export class EventDaoImpl implements EventDao{
     private db: ExtendedProtocol;
-    constructor(@inject(TYPES.PgPromise) db){
+    constructor(@inject(TYPES.DB) db){
         this.db = db;
     }
 
@@ -43,20 +45,14 @@ export class EventDaoImpl implements EventDao{
     }
 
     public async getEventFromPass(messageContent: string): Promise<Event | null> {
-        const events = await this.getRealtimeActiveEvents();
-
-        return events.find((e) =>
-            EventDaoImpl.isMsgTheSame(messageContent, e.pass)
-        );
+        const eventPass = messageContent.trim().toLowerCase();
+        return await this.db.one<Event>("SELECT * FROM events WHERE server = $1::text AND is_active = $2", [eventPass, true]);
     }
 
     public async isPassAvailable(messageContent: string): Promise<boolean>{
-        const events = await this.getAllEvents();
-        const eventSelected = events.find((e) => EventDaoImpl.isMsgTheSame(messageContent, e.pass));
-
-        console.log(`[DB] exist event: ${eventSelected && eventSelected.id} for pass: ${messageContent}`);
-
-        return !!eventSelected;
+        const eventPass = messageContent.trim().toLowerCase();
+        const events = await this.db.any<Event>("SELECT * FROM events WHERE server = $1::text", [eventPass]);
+        return events.length === 0;
     }
 
     static isMsgTheSame(message: string, eventPass: Event['pass']) {
@@ -64,49 +60,14 @@ export class EventDaoImpl implements EventDao{
         return eventPass.toLowerCase().includes(messagePass.toLowerCase());
     }
 
-    public async checkCodeForEventUsername(event_id: Event['id'], username: string) {
-        const now = new Date();
-        return await this.db.task(async (t) => {
-                // TODO check whitelisted for event_id
-                await t.none(
-                    "SELECT * FROM codes WHERE event_id = $1 AND username = $2::text",
-                    [event_id, username]
-                );
-                const code = await t.one(
-                    "UPDATE codes SET username = $1, claimed_date = $3::timestamp WHERE code in (SELECT code FROM codes WHERE event_id = $2 AND username IS NULL ORDER BY RANDOM() LIMIT 1) RETURNING code",
-                    [username, event_id, now]
-                );
-                console.log(`[DB] checking event: ${event_id}, user: ${username} `);
-                return code;
-            })
-            .then((data) => {
-                // console.log(data);
-                return data;
-            })
-            .catch((error) => {
-                console.log(`[ERROR] ${error.message} -> ${error.received}`);
-                return false;
-            });
-    }
-
-    public async saveEvent(event: Event, username: string): Promise<Event>{
-        const now = new Date();
-
-        return await this.db.none(
-            "INSERT INTO events (id, server, channel, start_date, end_date, response_message, pass, file_url, created_by, created_date, is_whitelisted ) VALUES ( $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11);",
-            [
-                event.id,
-                event.server,
-                event.channel,
-                event.start_date,
-                event.end_date,
-                event.response_message,
-                event.pass,
-                event.file_url,
-                username,
-                now,
-                false,
-            ]
+    public async saveEvent(event: EventInput): Promise<Event>{
+        return await this.db.one<Event>(
+            "INSERT INTO events " +
+            "(server, channel, start_date, end_date, response_message, pass, file_url, created_by, created_date, is_whitelisted) " +
+            "VALUES ( $1, $2, $3, $4, $5, $6, $7, $8, $9, $10) " +
+            "RETURNING id, server, channel, start_date, end_date, response_message, pass, file_url, created_by, created_date, is_whitelisted;",
+            [event.server, event.channel, event.start_date, event.end_date, event.response_message, event.pass,
+                    event.file_url, event.created_by, event.created_date, false,]
         );
     }
 }

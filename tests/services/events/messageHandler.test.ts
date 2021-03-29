@@ -73,7 +73,7 @@ describe('MessageResponder', () => {
 
     function whenIsCommandByMessage(result: boolean) {
         when(mockedCommandLoaderClass.commands).thenReturn(new Map([[mockedCommandInstance.name, mockedCommandInstance]]));
-        when(mockedCommandClass.isCommandCalledByMessage(mockedMessageInstance)).thenReturn(result);
+        when(mockedCommandClass.isCommandCalledByMessage(mockedMessageInstance)).thenReturn(Promise.resolve(result));
     }
 
     function whenCommandEmpty(){

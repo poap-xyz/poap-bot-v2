@@ -1,10 +1,13 @@
 import * as moment from "moment";
-import {BotConfig} from "../../config/bot.config";
-import {SetupState, SetupStep, SetupStepId} from "../../interfaces/command/setup/setup.interface";
+import {BotConfig} from "../../../../config/bot.config";
+import {SetupState, SetupStep, SetupStepId} from "../../../../interfaces/command/setup/setup.interface";
 import {Message} from "discord.js";
+import {SetupAbstractHandler} from "./setupAbstractHandler";
 
-export class SetupDateEndStepHandler implements SetupStep {
-    readonly stepId: SetupStepId = 'END';
+export class SetupDateEndStepHandler extends SetupAbstractHandler{
+    constructor() {
+        super('END');
+    }
 
     async sendInitMessage(setupState: SetupState): Promise<Message>{
         const hintDate = moment(setupState.event.start_date).add(1, "h").format("YYYY-MM-DD HH:mm");

@@ -1,10 +1,13 @@
-import {BotConfig} from "../../config/bot.config";
-import {SetupState, SetupStep, SetupStepId} from "../../interfaces/command/setup/setup.interface";
+import {BotConfig} from "../../../../config/bot.config";
+import {SetupState, SetupStep, SetupStepId} from "../../../../interfaces/command/setup/setup.interface";
 import {Message} from "discord.js";
+import {SetupAbstractHandler} from "./setupAbstractHandler";
 
 
-export class SetupResponseStepHandler implements SetupStep{
-    readonly stepId: SetupStepId = 'FILE';
+export class SetupResponseStepHandler extends SetupAbstractHandler{
+    constructor() {
+        super('RESPONSE');
+    }
 
     async sendInitMessage(setupState: SetupState): Promise<Message> {
         return await setupState.dmChannel.send(`Response to send privately to members during the event? (${BotConfig.defaultResponseMessage})`);
