@@ -1,7 +1,8 @@
-import {ScheduleCallback} from "../../schedeuleCallback";
+import {ScheduleCallback} from "../../callback/schedeuleCallback";
 import {Event} from "../../../models/event";
 
 export type EventSchedule = {
+    event: Event,
     start: ScheduleCallback,
     end: ScheduleCallback,
 }

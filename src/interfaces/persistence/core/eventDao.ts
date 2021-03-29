@@ -1,5 +1,5 @@
-import {Event} from "../../models/event";
-import {EventInput} from "../../models/input/eventInput";
+import {Event} from "../../../models/event";
+import {EventInput} from "../../../models/input/eventInput";
 
 export interface EventDao{
     /**

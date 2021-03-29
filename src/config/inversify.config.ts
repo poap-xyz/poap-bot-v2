@@ -3,26 +3,27 @@ import {Container} from "inversify";
 import {TYPES} from "./types";
 import {Bot} from "../bot";
 import {Client} from "discord.js";
-import {MessageHandler} from "../services/events/messageHandler";
+import {MessageHandler} from "../discord/events/messageHandler";
 import {loggerConfig} from "./logger.config";
 import {DBConfig} from "./db.config";
-import {CommandLoader} from "../services/loaders/commandLoader";
+import {CommandLoader} from "../discord/loaders/commandLoader";
 import * as pgPromise from 'pg-promise';
 import {EventServiceImpl} from "../services/core/eventServiceImpl";
 import {EventService} from "../interfaces/services/core/eventService";
-import {EventDaoImpl} from "../persistence/eventDaoImpl";
-import {EventDao} from "../interfaces/persistence/eventDao";
-import {CodeDaoImpl} from "../persistence/codeDaoImpl";
-import {UserDaoImpl} from "../persistence/userDaoImpl";
-import {CodeDao} from "../interfaces/persistence/codeDao";
-import {UserDao} from "../interfaces/persistence/userDao";
+import {EventDaoImpl} from "../persistence/core/eventDaoImpl";
+import {EventDao} from "../interfaces/persistence/core/eventDao";
+import {CodeDaoImpl} from "../persistence/core/codeDaoImpl";
+import {UserDaoImpl} from "../persistence/core/userDaoImpl";
+import {CodeDao} from "../interfaces/persistence/core/codeDao";
+import {UserDao} from "../interfaces/persistence/core/userDao";
 import {CodeService} from "../interfaces/services/core/codeService";
 import {UserService} from "../interfaces/services/core/userService";
 import {CodeServiceImpl} from "../services/core/codeServiceImpl";
 import {UserServiceImpl} from "../services/core/userServiceImpl";
 import {ScheduleServiceImpl} from "../services/core/scheduleServiceImpl";
-import {ScheduleService} from "../interfaces/services/core/scheduleService";
-import {GuildManager} from "../_helpers/utils/guildManager";
+import {ScheduleService} from "../interfaces/services/schedule/scheduleService";
+import {GuildService} from "../interfaces/services/discord/guildService";
+import {GuildServiceImpl} from "../services/discord/guildServiceImpl";
 
 let container = new Container();
 
@@ -44,10 +45,8 @@ container.bind<EventService>(TYPES.EventService).to(EventServiceImpl).inSingleto
 container.bind<CodeService>(TYPES.CodeService).to(CodeServiceImpl).inSingletonScope();
 container.bind<UserService>(TYPES.UserService).to(UserServiceImpl).inSingletonScope();
 container.bind<ScheduleService>(TYPES.ScheduleService).to(ScheduleServiceImpl).inSingletonScope();
+container.bind<GuildService>(TYPES.GuildService).to(GuildServiceImpl).inSingletonScope();
 
 container.bind<MessageHandler>(TYPES.MessageHandler).to(MessageHandler).inSingletonScope();
 container.bind<CommandLoader>(TYPES.CommandLoader).to(CommandLoader).inSingletonScope();
-
-/* Utils binds */
-container.bind<GuildManager>(TYPES.GuildManager).to(GuildManager).inSingletonScope();
 export default container;

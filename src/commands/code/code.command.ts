@@ -10,7 +10,7 @@ import {logger} from "../../logger";
 import {CodeService} from "../../interfaces/services/core/codeService";
 
 export default class Code extends Command{
-    @lazyInject(TYPES.CodeService) eventService: EventService;
+    @lazyInject(TYPES.EventService) eventService: EventService;
     @lazyInject(TYPES.CodeService) codeService: CodeService;
 
     constructor() {
@@ -23,6 +23,7 @@ export default class Code extends Command{
 
     public async isCommandCalledByMessage(message: Message): Promise<boolean>{
         /* This method call is expensive so it must be last in the execution priority */
+        console.log(this.eventService);
         const event = await this.eventService.getEventFromPass(message.content);
         return !!event;
     }

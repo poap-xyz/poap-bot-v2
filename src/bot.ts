@@ -1,11 +1,11 @@
 import {Client, Message} from "discord.js";
 import {inject, injectable} from "inversify";
 import {TYPES} from "./config/types";
-import {MessageHandler} from "./services/events/messageHandler";
+import {MessageHandler} from "./discord/events/messageHandler";
 import {logger} from "./logger";
 import * as pino from "pino";
 import * as path from "path";
-import {CommandLoader} from "./services/loaders/commandLoader";
+import {CommandLoader} from "./discord/loaders/commandLoader";
 
 @injectable()
 export class Bot {

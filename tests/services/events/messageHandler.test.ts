@@ -1,12 +1,12 @@
 import "reflect-metadata";
 import 'mocha';
 import {expect} from 'chai';
-import {MessageHandler} from "../../../src/services/events/messageHandler";
+import {MessageHandler} from "../../../src/discord/events/messageHandler";
 import {instance, mock, reset, verify, when} from "ts-mockito";
 import {Message, User} from "discord.js";
 import {Bot} from "../../../src/bot";
 import {Command} from "../../../src/commands/command";
-import {CommandLoader} from "../../../src/services/loaders/commandLoader";
+import {CommandLoader} from "../../../src/discord/loaders/commandLoader";
 
 describe('MessageResponder', () => {
     let mockedCommandLoaderClass: CommandLoader;

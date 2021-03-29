@@ -1,7 +1,7 @@
 import {CodeService} from "../../interfaces/services/core/codeService";
 import {inject, injectable} from "inversify";
 import {TYPES} from "../../config/types";
-import {CodeDao} from "../../interfaces/persistence/codeDao";
+import {CodeDao} from "../../interfaces/persistence/core/codeDao";
 import {Code} from "../../models/code";
 import {CodeInput} from "../../models/input/codeInput";
 import {Event} from "../../models/event";

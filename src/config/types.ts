@@ -1,5 +1,5 @@
 import {IDatabase} from "pg-promise";
-import {CommandLoader} from "../services/loaders/commandLoader";
+import {CommandLoader} from "../discord/loaders/commandLoader";
 
 export const TYPES = {
     /* DB Types */
@@ -16,6 +16,7 @@ export const TYPES = {
     ScheduleService: Symbol("ScheduleService"),
     CodeService: Symbol("CodeService"),
     UserService: Symbol("UserService"),
+    GuildService: Symbol("GuildService"),
 
     MessageHandler: Symbol("MessageHandler"),
     CommandLoader: Symbol("CommandLoader"),
@@ -25,7 +26,7 @@ export const TYPES = {
     CodeDao: Symbol("CodeDao"),
     UserDao: Symbol("UserDao"),
 
-    GuildManager: Symbol("GuildManager"),
+
 };
 /* DB Protocol Type export */
 export type ExtendedProtocol = IDatabase<any>;

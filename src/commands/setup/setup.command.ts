@@ -13,7 +13,7 @@ import {SetupState} from "../../interfaces/command/setup/setup.interface";
 import {Event} from "../../models/event";
 import {SetupDMChannelHandler} from "./handlers/setupDMChannelHandler";
 import {EventInput} from "../../models/input/eventInput";
-import {EventScheduleService} from "../../interfaces/services/core/eventScheduleService";
+import {EventScheduleService} from "../../interfaces/services/schedule/eventScheduleService";
 
 const { lazyInject } = getDecorators(container);
 

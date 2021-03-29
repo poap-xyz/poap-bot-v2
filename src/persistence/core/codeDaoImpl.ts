@@ -1,9 +1,9 @@
 import {inject, injectable} from "inversify";
-import {ExtendedProtocol, TYPES} from "../config/types";
-import {Code} from "../models/code";
-import {CodeDao} from "../interfaces/persistence/codeDao";
-import {CodeInput} from "../models/input/codeInput";
-import {Event} from "../models/event";
+import {ExtendedProtocol, TYPES} from "../../config/types";
+import {Code} from "../../models/code";
+import {CodeDao} from "../../interfaces/persistence/core/codeDao";
+import {CodeInput} from "../../models/input/codeInput";
+import {Event} from "../../models/event";
 
 @injectable()
 export class CodeDaoImpl implements CodeDao{

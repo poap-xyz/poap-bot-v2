@@ -1,4 +1,4 @@
-import {ScheduleCallback} from "../../schedeuleCallback";
+import {ScheduleCallback} from "../../callback/schedeuleCallback";
 
 export interface ScheduleService{
     scheduleCallback(callback: (...args) => void, timeOutSecs: number | Date): ScheduleCallback;

@@ -1,5 +1,5 @@
 import {Channel, DMChannel, Guild, GuildChannel, Message, TextChannel, User} from "discord.js";
-import {DMChannelCallback} from "../../interfaces/DMChannelCallback";
+import {DMChannelCallback} from "../../interfaces/callback/DMChannelCallback";
 import {BotConfig} from "../../config/bot.config";
 
 export type ChannelType = 'DM_COMMAND' | 'GUILD_COMMAND' | 'UNKNOWN';

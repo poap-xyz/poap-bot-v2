@@ -1,5 +1,5 @@
-import {ScheduleService} from "../../interfaces/services/core/scheduleService";
-import {ScheduleCallback} from "../../interfaces/schedeuleCallback";
+import {ScheduleService} from "../../interfaces/services/schedule/scheduleService";
+import {ScheduleCallback} from "../../interfaces/callback/schedeuleCallback";
 import {isNumber} from "util";
 
 export class ScheduleServiceImpl implements ScheduleService{

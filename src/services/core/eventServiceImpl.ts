@@ -2,7 +2,7 @@ import {Event} from "../../models/event";
 import {inject, injectable} from "inversify";
 import {EventService} from "../../interfaces/services/core/eventService";
 import {TYPES} from "../../config/types";
-import {EventDao} from "../../interfaces/persistence/eventDao";
+import {EventDao} from "../../interfaces/persistence/core/eventDao";
 import {CodeService} from "../../interfaces/services/core/codeService";
 @injectable()
 export class EventServiceImpl implements EventService{

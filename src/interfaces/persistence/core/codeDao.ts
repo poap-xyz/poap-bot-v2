@@ -1,6 +1,6 @@
-import {Code} from "../../models/code";
-import {CodeInput} from "../../models/input/codeInput";
-import {Event} from "../../models/event";
+import {Code} from "../../../models/code";
+import {CodeInput} from "../../../models/input/codeInput";
+import {Event} from "../../../models/event";
 
 export interface CodeDao{
     addCode(code: CodeInput): Promise<Code>;

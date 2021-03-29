@@ -4,7 +4,7 @@ import {logger} from "../../../logger";
 import {Event} from "../../../models/event";
 import Setup from "../setup.command";
 import {EventService} from "../../../interfaces/services/core/eventService";
-import {DMChannelCallback} from "../../../interfaces/DMChannelCallback";
+import {DMChannelCallback} from "../../../interfaces/callback/DMChannelCallback";
 import {SetupChannelStepHandler} from "./steps/setupChannelStepHandler";
 import {SetupDateStartStepHandler} from "./steps/setupDateStartStepHandler";
 import {SetupDateEndStepHandler} from "./steps/setupDateEndStepHandler";
