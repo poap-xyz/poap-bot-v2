@@ -17,7 +17,7 @@ import {EventScheduleService} from "../../interfaces/services/schedule/eventSche
 
 const { lazyInject } = getDecorators(container);
 
-export default class Setup extends Command{
+export default class SetupCommand extends Command{
     private setupUsers: Map<Snowflake, SetupState>;
     private readonly setupDMChannelHandler: SetupDMChannelHandler;
 
@@ -51,13 +51,17 @@ export default class Setup extends Command{
 
     //TODO expiry clear user from map
     private async initializeSetup(user: User, guild: Guild, message: Message) {
+        const defaultEventInput: EventInputBuilder = new EventInputBuilder()
+                                                        .setCreatedDate(new Date())
+                                                        .setCreatedBy(user.id)
+                                                        .setServer(guild.id);
         const defaultSetup: SetupState = {
             step: 0,
             user: user,
             guild: guild,
             channel: message.channel,
             dmChannel: undefined,
-            event: new EventInputBuilder(),
+            event: defaultEventInput,
             expire: 0
         };
 
@@ -101,7 +105,7 @@ export default class Setup extends Command{
     }
 
     public async saveEvent(setupState: SetupState): Promise<Message>{
-        logger.error(`Saving event: ${setupState.event} for user ${setupState.user} and guild ${setupState.guild}`);
+        logger.info(`Saving event: ${setupState.event} for user ${setupState.user} and guild ${setupState.guild}`);
         const event: EventInput = setupState.event.build();
         try {
             const savedEvent = await this.eventService.saveEvent(event, setupState.user.username);

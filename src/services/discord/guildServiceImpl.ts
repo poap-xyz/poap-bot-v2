@@ -1,8 +1,9 @@
 import {GuildService} from "../../interfaces/services/discord/guildService";
 import {Client, Guild} from "discord.js";
-import {inject} from "inversify";
+import {inject, injectable} from "inversify";
 import {TYPES} from "../../config/types";
 
+@injectable()
 export class GuildServiceImpl implements GuildService{
     private readonly client: Client;
 

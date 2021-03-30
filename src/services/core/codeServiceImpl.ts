@@ -19,7 +19,7 @@ export class CodeServiceImpl implements CodeService{
     public async addCodes(codes: CodeInput[]): Promise<Code[]> {
         const savedCodes: Code[] = [];
         if(!Array.isArray(codes))
-            return Promise.reject("Argument codes is not an Array of CodeInput");
+            throw new Error("Argument codes is not an Array of CodeInput");
 
         for(let i = 0; i < savedCodes.length; i++){
             savedCodes.push(await this.addCode(codes[i]));
@@ -28,12 +28,12 @@ export class CodeServiceImpl implements CodeService{
         return savedCodes;
     }
 
-    public async countClaimedCodes(event_id: Code["event_id"]): Promise<number> {
-        return this.codeDao.countClaimedCodes(event_id);
-    }
-
     public async checkCodeForEventUsername(event_id: Event['id'], username: string){
         return await this.codeDao.checkCodeForEventUsername(event_id, username);
+    }
+
+    public async countClaimedCodes(event_id: Code["event_id"]): Promise<number> {
+        return this.codeDao.countClaimedCodes(event_id);
     }
 
     public async countTotalCodes(event_id: Code["event_id"]): Promise<number> {

@@ -46,7 +46,7 @@ export class EventDaoImpl implements EventDao{
 
     public async getEventFromPass(messageContent: string): Promise<Event | null> {
         const eventPass = messageContent.trim().toLowerCase();
-        return await this.db.one<Event>("SELECT * FROM events WHERE server = $1::text AND is_active = $2", [eventPass, true]);
+        return await this.db.oneOrNone<Event>("SELECT * FROM events WHERE pass = $1::text AND is_active = $2", [eventPass, true]);
     }
 
     public async isPassAvailable(messageContent: string): Promise<boolean>{

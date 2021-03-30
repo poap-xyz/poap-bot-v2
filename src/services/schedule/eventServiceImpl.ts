@@ -4,6 +4,7 @@ import {EventService} from "../../interfaces/services/core/eventService";
 import {TYPES} from "../../config/types";
 import {EventDao} from "../../interfaces/persistence/core/eventDao";
 import {CodeService} from "../../interfaces/services/core/codeService";
+
 @injectable()
 export class EventServiceImpl implements EventService{
     private eventDao: EventDao;

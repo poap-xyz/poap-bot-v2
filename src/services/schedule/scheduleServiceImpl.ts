@@ -1,7 +1,8 @@
 import {ScheduleService} from "../../interfaces/services/schedule/scheduleService";
 import {ScheduleCallback} from "../../interfaces/callback/schedeuleCallback";
-import {isNumber} from "util";
+import {injectable} from "inversify";
 
+@injectable()
 export class ScheduleServiceImpl implements ScheduleService{
     constructor() {
     }

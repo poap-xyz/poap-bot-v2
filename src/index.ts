@@ -7,5 +7,6 @@ let bot: Bot = container.get<Bot>(TYPES.Bot);
 bot.init().then(() => {
     console.log('Logged in!')
 }).catch((error) => {
-    console.log('Oh no! ', error)
+    console.log('Oh no! ', error);
+    process.exit(1);
 });

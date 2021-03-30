@@ -13,7 +13,7 @@ export class UserDaoImpl implements UserDao{
 
     public async getBannedUsersById(user_id: User['id']): Promise<boolean>{
         const res = await this.db.one(
-            "SELECT COUNT(*) FROM banned WHERE user_id LIKE $1::text",
+            "SELECT COUNT(*) FROM users WHERE user_id LIKE $1::text",
             [user_id], (a: { count: string }) => +a.count);
 
         return res != 0;

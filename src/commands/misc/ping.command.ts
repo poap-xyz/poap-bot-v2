@@ -1,6 +1,5 @@
 import {Command} from "../command";
 import {CommandContext} from "../commandContext";
-import {injectable} from "inversify";
 
 export default class PingCommand extends Command{
     constructor() {

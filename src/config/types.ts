@@ -17,15 +17,17 @@ export const TYPES = {
     CodeService: Symbol("CodeService"),
     UserService: Symbol("UserService"),
     GuildService: Symbol("GuildService"),
+    MaintenanceDBService: Symbol("MaintenanceDBService"),
 
     MessageHandler: Symbol("MessageHandler"),
+    InitLoader: Symbol("InitHandler"),
     CommandLoader: Symbol("CommandLoader"),
 
     /* Persistence Types */
     EventDao: Symbol("EventDao"),
     CodeDao: Symbol("CodeDao"),
     UserDao: Symbol("UserDao"),
-
+    MaintenanceDB: Symbol("MaintenanceDB")
 
 };
 /* DB Protocol Type export */
