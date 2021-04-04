@@ -4,6 +4,9 @@ import {EventService} from "../../interfaces/services/core/eventService";
 import {TYPES} from "../../config/types";
 import {EventDao} from "../../interfaces/persistence/core/eventDao";
 import {CodeService} from "../../interfaces/services/core/codeService";
+import {logger} from "../../logger";
+import {CodeInput} from "../../models/input/codeInput";
+import {EventInput} from "../../models/input/eventInput";
 
 @injectable()
 export class EventServiceImpl implements EventService{
@@ -39,11 +42,22 @@ export class EventServiceImpl implements EventService{
         return await this.eventDao.getEventFromPass(messageContent);
     }
 
-    public async saveEvent(event: Event, username: string){
+    public async saveEvent(event: EventInput, username: string){
         const savedEvent: Event = await this.eventDao.saveEvent(event);
-        if(event.codes)
-            savedEvent.codes = await this.codeService.addCodes(event.codes);
+        if(event.codes){
+            const codes = EventServiceImpl.createCodeInputByEvent(savedEvent, event.codes);
+            savedEvent.codes = await this.codeService.addCodes(codes);
+        }
+
         return savedEvent;
+    }
+
+    private static createCodeInputByEvent(savedEvent: Event, codeInputs: CodeInput[]): CodeInput[]{
+        const codeInputsFinal: CodeInput[] = [];
+        for(let i = 0; i < codeInputs.length; i++){
+            codeInputsFinal.push({...codeInputs[i], event_id: savedEvent.id})
+        }
+        return codeInputsFinal;
     }
 
     isPassAvailable(messageContent: string): Promise<boolean> {

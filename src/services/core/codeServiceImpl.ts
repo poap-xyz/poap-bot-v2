@@ -5,6 +5,7 @@ import {CodeDao} from "../../interfaces/persistence/core/codeDao";
 import {Code} from "../../models/code";
 import {CodeInput} from "../../models/input/codeInput";
 import {Event} from "../../models/event";
+import {logger} from "../../logger";
 @injectable()
 export class CodeServiceImpl implements CodeService{
     private codeDao: CodeDao;
@@ -14,14 +15,15 @@ export class CodeServiceImpl implements CodeService{
     }
 
     public async addCode(code: CodeInput): Promise<Code>{
-        return this.codeDao.addCode(code);
+        return await this.codeDao.addCode(code);
     }
+
     public async addCodes(codes: CodeInput[]): Promise<Code[]> {
         const savedCodes: Code[] = [];
         if(!Array.isArray(codes))
             throw new Error("Argument codes is not an Array of CodeInput");
 
-        for(let i = 0; i < savedCodes.length; i++){
+        for(let i = 0; i < codes.length; i++){
             savedCodes.push(await this.addCode(codes[i]));
         }
 

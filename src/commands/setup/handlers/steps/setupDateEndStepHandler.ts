@@ -11,7 +11,7 @@ export class SetupDateEndStepHandler extends SetupAbstractHandler{
 
     async sendInitMessage(setupState: SetupState): Promise<Message>{
         const hintDate = moment(setupState.event.start_date).add(1, "h").format("YYYY-MM-DD HH:mm");
-        return await setupState.dmChannel.send(`Date and time to END 🛬  the event? (${hintDate})`);
+        return await setupState.dmChannel.send(`Date and time to END 🛬  the event? *Hint: Time in UTC this format 👉  yyyy-mm-dd hh:mm (${hintDate})`);
     }
 
     async handler(message: Message, setupState: SetupState):Promise<string> {

@@ -1,12 +1,13 @@
 import {Command} from "../command";
 import {CommandContext} from "../commandContext";
+import {Permissions} from "discord.js";
 
 export default class InstructionsCommand extends Command{
     constructor() {
         super("instructions",
             {aliases: ["instruction", "help"],
                 commandType: {DMCommand: true, GuildCommand: true},
-                botPermissions: [],
+                botPermissions: [Permissions.FLAGS.SEND_MESSAGES],
                 memberPermissions: []})
     }
 

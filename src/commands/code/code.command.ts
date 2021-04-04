@@ -8,10 +8,12 @@ import container from "../../config/inversify.config";
 const { lazyInject } = getDecorators(container);
 import {logger} from "../../logger";
 import {CodeService} from "../../interfaces/services/core/codeService";
+import {ChannelService} from "../../interfaces/services/discord/channelService";
 
 export default class CodeCommand extends Command{
-    @lazyInject(TYPES.EventService) eventService: EventService;
-    @lazyInject(TYPES.CodeService) codeService: CodeService;
+    @lazyInject(TYPES.EventService) readonly eventService: EventService;
+    @lazyInject(TYPES.CodeService) readonly codeService: CodeService;
+    @lazyInject(TYPES.ChannelService) readonly channelService: ChannelService;
 
     constructor() {
         super("code",
@@ -36,6 +38,6 @@ export default class CodeCommand extends Command{
         }
 
         await commandContext.message.react("🤔");
-        return await commandContext.message.reply("You have already claim a POAP for this event!");
+        return await commandContext.message.reply("Sorry there are no more POAPs available for this event!");
     }
 }

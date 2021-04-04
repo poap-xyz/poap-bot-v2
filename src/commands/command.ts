@@ -1,10 +1,7 @@
 import {DMChannel, GuildMember, Message, PermissionResolvable} from "discord.js";
 import {CommandOptions} from "../interfaces/command/commandOptions";
 import {CommandContext} from "./commandContext";
-import {PermissionManager} from "../_helpers/utils/permissionManager";
-import {injectable} from "inversify";
-
-//@injectable()
+import {PermissionStatus} from "../_helpers/utils/permissionManager";
 export abstract class Command {
     readonly name: string;
     readonly commandOptions: CommandOptions;
@@ -28,11 +25,18 @@ export abstract class Command {
             return this.execute(commandContext);
         }
 
-        return this.showError(message, commandContext.getCommandPermissions());
+        return Command.showError(message, commandContext.getCommandPermissions());
     };
 
-    private showError(message:Message, commandPermissions: PermissionManager): Promise<Message | Message[]>{
-        //todo
+    private static showError(message:Message, commandPermissions: PermissionStatus): Promise<Message | Message[]>{
+        switch(commandPermissions.permissionType){
+            case "GUILD_LACK_OF_PERMISSIONS":
+                return message.reply(`Bot have no permissions to execute this command`);
+            case "MEMBER_LACK_OF_PERMISSIONS":
+                return message.reply(`You have no permissions to execute this command`);
+            case "UNSUPPORTED_CHANNEL":
+                return message.reply(`This command can not be executed in this channel`);
+        }
         return message.reply(`Error in command permissions`);
     }
 

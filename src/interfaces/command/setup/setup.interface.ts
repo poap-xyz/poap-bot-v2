@@ -18,5 +18,4 @@ export type SetupState = {
     channel: Channel,
     dmChannel: DMChannel,
     event: EventInputBuilder,
-    expire: number,
 }

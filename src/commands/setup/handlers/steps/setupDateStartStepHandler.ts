@@ -3,6 +3,7 @@ import {BotConfig} from "../../../../config/bot.config";
 import {SetupState, SetupStep, SetupStepId} from "../../../../interfaces/command/setup/setup.interface";
 import {Message} from "discord.js";
 import {SetupAbstractHandler} from "./setupAbstractHandler";
+import {logger} from "../../../../logger";
 
 export class SetupDateStartStepHandler extends SetupAbstractHandler{
     constructor() {
@@ -10,7 +11,8 @@ export class SetupDateStartStepHandler extends SetupAbstractHandler{
     }
 
     async sendInitMessage(setupState: SetupState): Promise<Message>{
-        return await setupState.dmChannel.send(`Date and time to START 🛫 ? *Hint: Time in UTC this format 👉  yyyy-mm-dd hh:mm`);
+        const hintDate = moment(new Date()).add(1, "h").format("YYYY-MM-DD HH:mm");
+        return await setupState.dmChannel.send(`Date and time to START 🛫 ? *Hint: Time in UTC this format 👉  yyyy-mm-dd hh:mm (${hintDate})`);
     }
 
     async handler(message: Message, setupState: SetupState):Promise<string> {
@@ -27,12 +29,16 @@ export class SetupDateStartStepHandler extends SetupAbstractHandler{
 
     private static validateStartDate(messageContent: string): Date{
         const defaultDate = new Date();
+        defaultDate.setHours(defaultDate.getHours() + 1);
 
         if (messageContent === BotConfig.defaultOptionMessage)
             return defaultDate;
-
-        if(moment(messageContent).isValid()){
-            return new Date(messageContent);
+        try {
+            if (moment(messageContent).isValid()) {
+                return new Date(messageContent);
+            }
+        }catch (e){
+            logger.error(`[StartDateSetupStep] Invalid date in message: ${messageContent}, error: ${e} `);
         }
 
         return undefined;

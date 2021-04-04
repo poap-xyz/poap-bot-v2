@@ -7,10 +7,14 @@ import {Message, User} from "discord.js";
 import {Bot} from "../../../src/bot";
 import {Command} from "../../../src/commands/command";
 import {CommandLoader} from "../../../src/discord/loaders/commandLoader";
+import {ChannelService} from "../../../src/interfaces/services/discord/channelService";
+import {ChannelServiceImpl} from "../../../src/services/discord/channelServiceImpl";
 
 describe('MessageResponder', () => {
     let mockedCommandLoaderClass: CommandLoader;
     let mockedCommandLoaderInstance: CommandLoader;
+    let mockedChannelServiceClass: ChannelService;
+    let mockedChannelServiceInstance: ChannelService;
     let mockedCommandClass: Command;
     let mockedCommandInstance: Command;
     let mockedAuthorClass: User;
@@ -23,6 +27,8 @@ describe('MessageResponder', () => {
     beforeEach(() => {
         mockedCommandLoaderClass = mock(CommandLoader);
         mockedCommandLoaderInstance = instance(mockedCommandLoaderClass);
+        mockedChannelServiceClass = mock(ChannelServiceImpl);
+        mockedChannelServiceInstance = instance(mockedChannelServiceClass);
         mockedCommandClass = mock(Command);
         mockedCommandInstance = instance(mockedCommandClass);
         mockedAuthorClass = mock(User);
@@ -32,7 +38,7 @@ describe('MessageResponder', () => {
 
         setMessageContents();
 
-        service = new MessageHandler(mockedCommandLoaderInstance);
+        service = new MessageHandler(mockedCommandLoaderInstance, mockedChannelServiceInstance);
     });
 
     it('should run', async () => {

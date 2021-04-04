@@ -17,6 +17,7 @@ export const TYPES = {
     CodeService: Symbol("CodeService"),
     UserService: Symbol("UserService"),
     GuildService: Symbol("GuildService"),
+    ChannelService: Symbol("ChannelService"),
     MaintenanceDBService: Symbol("MaintenanceDBService"),
 
     MessageHandler: Symbol("MessageHandler"),

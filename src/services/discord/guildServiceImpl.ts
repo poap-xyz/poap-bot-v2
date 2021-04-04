@@ -11,6 +11,14 @@ export class GuildServiceImpl implements GuildService{
         this.client = client;
     }
 
+    public getGuildById(guildId: string) {
+        if(!guildId)
+            return undefined;
+
+        //TODO research this
+        return this.client.guilds.cache.find((guild) => guild.id === guildId);
+    }
+
     public getGuildByName(guildName: string) {
         if(!guildName)
             return undefined;

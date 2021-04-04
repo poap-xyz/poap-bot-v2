@@ -2,13 +2,17 @@ import {Event} from "../../models/event";
 import {inject, injectable} from "inversify";
 import {EventService} from "../../interfaces/services/core/eventService";
 import {TYPES} from "../../config/types";
-import {EventSchedule, EventScheduleService} from "../../interfaces/services/schedule/eventScheduleService";
+import {
+    EventSchedule,
+    EventScheduleService,
+    TimeToEvent
+} from "../../interfaces/services/schedule/eventScheduleService";
 import {ScheduleCallback} from "../../interfaces/callback/schedeuleCallback";
 import {ScheduleService} from "../../interfaces/services/schedule/scheduleService";
 import {logger} from "../../logger";
-import {ChannelManager} from "../../_helpers/utils/channelManager";
 import {Guild, GuildChannel, TextChannel} from "discord.js";
 import {GuildService} from "../../interfaces/services/discord/guildService";
+import {ChannelService} from "../../interfaces/services/discord/channelService";
 
 @injectable()
 export class EventScheduleServiceImpl implements EventScheduleService{
@@ -16,13 +20,15 @@ export class EventScheduleServiceImpl implements EventScheduleService{
     private scheduleService: ScheduleService;
     private scheduledEvents: Map<number, EventSchedule>;
     private guildService: GuildService;
+    private channelService: ChannelService;
 
     constructor(@inject(TYPES.EventService) eventService: EventService, @inject(TYPES.ScheduleService) scheduleService: ScheduleService,
-                @inject(TYPES.GuildService) guildManager: GuildService) {
+                @inject(TYPES.GuildService) guildService: GuildService, @inject(TYPES.ChannelService) channelService: ChannelService) {
         this.eventService = eventService;
+        this.guildService = guildService;
+        this.channelService = channelService;
         this.scheduleService = scheduleService;
         this.scheduledEvents = new Map<number, EventSchedule>();
-        this.guildService = guildManager;
     }
 
     public cancelEvent(event: Event): boolean {
@@ -33,6 +39,16 @@ export class EventScheduleServiceImpl implements EventScheduleService{
         this.scheduleService.cancelCallback(eventSchedule.start);
         this.scheduleService.cancelCallback(eventSchedule.end);
         return true;
+    }
+
+    public getTimeToEvent(event: Event): TimeToEvent{
+        const eventSchedule = this.getEventScheduled(event);
+        console.log("CHE")
+        console.log(JSON.stringify(eventSchedule));
+        if(!eventSchedule)
+            return undefined;
+
+        return {startSecs: this.scheduleService.getSecondsToExecution(eventSchedule.start), endSecs: this.scheduleService.getSecondsToExecution(eventSchedule.end)};
     }
 
     public isEventScheduled(event: Event): boolean {
@@ -68,9 +84,10 @@ export class EventScheduleServiceImpl implements EventScheduleService{
     }
 
     private scheduleEventCallback(event: Event, message: string, executeDate: Date): ScheduleCallback{
-        const guild: Guild = this.guildService.getGuildByName(event.server);
-        const channel: GuildChannel = guild && ChannelManager.getChannelFromGuild(guild, event.channel);
-
+        const guild: Guild = this.guildService.getGuildById(event.server);
+        const channel: GuildChannel = guild && this.channelService.getChannelFromGuild(guild, event.channel);
+        console.log(`guild: ` + JSON.stringify(guild))
+        console.log(`channel: ` + JSON.stringify(channel))
         if(!(guild && channel && channel instanceof TextChannel))
             return undefined;
 
@@ -85,16 +102,16 @@ export class EventScheduleServiceImpl implements EventScheduleService{
         try {
             let events: Event[] = await this.eventService.getFutureActiveEvents();
             if (!(events && events.length)){
-                logger.info(`[PG] No future active events`);
+                logger.info(`[EventScheduleService] No future active events`);
                 return undefined;
             }
 
-            logger.info(`[PG] Active events: ${events.length}`);
+            logger.info(`[EventScheduleService] Active events: ${events.length}`);
             for (let i = 0; i < events.length; i++) {
                 eventSchedules.push(this.scheduleEvent(events[i]));
             }
         } catch (e){
-            logger.error(`[PG] Error while getting future event, error: ${e}`);
+            logger.error(`[EventScheduleService] Error while getting future event, error: ${e}`);
         }
         return eventSchedules;
     }

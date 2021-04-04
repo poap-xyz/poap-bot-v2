@@ -1,6 +1,7 @@
 import {Event} from "../event";
 import {Code} from "../code";
 import {EventInput} from "../input/eventInput";
+import {CodeInput} from "../input/codeInput";
 
 export class EventInputBuilder {
     private _id: number;
@@ -16,7 +17,7 @@ export class EventInputBuilder {
     private _isActive: boolean;
     private _isWhitelisted: boolean | null;
     private _whitelistFileUrl: string | null;
-    private _codes?: Code[];
+    private _codes?: CodeInput[];
     constructor() {
     }
 
@@ -92,7 +93,7 @@ export class EventInputBuilder {
         return this;
     }
 
-    setCodes(value: Code[]){
+    setCodes(value: CodeInput[]){
         this._codes = value;
         return this;
     }

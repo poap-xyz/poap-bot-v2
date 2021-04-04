@@ -3,19 +3,26 @@ import {Command} from "../../commands/command";
 import {inject, injectable} from "inversify";
 import {TYPES} from "../../config/types";
 import {CommandLoader} from "../loaders/commandLoader";
-import * as pino from "pino";
+import {ChannelService} from "../../interfaces/services/discord/channelService";
 
 @injectable()
 export class MessageHandler {
     private readonly commandLoader: CommandLoader;
+    private readonly channelService: ChannelService;
 
-    constructor(@inject(TYPES.CommandLoader) commandLoader: CommandLoader) {
+    constructor(@inject(TYPES.CommandLoader) commandLoader: CommandLoader,
+                @inject(TYPES.ChannelService) channelService: ChannelService) {
         this.commandLoader = commandLoader;
+        this.channelService = channelService;
     }
 
     async handle(message: Message): Promise<Message | Message[]> {
         if (message.author.bot) {
             return Promise.reject('Ignoring bot message!');
+        }
+
+        if(this.channelService.getMessageChannel(message) ==='DM_COMMAND' && this.channelService.hasUserDMChannel(message.author)){
+            return Promise.reject('Ignoring DM message because already has a handler');
         }
 
         /* Obtain guild if not cached */

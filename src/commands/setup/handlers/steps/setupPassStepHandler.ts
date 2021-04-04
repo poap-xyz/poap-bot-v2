@@ -6,7 +6,7 @@ import {SetupAbstractHandler} from "./setupAbstractHandler";
 
 
 export class SetupPassStepHandler extends SetupAbstractHandler{
-    readonly eventService: EventService;
+    private readonly eventService: EventService;
 
     constructor(eventService: EventService) {
         super('PASS');

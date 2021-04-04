@@ -41,7 +41,7 @@ export class EventDaoImpl implements EventDao{
         const now = new Date();
         return await this.db.any<Event>(
             "SELECT * FROM events WHERE end_date >= $1::timestamp AND start_date <= $1::timestamp " +
-                    "AND server = $2::text AND is_active = $3", [now, server, true]);
+                  "AND server = $2::text AND is_active = $3", [now, server, true]);
     }
 
     public async getEventFromPass(messageContent: string): Promise<Event | null> {
@@ -51,13 +51,8 @@ export class EventDaoImpl implements EventDao{
 
     public async isPassAvailable(messageContent: string): Promise<boolean>{
         const eventPass = messageContent.trim().toLowerCase();
-        const events = await this.db.any<Event>("SELECT * FROM events WHERE server = $1::text", [eventPass]);
-        return events.length === 0;
-    }
-
-    static isMsgTheSame(message: string, eventPass: Event['pass']) {
-        let messagePass = message.replace('!', '').replace(/ /g, "");
-        return eventPass.toLowerCase().includes(messagePass.toLowerCase());
+        const eventsWithPass = await this.db.one<number>("SELECT count(*) FROM events WHERE pass = $1::text", [eventPass], (a: { count: string }) => +a.count);
+        return eventsWithPass === 0;
     }
 
     public async saveEvent(event: EventInput): Promise<Event>{

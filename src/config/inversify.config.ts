@@ -8,7 +8,7 @@ import {loggerConfig} from "./logger.config";
 import {DBConfig} from "./db.config";
 import {CommandLoader} from "../discord/loaders/commandLoader";
 import * as pgPromise from 'pg-promise';
-import {EventServiceImpl} from "../services/schedule/eventServiceImpl";
+import {EventServiceImpl} from "../services/core/eventServiceImpl";
 import {EventService} from "../interfaces/services/core/eventService";
 import {EventDaoImpl} from "../persistence/core/eventDaoImpl";
 import {EventDao} from "../interfaces/persistence/core/eventDao";
@@ -26,11 +26,13 @@ import {GuildService} from "../interfaces/services/discord/guildService";
 import {GuildServiceImpl} from "../services/discord/guildServiceImpl";
 import {InitLoader} from "../discord/events/initLoader";
 import {EventScheduleService} from "../interfaces/services/schedule/eventScheduleService";
-import {EventScheduleServiceImpl} from "../services/core/eventScheduleServiceImpl";
+import {EventScheduleServiceImpl} from "../services/schedule/eventScheduleServiceImpl";
 import {MaintenanceDBImpl} from "../persistence/maintenance/maintenanceDBImpl";
 import {MaintenanceDBService} from "../interfaces/services/maintenance/maintenanceDBService";
 import {MaintenanceDBServiceImpl} from "../services/maintenance/maintenanceDBServiceImpl";
 import {MaintenanceDB} from "../interfaces/persistence/maintenance/maintenanceDB";
+import {ChannelService} from "../interfaces/services/discord/channelService";
+import {ChannelServiceImpl} from "../services/discord/channelServiceImpl";
 
 let container = new Container();
 
@@ -46,15 +48,22 @@ container.bind<string>(TYPES.Token).toConstantValue(process.env.BOT_TOKEN);
 container.bind<EventDao>(TYPES.EventDao).to(EventDaoImpl).inSingletonScope();
 container.bind<CodeDao>(TYPES.CodeDao).to(CodeDaoImpl).inSingletonScope();
 container.bind<UserDao>(TYPES.UserDao).to(UserDaoImpl).inSingletonScope();
+
+/* DB Maintenance binds */
 container.bind<MaintenanceDB>(TYPES.MaintenanceDB).to(MaintenanceDBImpl).inSingletonScope();
 
-/* Services binds */
+/* Core Services binds */
 container.bind<EventService>(TYPES.EventService).to(EventServiceImpl).inSingletonScope();
 container.bind<CodeService>(TYPES.CodeService).to(CodeServiceImpl).inSingletonScope();
 container.bind<UserService>(TYPES.UserService).to(UserServiceImpl).inSingletonScope();
 container.bind<ScheduleService>(TYPES.ScheduleService).to(ScheduleServiceImpl).inSingletonScope();
 container.bind<EventScheduleService>(TYPES.EventScheduleService).to(EventScheduleServiceImpl).inSingletonScope();
+
+/* Discord Services binds */
 container.bind<GuildService>(TYPES.GuildService).to(GuildServiceImpl).inSingletonScope();
+container.bind<ChannelService>(TYPES.ChannelService).to(ChannelServiceImpl).inSingletonScope();
+
+/* DB Services binds */
 container.bind<MaintenanceDBService>(TYPES.MaintenanceDBService).to(MaintenanceDBServiceImpl).inSingletonScope();
 
 container.bind<MessageHandler>(TYPES.MessageHandler).to(MessageHandler).inSingletonScope();
