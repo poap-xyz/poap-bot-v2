@@ -84,7 +84,17 @@ export class ChannelServiceImpl implements ChannelService{
         return 'UNKNOWN';
     }
 
-    getChannelFromGuild(guild: Guild, channelName: string): GuildChannel {
+    getChannelFromGuild(guild: Guild, channelId: string | Snowflake): GuildChannel {
+        if(!guild || !channelId)
+            return undefined;
+
+        const stripChannelName = ChannelServiceImpl.stripChannel(channelId);
+
+        //TODO research this
+        return guild.channels.cache.find((channel => channel.id.toLowerCase() === stripChannelName));
+    }
+
+    getChannelFromGuildByName(guild: Guild, channelName: string): GuildChannel {
         if(!guild || !channelName)
             return undefined;
 

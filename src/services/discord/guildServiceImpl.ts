@@ -1,5 +1,5 @@
 import {GuildService} from "../../interfaces/services/discord/guildService";
-import {Client, Guild} from "discord.js";
+import {Client, Guild, Snowflake} from "discord.js";
 import {inject, injectable} from "inversify";
 import {TYPES} from "../../config/types";
 
@@ -11,12 +11,10 @@ export class GuildServiceImpl implements GuildService{
         this.client = client;
     }
 
-    public getGuildById(guildId: string) {
-        if(!guildId)
+    public async getGuildById(guildId: string | Snowflake) {
+        if (!guildId)
             return undefined;
-
-        //TODO research this
-        return this.client.guilds.cache.find((guild) => guild.id === guildId);
+        return this.client.guilds.cache.find((guild) => guild.id === guildId) || await this.client.guilds.fetch(guildId);
     }
 
     public getGuildByName(guildName: string) {
@@ -25,7 +23,7 @@ export class GuildServiceImpl implements GuildService{
 
         const stripGuildName = guildName.trim().toLowerCase();
 
-        //TODO research this
         return this.client.guilds.cache.find((guild) => guild.name === stripGuildName);
     }
+
 }

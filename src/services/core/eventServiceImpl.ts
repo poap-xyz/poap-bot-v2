@@ -7,15 +7,18 @@ import {CodeService} from "../../interfaces/services/core/codeService";
 import {logger} from "../../logger";
 import {CodeInput} from "../../models/input/codeInput";
 import {EventInput} from "../../models/input/eventInput";
+import {EventScheduleService} from "../../interfaces/services/schedule/eventScheduleService";
 
 @injectable()
 export class EventServiceImpl implements EventService{
-    private eventDao: EventDao;
-    private codeService: CodeService;
-
-    constructor(@inject(TYPES.EventDao) eventDao: EventDao, @inject(TYPES.CodeService) codeService: CodeService) {
+    private readonly eventDao: EventDao;
+    private readonly codeService: CodeService;
+    private readonly eventScheduleService: EventScheduleService;
+    constructor(@inject(TYPES.EventDao) eventDao: EventDao, @inject(TYPES.CodeService) codeService: CodeService,
+            @inject(TYPES.EventScheduleService) eventScheduleService) {
         this.eventDao = eventDao;
         this.codeService = codeService;
+        this.eventScheduleService = eventScheduleService;
     }
 
     public async getRealtimeActiveEvents(): Promise<Event[]>{
@@ -48,7 +51,8 @@ export class EventServiceImpl implements EventService{
             const codes = EventServiceImpl.createCodeInputByEvent(savedEvent, event.codes);
             savedEvent.codes = await this.codeService.addCodes(codes);
         }
-
+        
+        await this.eventScheduleService.scheduleEvent(savedEvent);
         return savedEvent;
     }
 

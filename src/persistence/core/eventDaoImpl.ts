@@ -31,10 +31,9 @@ export class EventDaoImpl implements EventDao{
     }
 
     public async getGuildEvents(server: Event['server']): Promise<Event[]> {
-        const now = new Date();
         return await this.db.any<Event>(
-            "SELECT * FROM events WHERE end_date >= $1::timestamp AND server = $2::text AND is_active = $3",
-            [now, server, true]);
+            "SELECT * FROM events WHERE server = $1::text",
+            [server]);
     }
 
     public async getGuildActiveEvents(server: Event['server']): Promise<Event[]> {

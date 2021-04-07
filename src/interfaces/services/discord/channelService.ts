@@ -1,11 +1,13 @@
-import {DMChannel, Guild, GuildChannel, Message, User} from "discord.js";
+import {DMChannel, Guild, GuildChannel, Message, Snowflake, User} from "discord.js";
 import {DMChannelCallback} from "../../callback/DMChannelCallback";
 import {logger} from "../../../logger";
 
 export type ChannelType = 'DM_COMMAND' | 'GUILD_COMMAND' | 'UNKNOWN';
 
 export interface ChannelService{
-    getChannelFromGuild(guild: Guild, channelName: string): GuildChannel;
+    getChannelFromGuild(guild: Guild, channelId: string | Snowflake): GuildChannel;
+
+    getChannelFromGuildByName(guild: Guild, channelName: string): GuildChannel;
 
     getChannelsArray(guild: Guild): string[];
 

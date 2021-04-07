@@ -11,11 +11,12 @@ export class ScheduleServiceImpl implements ScheduleService{
     public scheduleCallback(callback: (...args) => void, timeOutSecs: Date | number): ScheduleCallback {
         if(typeof timeOutSecs === 'number')
             return ScheduleServiceImpl.scheduleCallbackByTime(callback, timeOutSecs);
-        console.log("si")
+
         if(Object.prototype.toString.call(timeOutSecs) === '[object Date]'){
             if ("getTime" in timeOutSecs) {
                 const now = new Date();
                 const timeOutSecsDate = (timeOutSecs.getTime() - now.getTime()) / 1000;
+                logger.debug(`Scheduling callback for timeout in ${timeOutSecsDate} seconds for date ${timeOutSecs.toISOString()}`);
                 return ScheduleServiceImpl.scheduleCallbackByTime(callback, timeOutSecsDate);
             }
         }

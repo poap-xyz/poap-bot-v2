@@ -13,6 +13,7 @@ import {SetupDMChannelHandler} from "./handlers/setupDMChannelHandler";
 import {EventInput} from "../../models/input/eventInput";
 import {EventScheduleService} from "../../interfaces/services/schedule/eventScheduleService";
 import {ChannelService} from "../../interfaces/services/discord/channelService";
+import {Event} from "../../models/event";
 
 const { lazyInject } = getDecorators(container);
 
@@ -21,7 +22,6 @@ export default class SetupCommand extends Command{
     private readonly setupDMChannelHandler: SetupDMChannelHandler;
 
     @lazyInject(TYPES.EventService) readonly eventService: EventService;
-    @lazyInject(TYPES.EventScheduleService) readonly eventScheduleService: EventScheduleService;
     @lazyInject(TYPES.ChannelService) readonly channelService: ChannelService;
 
     constructor() {
@@ -119,12 +119,17 @@ export default class SetupCommand extends Command{
         const event: EventInput = setupState.event.build();
         try {
             const savedEvent = await this.eventService.saveEvent(event, setupState.user.username);
-            await this.eventScheduleService.scheduleEvent(savedEvent);
-            logger.info(`[SetupCommand] Saved event: ${JSON.stringify(savedEvent)}`);
+            return SetupCommand.checkSavedEvent(setupState, event, savedEvent);
         }catch(e){
             logger.error(`[SetupCommand] Error saving event, error: ${e}`);
             return await setupState.dmChannel.send(`Something went wrong, please try again in a few minutes or contact support.`)
         }
+    }
+
+    private static async checkSavedEvent(setupState: SetupState, eventInput: EventInput, savedEvent: Event): Promise<Message>{
+        logger.info(`[SetupCommand] Saved event: ${JSON.stringify(savedEvent)}`);
+        if(eventInput.codes.length !== savedEvent.codes.length)
+            return await setupState.dmChannel.send(`Event saved but some codes may be repeated. Please check with command !status and !setup addcodes to add more codes!`);
 
         return await setupState.dmChannel.send(`Thank you. That's everything. I'll start the event at the appointed time.`);
     }

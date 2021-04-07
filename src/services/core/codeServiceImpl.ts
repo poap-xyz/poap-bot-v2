@@ -24,7 +24,11 @@ export class CodeServiceImpl implements CodeService{
             throw new Error("Argument codes is not an Array of CodeInput");
 
         for(let i = 0; i < codes.length; i++){
-            savedCodes.push(await this.addCode(codes[i]));
+            try {
+                savedCodes.push(await this.addCode(codes[i]));
+            }catch (e){
+                logger.error(`[CodeService] Cannot add code ${JSON.stringify(codes[i])}, error: ${e}`);
+            }
         }
 
         return savedCodes;

@@ -14,9 +14,9 @@ export type TimeToEvent = {
 
 export interface EventScheduleService{
     schedulePendingEvents(): Promise<EventSchedule[]>
-    scheduleEvent(event: Event): EventSchedule;
+    scheduleEvent(event: Event): Promise<EventSchedule>;
     cancelEvent(event: Event): boolean;
     isEventScheduled(event: Event): boolean;
     getEventScheduled(event: Event): EventSchedule;
-    getTimeToEvent(event: Event): TimeToEvent
+    getTimeToEvent(event: Event): TimeToEvent;
 }

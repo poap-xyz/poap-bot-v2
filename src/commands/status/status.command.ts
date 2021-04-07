@@ -26,14 +26,16 @@ export default class InstructionsCommand extends Command{
 
     protected async execute(commandContext: CommandContext): Promise<Message> {
         const guild = commandContext.message.guild;
-        let response;
+        const response = commandContext.message.reply("Please check your DM.");
         try {
             const events = await this.eventService.getGuildEvents(guild.id);
+            console.log(JSON.stringify(events))
+            console.log(guild.id)
             if(!events || events.length === 0)
-                return await commandContext.message.reply("There are no events scheduled in this server.");
+                return await commandContext.message.author.send("There are no events scheduled in this server.");
             for (const event of events) {
                 const formattedEvent = await this.getFormattedEvent(event);
-                response = await commandContext.message.channel.send(formattedEvent);
+                await commandContext.message.author.send(formattedEvent);
             }
         }catch (e){
             logger.error(`[StatusCommand] Error fetching guild events, error: ${e}`);
@@ -64,10 +66,10 @@ export default class InstructionsCommand extends Command{
                 ${eventStatus}`;
     }
 
-    private static getEventStatus(event: Event, timeToEvent:TimeToEvent){
+    private static getEventStatus(event: Event, timeToEvent: TimeToEvent){
         const now = new Date();
         if(!timeToEvent)
-            return (now < event.end_date)? `Event not scheduled :'(` : `Event finishede`;
+            return (now < event.end_date)? `Event not scheduled :'(` : `Event finished`;
 
         if(timeToEvent.startSecs > 0)
             return `Event will start in ${timeToEvent.startSecs} seconds`;

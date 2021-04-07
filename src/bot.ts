@@ -29,16 +29,19 @@ export class Bot {
     }
 
     public async init(){
-        await this.commandLoader.init();
-        await this.initHandler.init();
-        await this.listen();
+        await this.configBotEventListeners();
     }
 
-    private listen(): Promise<string> {
+    private configBotEventListeners(): Promise<string> {
+        this.client.on('ready', async () => {
+            this.commandLoader.init();
+            await this.initHandler.init();
+        });
+
         this.client.on('message', (message: Message) => {
             logger.debug(`Message received! Contents: ${message.content}`);
 
-        this.messageHandler.handle(message).then((m) => {
+            this.messageHandler.handle(message).then((m) => {
                 logger.debug(`Message responded, Content: ${m}`);
             }).catch((e) => {
                 logger.debug(`Message not responded, Cause:${e}`);
