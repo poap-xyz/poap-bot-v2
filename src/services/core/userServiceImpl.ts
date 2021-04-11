@@ -3,7 +3,7 @@ import {EventDao} from "../../interfaces/persistence/core/eventDao";
 import {inject} from "inversify";
 import {TYPES} from "../../config/types";
 import {UserDao} from "../../interfaces/persistence/core/userDao";
-import {User} from "../../models/user";
+import {User} from "../../models/core/user";
 
 export class UserServiceImpl implements UserService{
     private userDao: UserDao;

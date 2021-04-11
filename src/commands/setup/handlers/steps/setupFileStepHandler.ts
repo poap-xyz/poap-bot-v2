@@ -3,7 +3,7 @@ import {Message} from "discord.js";
 import {BotConfig} from "../../../../config/bot.config";
 import {logger} from "../../../../logger";
 import {parseString} from "@fast-csv/parse";
-import {Code} from "../../../../models/code";
+import {Code} from "../../../../models/core/code";
 import axios from "axios";
 import {SetupAbstractHandler} from "./setupAbstractHandler";
 import {CodeInput} from "../../../../models/input/codeInput";

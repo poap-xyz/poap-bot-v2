@@ -1,5 +1,5 @@
-import {Event} from "../event";
-import {Code} from "../code";
+import {BotEvent} from "../core/event";
+import {Code} from "../core/code";
 import {EventInput} from "../input/eventInput";
 
 export class EventInputBuilder {
@@ -20,7 +20,7 @@ export class EventInputBuilder {
     constructor() {
     }
 
-    build(): Event{
+    build(): BotEvent{
         return {
             id: this._id,
             channel: this._channel,

@@ -1,6 +1,6 @@
 import {inject, injectable} from "inversify";
 import {ExtendedProtocol, TYPES} from "../../config/types";
-import {User} from "../../models/user";
+import {User} from "../../models/core/user";
 import {UserDao} from "../../interfaces/persistence/core/userDao";
 
 @injectable()

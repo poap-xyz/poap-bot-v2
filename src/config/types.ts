@@ -4,6 +4,7 @@ import {CommandLoader} from "../discord/loaders/commandLoader";
 export const TYPES = {
     /* DB Types */
     DB: Symbol("DB"),
+    Cache: Symbol("Cache"),
 
     /* Core Types */
     Bot: Symbol("Bot"),

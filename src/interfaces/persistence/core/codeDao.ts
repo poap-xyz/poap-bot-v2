@@ -1,6 +1,6 @@
-import {Code} from "../../../models/code";
+import {Code} from "../../../models/core/code";
 import {CodeInput} from "../../../models/input/codeInput";
-import {Event} from "../../../models/event";
+import {BotEvent} from "../../../models/core/event";
 
 export interface CodeDao{
     addCode(code: CodeInput): Promise<Code>;
@@ -13,7 +13,7 @@ export interface CodeDao{
      * @param {string} username
      * @returns {Promise<boolean>} true if pass is correct and username has not claim yet
      */
-    checkCodeForEventUsername(event_id: Event['id'], username: string);
+    checkCodeForEventUsername(event_id: BotEvent['id'], username: string);
 
     countClaimedCodes(event_id: Code['event_id']): Promise<number>;
 }

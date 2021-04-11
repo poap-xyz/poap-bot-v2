@@ -1,4 +1,4 @@
-import {Event} from "../../models/event";
+import {BotEvent} from "../../models/core/event";
 import {inject, injectable} from "inversify";
 import {EventService} from "../../interfaces/services/core/eventService";
 import {TYPES} from "../../config/types";
@@ -31,7 +31,7 @@ export class EventScheduleServiceImpl implements EventScheduleService{
         this.scheduledEvents = new Map<number, EventSchedule>();
     }
 
-    public cancelEvent(event: Event): boolean {
+    public cancelEvent(event: BotEvent): boolean {
         const eventSchedule = this.getEventScheduled(event);
         if(!eventSchedule)
             return false;
@@ -41,7 +41,7 @@ export class EventScheduleServiceImpl implements EventScheduleService{
         return true;
     }
 
-    public getTimeToEvent(event: Event): TimeToEvent{
+    public getTimeToEvent(event: BotEvent): TimeToEvent{
         const eventSchedule = this.getEventScheduled(event);
         if(!eventSchedule)
             return undefined;
@@ -49,11 +49,11 @@ export class EventScheduleServiceImpl implements EventScheduleService{
         return {startSecs: this.scheduleService.getSecondsToExecution(eventSchedule.start), endSecs: this.scheduleService.getSecondsToExecution(eventSchedule.end)};
     }
 
-    public isEventScheduled(event: Event): boolean {
+    public isEventScheduled(event: BotEvent): boolean {
         return this.scheduledEvents.has(event.id);
     }
 
-    public getEventScheduled(event: Event): EventSchedule{
+    public getEventScheduled(event: BotEvent): EventSchedule{
         if(!this.isEventScheduled(event))
             return undefined;
 
@@ -69,7 +69,7 @@ export class EventScheduleServiceImpl implements EventScheduleService{
         return scheduledEvent;
     }
 
-    public async scheduleEvent(event: Event): Promise<EventSchedule> {
+    public async scheduleEvent(event: BotEvent): Promise<EventSchedule> {
         const startMessage = "The POAP distribution event is now active. *DM me to get your POAP*";
         const endMessage = "The POAP distribution event has ended.";
         let eventSchedule = {
@@ -81,7 +81,7 @@ export class EventScheduleServiceImpl implements EventScheduleService{
         return eventSchedule;
     }
 
-    private async scheduleEventCallback(event: Event, message: string, executeDate: Date): Promise<ScheduleCallback> {
+    private async scheduleEventCallback(event: BotEvent, message: string, executeDate: Date): Promise<ScheduleCallback> {
         const guild: Guild = await this.guildService.getGuildById(event.server);
         const channel: GuildChannel = guild && this.channelService.getChannelFromGuild(guild, event.channel);
         if (!(guild && channel && channel instanceof TextChannel))
@@ -96,7 +96,7 @@ export class EventScheduleServiceImpl implements EventScheduleService{
     async schedulePendingEvents(): Promise<EventSchedule[]> {
         let eventSchedules: EventSchedule[] = [];
         try {
-            let events: Event[] = await this.eventService.getFutureActiveEvents();
+            let events: BotEvent[] = await this.eventService.getFutureActiveEvents();
             if (!(events && events.length)){
                 logger.info(`[EventScheduleService] No future active events`);
                 return undefined;

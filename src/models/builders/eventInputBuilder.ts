@@ -1,5 +1,5 @@
-import {Event} from "../event";
-import {Code} from "../code";
+import {BotEvent} from "../core/event";
+import {Code} from "../core/code";
 import {EventInput} from "../input/eventInput";
 import {CodeInput} from "../input/codeInput";
 

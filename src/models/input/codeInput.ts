@@ -1,4 +1,4 @@
-import {Code} from "../code";
+import {Code} from "../core/code";
 
 export interface CodeInput {
     code: Code['code'];

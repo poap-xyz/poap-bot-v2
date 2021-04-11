@@ -4,16 +4,20 @@ import {TYPES} from "../../config/types";
 import {EventService} from "../../interfaces/services/core/eventService";
 import getDecorators from "inversify-inject-decorators";
 import container from "../../config/inversify.config";
-import {Message, Permissions} from "discord.js";
+import {Channel, Guild, GuildChannel, Message, MessageEmbed, Permissions} from "discord.js";
 import {logger} from "../../logger";
-import {Event} from "../../models/event";
+import {BotEvent} from "../../models/core/event";
 import {CodeService} from "../../interfaces/services/core/codeService";
 import {EventScheduleService, TimeToEvent} from "../../interfaces/services/schedule/eventScheduleService";
+import {GuildService} from "../../interfaces/services/discord/guildService";
+import {ChannelService} from "../../interfaces/services/discord/channelService";
 const { lazyInject } = getDecorators(container);
 
-export default class InstructionsCommand extends Command{
+export default class StatusCommand extends Command{
     @lazyInject(TYPES.EventService) readonly eventService: EventService;
     @lazyInject(TYPES.CodeService) readonly codeService: CodeService;
+    @lazyInject(TYPES.GuildService) readonly guildService: GuildService;
+    @lazyInject(TYPES.ChannelService) readonly channelService: ChannelService;
     @lazyInject(TYPES.EventScheduleService) readonly eventScheduleService: EventScheduleService;
 
     constructor() {
@@ -25,12 +29,11 @@ export default class InstructionsCommand extends Command{
     }
 
     protected async execute(commandContext: CommandContext): Promise<Message> {
-        const guild = commandContext.message.guild;
+
         const response = commandContext.message.reply("Please check your DM.");
         try {
-            const events = await this.eventService.getGuildEvents(guild.id);
-            console.log(JSON.stringify(events))
-            console.log(guild.id)
+            const events = await this.getEventsByUserOrGuild(commandContext);
+
             if(!events || events.length === 0)
                 return await commandContext.message.author.send("There are no events scheduled in this server.");
             for (const event of events) {
@@ -44,29 +47,50 @@ export default class InstructionsCommand extends Command{
         return response;
     }
 
-    private async getFormattedEvent(event: Event): Promise<string> {
-        if (!event)
-            return undefined;
+    private getEventsByUserOrGuild(commandContext: CommandContext){
+        const guild = commandContext.message.guild;
+        if(guild && guild.id)
+            return this.eventService.getGuildEvents(guild.id);
 
-        const timeToEvent = this.eventScheduleService.getTimeToEvent(event);
-        const eventStatus = InstructionsCommand.getEventStatus(event, timeToEvent);
-
-        const totalCodes = await this.codeService.countTotalCodes(event.id);
-        const claimedCodes = await this.codeService.countClaimedCodes(event.id);
-
-        return `Event in guild: ${event.server}
-                Channel: ${event.channel}
-                Start: ${event.start_date}
-                End: ${event.end_date}
-                Response to member messages: ${event.response_message}
-                Pass to get the code: ${event.pass}
-                Codes url: ${event.file_url}
-                Total Codes: ${totalCodes}
-                Claimed Codes: ${claimedCodes}
-                ${eventStatus}`;
+        return this.eventService.getUserEvents(commandContext.message.author.id);
     }
 
-    private static getEventStatus(event: Event, timeToEvent: TimeToEvent){
+    private async getFormattedEvent(event: BotEvent): Promise<MessageEmbed> {
+        if (!event)
+            return undefined;
+        const timeToEvent = this.eventScheduleService.getTimeToEvent(event);
+        const totalCodes = await this.codeService.countTotalCodes(event.id);
+        const claimedCodes = await this.codeService.countClaimedCodes(event.id);
+        const guild = await this.guildService.getGuildById(event.server);
+        const channel = await this.channelService.getChannelFromGuild(guild, event.channel);
+
+        return StatusCommand.getStatusEmbed(event, guild, channel, timeToEvent, totalCodes, claimedCodes);
+    }
+
+    private static getStatusEmbed(event: BotEvent, guild: Guild, channel: GuildChannel, timeToEvent: TimeToEvent, totalCodes: number, claimedCodes: number){
+        const eventStatus = StatusCommand.getEventStatus(event, timeToEvent);
+
+        return new MessageEmbed()
+            .setColor('#0099ff')
+            .setTitle(`Event #${event.id}`)
+            .setDescription(`Event status: ${eventStatus}`)
+
+            .addField('Guild', `${guild.name} (${event.server})`, false)
+            .addField('Channel', `${channel.name} (${event.channel})`, false)
+            .addField('Start date', `${event.start_date}`, false)
+            .addField('End date', `${event.end_date}`, false)
+            .addField('Response to members', `${event.response_message}`, false)
+            .addField('Pass to get claim code', `${event.pass}`, true)
+            .addField('Codes CSV', `${event.file_url}`, true)
+            .addField('\u200b', '\u200b', false)
+            .addField('Claimed codes', `${claimedCodes}`, true)
+            .addField('Total codes', `${totalCodes}`, true)
+
+            .setTimestamp(new Date())
+            .setFooter('POAP Bot', 'https://media-exp1.licdn.com/dms/image/C4E0BAQH41LILaTN3cw/company-logo_200_200/0/1561273941114?e=2159024400&v=beta&t=ty-jdXGeZd1OE4V-WQP4owQ1_qvdEzgDJq5jOUw2S-s');
+    }
+
+    private static getEventStatus(event: BotEvent, timeToEvent: TimeToEvent){
         const now = new Date();
         if(!timeToEvent)
             return (now < event.end_date)? `Event not scheduled :'(` : `Event finished`;

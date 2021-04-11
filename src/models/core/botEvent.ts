@@ -1,6 +1,6 @@
 import {Code} from "./code";
 
-export interface Event {
+export interface BotEvent {
     id: number;
     server: string;
     channel: string;

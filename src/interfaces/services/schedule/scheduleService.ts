@@ -1,5 +1,5 @@
 import {ScheduleCallback} from "../../callback/schedeuleCallback";
-import {Event} from "../../../models/event";
+import {BotEvent} from "../../../models/core/event";
 import {TimeToEvent} from "./eventScheduleService";
 
 export interface ScheduleService{

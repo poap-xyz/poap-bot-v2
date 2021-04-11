@@ -1,9 +1,9 @@
 import {inject, injectable} from "inversify";
 import {ExtendedProtocol, TYPES} from "../../config/types";
-import {Code} from "../../models/code";
+import {Code} from "../../models/core/code";
 import {CodeDao} from "../../interfaces/persistence/core/codeDao";
 import {CodeInput} from "../../models/input/codeInput";
-import {Event} from "../../models/event";
+import {BotEvent} from "../../models/core/event";
 import {logger} from "../../logger";
 
 @injectable()
@@ -23,7 +23,7 @@ export class CodeDaoImpl implements CodeDao{
         );
     }
 
-    public async checkCodeForEventUsername(event_id: Event['id'], username: string): Promise<string> {
+    public async checkCodeForEventUsername(event_id: BotEvent['id'], username: string): Promise<string> {
         try{
             return await this.checkCodeForEventUsernameTask(event_id, username);
         }catch (e){
@@ -32,7 +32,7 @@ export class CodeDaoImpl implements CodeDao{
         }
     }
 
-    private async checkCodeForEventUsernameTask(event_id: Event['id'], username: string): Promise<string>{
+    private async checkCodeForEventUsernameTask(event_id: BotEvent['id'], username: string): Promise<string>{
         const now = new Date();
         logger.debug(`[CodeDao] checking event: ${event_id}, user: ${username} `);
         return await this.db.task(async (t) => {

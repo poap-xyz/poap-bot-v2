@@ -1,8 +1,8 @@
 import {ScheduleCallback} from "../../callback/schedeuleCallback";
-import {Event} from "../../../models/event";
+import {BotEvent} from "../../../models/core/event";
 
 export type EventSchedule = {
-    event: Event,
+    event: BotEvent,
     start: ScheduleCallback,
     end: ScheduleCallback,
 }
@@ -14,9 +14,9 @@ export type TimeToEvent = {
 
 export interface EventScheduleService{
     schedulePendingEvents(): Promise<EventSchedule[]>
-    scheduleEvent(event: Event): Promise<EventSchedule>;
-    cancelEvent(event: Event): boolean;
-    isEventScheduled(event: Event): boolean;
-    getEventScheduled(event: Event): EventSchedule;
-    getTimeToEvent(event: Event): TimeToEvent;
+    scheduleEvent(event: BotEvent): Promise<EventSchedule>;
+    cancelEvent(event: BotEvent): boolean;
+    isEventScheduled(event: BotEvent): boolean;
+    getEventScheduled(event: BotEvent): EventSchedule;
+    getTimeToEvent(event: BotEvent): TimeToEvent;
 }

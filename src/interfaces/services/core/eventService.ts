@@ -1,46 +1,60 @@
-import {Event} from "../../../models/event";
+import {BotEvent} from "../../../models/core/event";
 import {EventInput} from "../../../models/input/eventInput";
 
 export interface EventService{
     /**
      * @method
      * Get events held right now
-     * @returns {Promise<Event[]>}
+     * @returns {Promise<BotEvent[]>}
      */
-    getRealtimeActiveEvents(): Promise<Event[]>;
+    getRealtimeActiveEvents(): Promise<BotEvent[]>;
     /**
      * @method
      * Get events held in the future
-     * @returns {Promise<Event[]>}
+     * @returns {Promise<BotEvent[]>}
      */
-    getFutureActiveEvents(): Promise<Event[]>;
+    getFutureActiveEvents(): Promise<BotEvent[]>;
     /**
      * @method
      * Get all events
-     * @returns {Promise<Event[]>}
+     * @returns {Promise<BotEvent[]>}
      */
-    getAllEvents(): Promise<Event[]>;
+    getAllEvents(): Promise<BotEvent[]>;
+    /**
+     * @method
+     * Get all events from a specific user
+     * @param {Event['created_by']} user
+     * @returns {Promise<BotEvent[]>}
+     */
+    getUserEvents(user: BotEvent['created_by']): Promise<BotEvent[]>;
+    /**
+     * @method
+     * Get all active events held right now from a specific User
+     * @param {Event['created_by']} user
+     * @returns {Promise<BotEvent[]>}
+     */
+    getUserActiveEvents(user: BotEvent['created_by']): Promise<BotEvent[]>;
     /**
      * @method
      * Get all events from a specific Server or Server
      * @param {Event['server']} server
-     * @returns {Promise<Event[]>}
+     * @returns {Promise<BotEvent[]>}
      */
-    getGuildEvents(server: Event['server']): Promise<Event[]>;
+    getGuildEvents(server: BotEvent['server']): Promise<BotEvent[]>;
     /**
      * @method
      * Get all active events held right now from a specific Server or Server
      * @param {Event['server']} server
-     * @returns {Promise<Event[]>}
+     * @returns {Promise<BotEvent[]>}
      */
-    getGuildActiveEvents(server: Event['server']): Promise<Event[]>;
+    getGuildActiveEvents(server: BotEvent['server']): Promise<BotEvent[]>;
     /**
      * @method
      * Get event using a specific pass
      * @param {string} messageContent
-     * @returns {Promise<Event> | null} Array of Events usign the pass or null if pass does not exists
+     * @returns {Promise<BotEvent> | null} Array of Events usign the pass or null if pass does not exists
      */
-    getEventFromPass(messageContent: string): Promise<Event | null>;
+    getEventFromPass(messageContent: string): Promise<BotEvent | null>;
     /**
      * @method
      * Check if a pass is available to use in a new Event
@@ -51,10 +65,10 @@ export interface EventService{
     /**
      * @method
      * Check if a pass is available to use in a new Event
-     * @param {Event} event to save
+     * @param {BotEvent} event to save
      * @param {string} username who is saving the Event
-     * @returns {Promise<Event>} the saved Event
+     * @returns {Promise<BotEvent>} the saved Event
      */
-    saveEvent(event: EventInput, username: string): Promise<Event>;
+    saveEvent(event: EventInput, username: string): Promise<BotEvent>;
 
 }

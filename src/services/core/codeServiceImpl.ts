@@ -2,9 +2,9 @@ import {CodeService} from "../../interfaces/services/core/codeService";
 import {inject, injectable} from "inversify";
 import {TYPES} from "../../config/types";
 import {CodeDao} from "../../interfaces/persistence/core/codeDao";
-import {Code} from "../../models/code";
+import {Code} from "../../models/core/code";
 import {CodeInput} from "../../models/input/codeInput";
-import {Event} from "../../models/event";
+import {BotEvent} from "../../models/core/event";
 import {logger} from "../../logger";
 @injectable()
 export class CodeServiceImpl implements CodeService{
@@ -34,7 +34,7 @@ export class CodeServiceImpl implements CodeService{
         return savedCodes;
     }
 
-    public async checkCodeForEventUsername(event_id: Event['id'], username: string){
+    public async checkCodeForEventUsername(event_id: BotEvent['id'], username: string){
         return await this.codeDao.checkCodeForEventUsername(event_id, username);
     }
 

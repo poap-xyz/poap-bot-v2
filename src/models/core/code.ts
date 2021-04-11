@@ -1,9 +1,9 @@
-import {Event} from "./event";
+import {BotEvent} from "./event";
 
 export interface Code{
     id: number;
     code: string;
-    event_id: Event['id'];
+    event_id: BotEvent['id'];
     username: string;
     is_active: boolean;
     claimed_date: Date | null;
