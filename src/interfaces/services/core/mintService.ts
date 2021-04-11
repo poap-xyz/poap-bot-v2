@@ -1,6 +1,5 @@
 export interface MintService{
-    getMintedPoaps();
-    getLastMintedPoaps();
+    cacheLastMintedPoaps();
     subscribeChannel();
     unsubscribeChannel();
 

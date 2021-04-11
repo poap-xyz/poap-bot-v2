@@ -1,7 +1,8 @@
 import {Account} from "./account";
 
-export interface Token{
+export interface Token {
     id: number,
-    owner: Account,
+    owner: string,
     event: Event,
+    created: Date,
 }

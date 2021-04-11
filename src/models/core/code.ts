@@ -1,4 +1,4 @@
-import {BotEvent} from "./event";
+import {BotEvent} from "./botEvent";
 
 export interface Code{
     id: number;

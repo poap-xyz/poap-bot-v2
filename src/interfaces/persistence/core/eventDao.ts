@@ -1,4 +1,4 @@
-import {BotEvent} from "../../../models/core/event";
+import {BotEvent} from "../../../models/core/botEvent";
 import {EventInput} from "../../../models/input/eventInput";
 
 export interface EventDao{

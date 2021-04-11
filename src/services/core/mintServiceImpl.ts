@@ -1,10 +1,11 @@
 import {MintService} from "../../interfaces/services/core/mintService";
 
 export class MintServiceImpl implements MintService{
-    getLastMintedPoaps() {
+    cacheLastMintedPoaps() {
     }
 
-    getMintedPoaps() {
+    private requestLastMintedPoaps(){
+
     }
 
     subscribeChannel() {

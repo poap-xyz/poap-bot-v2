@@ -1,7 +1,6 @@
 import {Message, User} from "discord.js";
 import {SetupState, SetupStep} from "../../../interfaces/command/setup/setup.interface";
 import {logger} from "../../../logger";
-import {BotEvent} from "../../../models/core/event";
 import Setup from "../setup.command";
 import {EventService} from "../../../interfaces/services/core/eventService";
 import {DMChannelCallback} from "../../../interfaces/callback/DMChannelCallback";

@@ -1,0 +1,15 @@
+export interface PoapEvent{
+    id: number,
+    created: Date,
+    fancy_id: string,
+    name: string,
+    event_url: string,
+    image_url: string,
+    country?: string,
+    city?: string,
+    description?:string,
+    year?: number,
+    start_date?: Date,
+    end_date?: Date,
+    supply?: number,
+}

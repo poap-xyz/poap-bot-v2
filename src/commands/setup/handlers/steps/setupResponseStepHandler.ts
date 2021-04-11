@@ -14,7 +14,7 @@ export class SetupResponseStepHandler extends SetupAbstractHandler{
     }
 
     async handler(message: Message, setupState: SetupState):Promise<string> {
-        const messageContent:string = message.content.trim();
+        const messageContent: string = message.content.trim();
         let responseMessage: string;
 
         if (messageContent === BotConfig.defaultOptionMessage)
@@ -23,6 +23,11 @@ export class SetupResponseStepHandler extends SetupAbstractHandler{
         if(!messageContent || !messageContent.length){
             await setupState.dmChannel.send(`Please provide a response or send '-' for default `);
             return Promise.reject("Invalid response (null or empty)");
+        }
+
+        if(messageContent.indexOf(BotConfig.responseMessageReplace) === -1){
+            await setupState.dmChannel.send(`Please provide a response containing the {code} word`);
+            return Promise.reject("Invalid response, missing {code}");
         }
 
         setupState.event.setResponseMessage(responseMessage);

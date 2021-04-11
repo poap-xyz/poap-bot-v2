@@ -4,7 +4,7 @@ import {TYPES} from "../../config/types";
 import {CodeDao} from "../../interfaces/persistence/core/codeDao";
 import {Code} from "../../models/core/code";
 import {CodeInput} from "../../models/input/codeInput";
-import {BotEvent} from "../../models/core/event";
+import {BotEvent} from "../../models/core/botEvent";
 import {logger} from "../../logger";
 @injectable()
 export class CodeServiceImpl implements CodeService{

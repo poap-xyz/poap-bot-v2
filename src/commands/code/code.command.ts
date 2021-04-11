@@ -9,6 +9,7 @@ const { lazyInject } = getDecorators(container);
 import {logger} from "../../logger";
 import {CodeService} from "../../interfaces/services/core/codeService";
 import {ChannelService} from "../../interfaces/services/discord/channelService";
+import {BotConfig} from "../../config/bot.config";
 
 export default class CodeCommand extends Command{
     @lazyInject(TYPES.EventService) readonly eventService: EventService;
@@ -33,7 +34,7 @@ export default class CodeCommand extends Command{
         const event = await this.eventService.getEventFromPass(commandContext.message.content);
         const claimCode = this.codeService.checkCodeForEventUsername(event.id, commandContext.message.author.id);
         if(claimCode){
-            const response = event.response_message.replace("{code}", claimCode);
+            const response = event.response_message.replace(BotConfig.responseMessageReplace, claimCode);
             return await commandContext.message.reply(response);
         }
 

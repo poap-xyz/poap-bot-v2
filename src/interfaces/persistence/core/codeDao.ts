@@ -1,6 +1,6 @@
 import {Code} from "../../../models/core/code";
 import {CodeInput} from "../../../models/input/codeInput";
-import {BotEvent} from "../../../models/core/event";
+import {BotEvent} from "../../../models/core/botEvent";
 
 export interface CodeDao{
     addCode(code: CodeInput): Promise<Code>;

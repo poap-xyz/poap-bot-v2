@@ -13,7 +13,7 @@ import {SetupDMChannelHandler} from "./handlers/setupDMChannelHandler";
 import {EventInput} from "../../models/input/eventInput";
 import {EventScheduleService} from "../../interfaces/services/schedule/eventScheduleService";
 import {ChannelService} from "../../interfaces/services/discord/channelService";
-import {BotEvent} from "../../models/core/event";
+import {BotEvent} from "../../models/core/botEvent";
 
 const { lazyInject } = getDecorators(container);
 

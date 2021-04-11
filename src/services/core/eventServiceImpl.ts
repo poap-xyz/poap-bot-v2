@@ -1,4 +1,4 @@
-import {BotEvent} from "../../models/core/event";
+import {BotEvent} from "../../models/core/botEvent";
 import {inject, injectable} from "inversify";
 import {EventService} from "../../interfaces/services/core/eventService";
 import {TYPES} from "../../config/types";

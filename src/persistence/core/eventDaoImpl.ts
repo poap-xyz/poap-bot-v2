@@ -1,6 +1,6 @@
 import {inject, injectable} from "inversify";
 import {ExtendedProtocol, TYPES} from "../../config/types";
-import {BotEvent} from "../../models/core/event";
+import {BotEvent} from "../../models/core/botEvent";
 import {EventDao} from "../../interfaces/persistence/core/eventDao";
 import {CodeInput} from "../../models/input/codeInput";
 import {EventInput} from "../../models/input/eventInput";

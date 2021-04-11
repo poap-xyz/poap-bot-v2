@@ -6,7 +6,7 @@ import getDecorators from "inversify-inject-decorators";
 import container from "../../config/inversify.config";
 import {Channel, Guild, GuildChannel, Message, MessageEmbed, Permissions} from "discord.js";
 import {logger} from "../../logger";
-import {BotEvent} from "../../models/core/event";
+import {BotEvent} from "../../models/core/botEvent";
 import {CodeService} from "../../interfaces/services/core/codeService";
 import {EventScheduleService, TimeToEvent} from "../../interfaces/services/schedule/eventScheduleService";
 import {GuildService} from "../../interfaces/services/discord/guildService";
