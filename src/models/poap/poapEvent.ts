@@ -7,9 +7,9 @@ export interface PoapEvent{
     image_url: string,
     country?: string,
     city?: string,
-    description?:string,
+    description:string,
     year?: number,
-    start_date?: Date,
-    end_date?: Date,
-    supply?: number,
+    start_date: Date,
+    end_date: Date,
+    supply: number,
 }

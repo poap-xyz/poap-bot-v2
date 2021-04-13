@@ -33,14 +33,16 @@ import {MaintenanceDBServiceImpl} from "../services/maintenance/maintenanceDBSer
 import {MaintenanceDB} from "../interfaces/persistence/maintenance/maintenanceDB";
 import {ChannelService} from "../interfaces/services/discord/channelService";
 import {ChannelServiceImpl} from "../services/discord/channelServiceImpl";
-import {createClient, RedisClient} from "redis";
 import {RedisConfig} from "./redis.config";
+import * as IORedis from "ioredis";
+import {Redis} from "ioredis";
+
 
 let container = new Container();
 
 /* DB Binds */
 container.bind<pgPromise.IDatabase<any>>(TYPES.DB).toConstantValue(pgPromise()(DBConfig));
-container.bind<RedisClient>(TYPES.Cache).toConstantValue(new RedisClient(RedisConfig));
+container.bind<Redis>(TYPES.Cache).toConstantValue(new IORedis(RedisConfig));
 
 /* Core binds */
 container.bind<Bot>(TYPES.Bot).to(Bot).inSingletonScope();
