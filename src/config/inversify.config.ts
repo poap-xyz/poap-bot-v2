@@ -36,6 +36,12 @@ import {ChannelServiceImpl} from "../services/discord/channelServiceImpl";
 import {RedisConfig} from "./redis.config";
 import * as IORedis from "ioredis";
 import {Redis} from "ioredis";
+import {MintService} from "../interfaces/services/core/mintService";
+import {SubscriberServiceImpl} from "../services/pubsub/subscriberServiceImpl";
+import {PublisherService} from "../interfaces/services/pubsub/publisherService";
+import {PubliserServiceImpl} from "../services/pubsub/publiserServiceImpl";
+import {SubscriberService} from "../interfaces/services/pubsub/subscriberService";
+import {MintServiceImpl} from "../services/core/mintServiceImpl";
 
 
 let container = new Container();
@@ -61,6 +67,11 @@ container.bind<MaintenanceDB>(TYPES.MaintenanceDB).to(MaintenanceDBImpl).inSingl
 container.bind<EventService>(TYPES.EventService).to(EventServiceImpl).inSingletonScope();
 container.bind<CodeService>(TYPES.CodeService).to(CodeServiceImpl).inSingletonScope();
 container.bind<UserService>(TYPES.UserService).to(UserServiceImpl).inSingletonScope();
+container.bind<MintService>(TYPES.MintService).to(MintServiceImpl).inSingletonScope();
+
+container.bind<SubscriberService>(TYPES.SubscriberService).to(SubscriberServiceImpl).inSingletonScope();
+container.bind<PublisherService>(TYPES.PublisherService).to(PubliserServiceImpl).inSingletonScope();
+
 container.bind<ScheduleService>(TYPES.ScheduleService).to(ScheduleServiceImpl).inSingletonScope();
 container.bind<EventScheduleService>(TYPES.EventScheduleService).to(EventScheduleServiceImpl).inSingletonScope();
 

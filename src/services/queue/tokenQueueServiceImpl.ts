@@ -1,9 +1,9 @@
-import {TokenQueueService} from "../../interfaces/services/core/tokenQueueService";
 import {TokenMetadata} from "../../models/poap/blockchain/tokenMetadata";
 import {Redis} from "ioredis";
 import {inject} from "inversify";
 import {TYPES} from "../../config/types";
 import {Queue, Worker} from "bullmq";
+import {TokenQueueService} from "../../interfaces/services/queue/tokenQueueService";
 
 export class TokenQueueServiceImpl implements TokenQueueService{
     private readonly redisClient: Redis;

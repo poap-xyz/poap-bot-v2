@@ -19,7 +19,15 @@ export const TYPES = {
     UserService: Symbol("UserService"),
     GuildService: Symbol("GuildService"),
     ChannelService: Symbol("ChannelService"),
+    MintService: Symbol("MintService"),
+
     MaintenanceDBService: Symbol("MaintenanceDBService"),
+
+
+    PublisherService: Symbol("PublisherService"),
+    SubscriberService: Symbol("SubscriberService"),
+    TokenQueueService: Symbol("TokenQueueService"),
+    TokenWorkerService: Symbol("TokenWorkerService"),
 
     MessageHandler: Symbol("MessageHandler"),
     InitLoader: Symbol("InitHandler"),

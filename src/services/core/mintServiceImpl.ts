@@ -41,15 +41,17 @@ export class MintServiceImpl implements MintService{
         return defaultTimestamp.getTime().toString();
     }
 
-    private getLastTimestamp(): Promise<string>{
-        return new Promise<string>( (resolve, reject) => {
-            this.redisClient.get("last_check_timestamp", function (err, reply) {
-                if(err) {
-                    reject(err);
-                }
-                resolve(reply);
-            });
-        });
+    private async getLastTimestamp(): Promise<string>{
+        try {
+            const timestamp = await this.redisClient.get("lastBlockchainPeekTimestamp");
+            if(timestamp === "")
+                return undefined;
+
+            return timestamp;
+        }catch (e){
+            logger.error(`[MintService] Error getting timestamp, error: ${e}`);
+            return Promise.reject(e);
+        }
     }
 
     private static async requestLastMintedPoapsByTimestamp(url: string, timestamp: number | string): Promise<TokenMetadata[]>{
