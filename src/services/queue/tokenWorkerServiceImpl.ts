@@ -1,6 +1,6 @@
 import {Job, Worker} from "bullmq";
 import {Redis} from "ioredis";
-import {inject} from "inversify";
+import {inject, injectable} from "inversify";
 import {TYPES} from "../../config/types";
 import {TokenMetadata} from "../../models/poap/blockchain/tokenMetadata";
 import {Token} from "../../models/poap/token";
@@ -10,7 +10,7 @@ import axios from "axios";
 import {BotConfig} from "../../config/bot.config";
 import {TokenWorkerService} from "../../interfaces/services/queue/tokenWorkerService";
 import {PublisherService} from "../../interfaces/services/pubsub/publisherService";
-
+@injectable()
 export class TokenWorkerServiceImpl implements TokenWorkerService{
     private readonly publisherService: PublisherService;
     private readonly redisClient: Redis;
@@ -40,6 +40,7 @@ export class TokenWorkerServiceImpl implements TokenWorkerService{
         const token = await this.getToken(tokenMetadata, account);
         if(!token)
             return Promise.reject("No token could be fetched");
+
         /* Cache token for further use */
         try {
             await this.redisClient.hset("tokens", token.tokenId, JSON.stringify(token));

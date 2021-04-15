@@ -1,10 +1,10 @@
 import {Redis} from "ioredis";
-import {inject} from "inversify";
+import {inject, injectable} from "inversify";
 import {TYPES} from "../../config/types";
 import {logger} from "../../logger";
 import {SubscriberCallback} from "../../interfaces/callback/subscriberCallback";
 import {SubscriberService} from "../../interfaces/services/pubsub/subscriberService";
-
+@injectable()
 export class SubscriberServiceImpl implements SubscriberService{
     private readonly redisSubscriberClient: Redis;
     private readonly subscriptions: Map<string, Redis>;
@@ -35,7 +35,7 @@ export class SubscriberServiceImpl implements SubscriberService{
                 resolve(subscribedClient);
 
             const newSubscriberClient = this.redisSubscriberClient.duplicate();
-            this.redisSubscriberClient.subscribe(channelName, (err, count) => {
+            newSubscriberClient.subscribe(channelName, (err, count) => {
                 if (err) {
                     logger.error(`[SubscriberService] Failed to subscribe: ${err.message}` );
                     return reject(err);

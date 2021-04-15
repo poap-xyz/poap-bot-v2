@@ -1,4 +1,4 @@
-import {BotEvent} from "../core/event";
+import {BotEvent} from "../core/botEvent";
 import {CodeInput} from "./codeInput";
 
 export interface EventInput {

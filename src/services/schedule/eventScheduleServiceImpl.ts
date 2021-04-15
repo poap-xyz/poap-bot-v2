@@ -19,13 +19,11 @@ export class EventScheduleServiceImpl implements EventScheduleService{
     private eventService: EventService;
     private scheduleService: ScheduleService;
     private scheduledEvents: Map<number, EventSchedule>;
-    private guildService: GuildService;
     private channelService: ChannelService;
 
     constructor(@inject(TYPES.EventService) eventService: EventService, @inject(TYPES.ScheduleService) scheduleService: ScheduleService,
-                @inject(TYPES.GuildService) guildService: GuildService, @inject(TYPES.ChannelService) channelService: ChannelService) {
+                @inject(TYPES.ChannelService) channelService: ChannelService) {
         this.eventService = eventService;
-        this.guildService = guildService;
         this.channelService = channelService;
         this.scheduleService = scheduleService;
         this.scheduledEvents = new Map<number, EventSchedule>();
@@ -82,12 +80,10 @@ export class EventScheduleServiceImpl implements EventScheduleService{
     }
 
     private async scheduleEventCallback(event: BotEvent, message: string, executeDate: Date): Promise<ScheduleCallback> {
-        const guild: Guild = await this.guildService.getGuildById(event.server);
-        const channel: GuildChannel = guild && this.channelService.getChannelFromGuild(guild, event.channel);
-        if (!(guild && channel && channel instanceof TextChannel))
+        const textChannel = await this.channelService.getTextChannel(event.server, event.channel);
+        if(!textChannel)
             return undefined;
 
-        const textChannel: TextChannel = <TextChannel>channel;
         return this.scheduleService.scheduleCallback(async () => {
             await textChannel.send(message)
         }, executeDate);

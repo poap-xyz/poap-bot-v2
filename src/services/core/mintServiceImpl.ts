@@ -4,32 +4,41 @@ import {logger} from "../../logger";
 import {BotConfig} from "../../config/bot.config";
 import {TokenMetadata} from "../../models/poap/blockchain/tokenMetadata";
 import {Redis} from "ioredis";
-import {inject} from "inversify";
+import {inject, injectable} from "inversify";
 import {TYPES} from "../../config/types";
 import {CodeInput} from "../../models/input/codeInput";
+import {TokenQueueService} from "../../interfaces/services/queue/tokenQueueService";
+import { Token } from "../../models/poap/token";
+import json = Mocha.reporters.json;
 
-
-
-export class MintServiceImpl implements MintService{
+@injectable()
+export class MintServiceImpl implements MintService {
     private static readonly POAP_API_ADDRESS_POAPS = BotConfig.poapCoreAPI + BotConfig.poapCoreScanAPIURI;
     private readonly redisClient: Redis;
+    private readonly tokenQueueService: TokenQueueService;
 
-    constructor(@inject(TYPES.Cache) redisClient: Redis) {
+    constructor(@inject(TYPES.Cache) redisClient: Redis, @inject(TYPES.TokenQueueService) tokenQueueService: TokenQueueService) {
         this.redisClient = redisClient;
+        this.tokenQueueService = tokenQueueService;
     }
 
-    async cacheLastMintedPoaps() {
+    async getTokenFromCache(tokenId: string | number): Promise<Token> {
+        return JSON.parse(await this.redisClient.hget("tokens", tokenId.toString()));
+    }
+
+    async getAccountFromCache(address: string): Promise<Account> {
+        return JSON.parse(await this.redisClient.hget("accounts", address));
+    }
+
+    async cacheLastMintedTokens() {
         const timestamp = await this.getLastOrDefaultTimestamp();
-        const mintedxDaiPoaps = await MintServiceImpl.requestLastMintedPoapsByTimestamp(BotConfig.poapSubgraphxDai, timestamp);
-        mintedxDaiPoaps.forEach((token) => {
-
-        });
-
+        const mintedxDaiPoaps = await this.requestLastMintedPoapsByTimestamp(BotConfig.poapSubgraphxDai, timestamp);
+        this.tokenQueueService.addTokensMetadataToQueue(mintedxDaiPoaps);
     }
 
     private async getLastOrDefaultTimestamp(): Promise<string>{
         const defaultTimestamp = new Date();
-        defaultTimestamp.setHours(defaultTimestamp.getHours() - 20); //TODO remove this after testing, default date should be now
+        defaultTimestamp.setHours(defaultTimestamp.getHours() - 200); //TODO remove this after testing, default date should be now
         try {
             const lastTimestamp = await this.getLastTimestamp();
             if(lastTimestamp)
@@ -38,7 +47,7 @@ export class MintServiceImpl implements MintService{
             logger.error(`[MintService] Error getting last timestamp in redis, error: ${err}`);
         }
 
-        return defaultTimestamp.getTime().toString();
+        return Math.floor(defaultTimestamp.getTime() / 1000).toString();
     }
 
     private async getLastTimestamp(): Promise<string>{
@@ -54,20 +63,23 @@ export class MintServiceImpl implements MintService{
         }
     }
 
-    private static async requestLastMintedPoapsByTimestamp(url: string, timestamp: number | string): Promise<TokenMetadata[]>{
+    private async requestLastMintedPoapsByTimestamp(url: string, timestamp: number | string): Promise<TokenMetadata[]>{
         let last_id = 0;
         let mintedPoaps: TokenMetadata[] = [];
         do {
             try {
-
                 const queryJSON = MintServiceImpl.getLastTokensByTimestampQuery(last_id, timestamp);
-                const axiosResponse = await axios.post(url, JSON.stringify(queryJSON));
+                const stringifiedQuery = JSON.stringify(queryJSON);
+                const axiosResponse = await axios.post(url, stringifiedQuery);
+                logger.debug(`[MintService] Blockchain Thegraph query: ${stringifiedQuery}, response: ${JSON.stringify(axiosResponse.data)}`);
 
-                const partialMintedPoaps: TokenMetadata[] = axiosResponse.data.tokens;
+                const partialMintedPoaps: TokenMetadata[] = axiosResponse.data && axiosResponse.data.data && axiosResponse.data.data.tokens;
                 last_id = MintServiceImpl.addTokensToListAndGetLastId(partialMintedPoaps, mintedPoaps);
 
-                if(!last_id)
+                if(!last_id){
+                    await this.setLastTimestamp();
                     return mintedPoaps;
+                }
             } catch (e) {
                 logger.error(`[MintService] Error fetching blockchain, error: ${e}`);
                 return Promise.reject(e);
@@ -82,11 +94,26 @@ export class MintServiceImpl implements MintService{
     }
 
     private static addTokensToListAndGetLastId(partialMintedPoaps: TokenMetadata[], allMintedPoaps: TokenMetadata[]): number{
-        logger.debug(`[MintService] Blockchain Thegraph response: ${partialMintedPoaps}`);
-        if(partialMintedPoaps.length === 0)
+        if(!partialMintedPoaps || partialMintedPoaps.length === 0)
             return undefined;
 
         allMintedPoaps.push(...partialMintedPoaps);
-        return partialMintedPoaps[-1].id;
+        return partialMintedPoaps[partialMintedPoaps.length - 1].id;
+    }
+
+    private async setLastTimestamp(){
+        try {
+            const now = new Date();
+            const timestamp = Math.floor(now.getTime() / 1000).toString();
+
+            const response = await this.redisClient.set("lastBlockchainPeekTimestamp", timestamp);
+            if(response !== "OK")
+                return undefined;
+
+            return timestamp;
+        }catch (e){
+            logger.error(`[MintService] Error setting timestamp, error: ${e}`);
+            return Promise.reject(e);
+        }
     }
 }

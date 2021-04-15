@@ -11,34 +11,41 @@ export const TYPES = {
     Client: Symbol("Client"),
     Token: Symbol("Token"),
 
+    /* Persistence Types */
+    EventDao: Symbol("EventDao"),
+    CodeDao: Symbol("CodeDao"),
+    UserDao: Symbol("UserDao"),
+    MaintenanceDB: Symbol("MaintenanceDB"),
+
     /* Services Types */
     EventService: Symbol("EventService"),
-    EventScheduleService: Symbol("EventScheduleService"),
-    ScheduleService: Symbol("ScheduleService"),
     CodeService: Symbol("CodeService"),
     UserService: Symbol("UserService"),
-    GuildService: Symbol("GuildService"),
-    ChannelService: Symbol("ChannelService"),
     MintService: Symbol("MintService"),
 
+    /* Schedule Services */
+    EventScheduleService: Symbol("EventScheduleService"),
+    ScheduleService: Symbol("ScheduleService"),
+
+    /* Discord Services */
+    GuildService: Symbol("GuildService"),
+    ChannelService: Symbol("ChannelService"),
+    MintChannelService: Symbol("MintChannelService"),
+
+    /* DB Maintenance Service */
     MaintenanceDBService: Symbol("MaintenanceDBService"),
 
-
+    /* PubSub Services */
     PublisherService: Symbol("PublisherService"),
     SubscriberService: Symbol("SubscriberService"),
+
+    /* Queue Services */
     TokenQueueService: Symbol("TokenQueueService"),
     TokenWorkerService: Symbol("TokenWorkerService"),
 
     MessageHandler: Symbol("MessageHandler"),
     InitLoader: Symbol("InitHandler"),
-    CommandLoader: Symbol("CommandLoader"),
-
-    /* Persistence Types */
-    EventDao: Symbol("EventDao"),
-    CodeDao: Symbol("CodeDao"),
-    UserDao: Symbol("UserDao"),
-    MaintenanceDB: Symbol("MaintenanceDB")
-
+    CommandLoader: Symbol("CommandLoader")
 };
 /* DB Protocol Type export */
 export type ExtendedProtocol = IDatabase<any>;

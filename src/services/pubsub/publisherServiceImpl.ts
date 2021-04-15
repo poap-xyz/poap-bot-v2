@@ -1,10 +1,10 @@
 import {Redis} from "ioredis";
-import {inject} from "inversify";
+import {inject, injectable} from "inversify";
 import {TYPES} from "../../config/types";
 import {PublisherService} from "../../interfaces/services/pubsub/publisherService";
 import {logger} from "../../logger";
-
-export class PubliserServiceImpl implements PublisherService{
+@injectable()
+export class PublisherServiceImpl implements PublisherService{
     private readonly redisPublisherClient: Redis;
     constructor(@inject(TYPES.Cache) redisClient: Redis) {
         this.redisPublisherClient = redisClient.duplicate();

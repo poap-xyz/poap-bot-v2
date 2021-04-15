@@ -11,11 +11,14 @@ import {logger} from "../../logger";
 @injectable()
 export class ChannelServiceImpl implements ChannelService{
     private readonly client: Client;
+    private readonly guildService: GuildService;
     private usersDM: Map<Snowflake, DMChannel>;
 
-    constructor(@inject(TYPES.Client) client: Client) {
+    constructor(@inject(TYPES.Client) client: Client,
+                @inject(TYPES.GuildService) guildService: GuildService) {
         this.client = client;
         this.usersDM = new Map<Snowflake, DMChannel>();
+        this.guildService = guildService;
     }
 
     async createUserDMChannel(user: User): Promise<DMChannel>{
@@ -92,6 +95,24 @@ export class ChannelServiceImpl implements ChannelService{
 
         //TODO research this
         return guild.channels.cache.find((channel => channel.id.toLowerCase() === stripChannelName));
+    }
+
+    getTextChannelFromGuild(guild: Guild, channelId: string | Snowflake): TextChannel {
+        const channel = this.getChannelFromGuild(guild, channelId);
+        if (!(guild && channel && channel instanceof TextChannel))
+            return undefined;
+
+        return <TextChannel>channel;
+    }
+
+    async getGuildChannel(guildId: string, channelId: string): Promise<GuildChannel>{
+        const guild: Guild = await this.guildService.getGuildById(guildId);
+        return guild && this.getChannelFromGuild(guild, channelId);
+    }
+
+    async getTextChannel(guildId: string, channelId: string): Promise<TextChannel>{
+        const guild: Guild = await this.guildService.getGuildById(guildId);
+        return guild && this.getTextChannelFromGuild(guild, channelId);
     }
 
     getChannelFromGuildByName(guild: Guild, channelName: string): GuildChannel {
