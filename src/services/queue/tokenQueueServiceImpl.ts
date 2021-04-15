@@ -4,6 +4,7 @@ import {inject, injectable} from "inversify";
 import {TYPES} from "../../config/types";
 import {Queue, Worker} from "bullmq";
 import {TokenQueueService} from "../../interfaces/services/queue/tokenQueueService";
+import {logger} from "../../logger";
 @injectable()
 export class TokenQueueServiceImpl implements TokenQueueService{
     private readonly redisClient: Redis;
@@ -19,6 +20,7 @@ export class TokenQueueServiceImpl implements TokenQueueService{
     }
 
     async addTokenMetadataToQueue(token: TokenMetadata) {
+        logger.debug(`Adding token ${JSON.stringify(token)} to queue`);
         await this.queue.add(token.id.toString(), token);
     }
 

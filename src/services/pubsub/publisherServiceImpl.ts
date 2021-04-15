@@ -11,6 +11,7 @@ export class PublisherServiceImpl implements PublisherService{
     }
 
     async publishToTokenChannel(message: string): Promise<number> {
+        logger.debug(`Publishing to token channel, message: ${message}`);
         try{
             return await this.redisPublisherClient.publish("tokenChannelQueue", message);
         }catch (e){

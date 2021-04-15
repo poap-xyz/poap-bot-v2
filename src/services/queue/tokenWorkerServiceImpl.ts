@@ -24,7 +24,7 @@ export class TokenWorkerServiceImpl implements TokenWorkerService{
     }
 
     createWorker(): Worker {
-        const newWorker = new Worker<TokenMetadata, Token>('token', this.workerProcessor, { connection: this.redisClient });
+        const newWorker = new Worker<TokenMetadata, Token>('token', async (m) => await this.workerProcessor(m), { connection: this.redisClient });
         newWorker.on("completed", async (job: Job, value: Token) => {
             /* Publish to all subscribers the new token */
             await this.publisherService.publishToTokenChannel(value.tokenId.toString());
@@ -75,6 +75,7 @@ export class TokenWorkerServiceImpl implements TokenWorkerService{
         try {
             const tokenByIdApiUrl = BotConfig.poapCoreAPI + BotConfig.poapCoreTokenAPIURI + tokenId;
             const request = await axios.get(tokenByIdApiUrl);
+            logger.debug(`[TokenWorkerService] token from api request response ${JSON.stringify(request.data)}`);
             return <Token>(request.data);
         }catch (e){
             logger.error(`[TokenWorkerService] Error requesting token by id, error: ${e}`);
@@ -128,6 +129,7 @@ export class TokenWorkerServiceImpl implements TokenWorkerService{
         try {
             const ensLookupApiUrl = BotConfig.poapCoreAPI + BotConfig.poapCoreENSLookupAPIURI + address;
             const request = await axios.get(ensLookupApiUrl);
+            logger.debug(`[TokenWorkerService ENS request response ${JSON.stringify(request.data)}`);
 
             const {valid, ens} = request.data;
             if(valid)
@@ -144,6 +146,7 @@ export class TokenWorkerServiceImpl implements TokenWorkerService{
         try {
             const tokensByAddressApiUrl = BotConfig.poapCoreAPI + BotConfig.poapCoreScanAPIURI + address;
             const request = await axios.get(tokensByAddressApiUrl);
+            logger.debug(`[TokenWorkerService Request tokens by address response ${JSON.stringify(request.data)}`);
             return <Token[]>(request.data);
         }catch (e){
             logger.error(`[TokenWorkerService] Error requesting tokens in address, error: ${e}`);
