@@ -18,7 +18,6 @@ export class MintChannelServiceImpl implements MintChannelService{
     private readonly subscriberService: SubscriberService;
     private readonly mintService: MintService;
     private readonly channelService: ChannelService;
-
     private subscriberCallback: SubscriberCallback;
 
 
@@ -47,11 +46,11 @@ export class MintChannelServiceImpl implements MintChannelService{
     }
 
     private createSubscriberCallback(): SubscriberCallback{
-        const sendMintToChannelsFunction = this.sendMintInfoToChannels;
+        const _this = this;
         return new class implements SubscriberCallback {
             async callback(message: string) {
                 try {
-                    await sendMintToChannelsFunction(message);
+                    await _this.sendMintInfoToChannels(message);
                 }catch (e){
                     logger.error(`[MintChannelService] Executing callback, error: ${e}`)
                 }
@@ -93,7 +92,7 @@ export class MintChannelServiceImpl implements MintChannelService{
         return [...this.channels];
     }
 
-    getSubscriberCallback(): SubscriberCallback{
+    getSubscriberCallback(): SubscriberCallback {
         return this.subscriberCallback;
     }
 

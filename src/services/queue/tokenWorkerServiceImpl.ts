@@ -37,6 +37,7 @@ export class TokenWorkerServiceImpl implements TokenWorkerService{
     private async workerProcessor(job: Job<TokenMetadata, Token>): Promise<Token>{
         const tokenMetadata: TokenMetadata = job.data;
         const account = await this.getAccount(tokenMetadata.owner.id);
+        logger.debug(`ACCOUNT ${JSON.stringify(account)}`)
         const token = await this.getToken(tokenMetadata, account);
         if(!token)
             return Promise.reject("No token could be fetched");
@@ -68,6 +69,7 @@ export class TokenWorkerServiceImpl implements TokenWorkerService{
         if(!(account && account.tokens)){
             return undefined;
         }
+
         return account.tokens.find((value => value.tokenId === token.id));
     }
 
@@ -85,9 +87,11 @@ export class TokenWorkerServiceImpl implements TokenWorkerService{
 
     private async getAccount(address: string): Promise<Account>{
         try {
-            let cachedAccount = this.getAccountCached(address);
-            if (!cachedAccount)
-                cachedAccount = this.requestAndCacheAccount(address);
+            let cachedAccount = await this.getAccountCached(address);
+            console.log(cachedAccount + "hola")
+            if (!cachedAccount){
+                cachedAccount = await this.requestAndCacheAccount(address);
+            }
 
             return cachedAccount;
         }catch (e){
@@ -98,7 +102,7 @@ export class TokenWorkerServiceImpl implements TokenWorkerService{
     private async getAccountCached(address: string): Promise<Account>{
         try {
             const tokensInAddress = await this.redisClient.hget("accounts", address);
-            if(tokensInAddress === "")
+            if(!tokensInAddress)
                 return undefined;
 
             return JSON.parse(tokensInAddress);
@@ -109,6 +113,7 @@ export class TokenWorkerServiceImpl implements TokenWorkerService{
     }
 
     private async requestAndCacheAccount(address: string): Promise<Account>{
+        console.log("hola");
         const tokens = await TokenWorkerServiceImpl.requestTokensByAddressFromAPI(address);
         const ens = await TokenWorkerServiceImpl.requestENSByAddress(address);
         const account: Account = {address: address, ens: ens, tokens: tokens};
@@ -128,8 +133,9 @@ export class TokenWorkerServiceImpl implements TokenWorkerService{
     private static async requestENSByAddress(address: string): Promise<string>{
         try {
             const ensLookupApiUrl = BotConfig.poapCoreAPI + BotConfig.poapCoreENSLookupAPIURI + address;
+
             const request = await axios.get(ensLookupApiUrl);
-            logger.debug(`[TokenWorkerService ENS request response ${JSON.stringify(request.data)}`);
+            logger.debug(`[TokenWorkerService] ENS request response ${JSON.stringify(request.data)}`);
 
             const {valid, ens} = request.data;
             if(valid)
@@ -145,8 +151,9 @@ export class TokenWorkerServiceImpl implements TokenWorkerService{
     private static async requestTokensByAddressFromAPI(address: string): Promise<Token[]>{
         try {
             const tokensByAddressApiUrl = BotConfig.poapCoreAPI + BotConfig.poapCoreScanAPIURI + address;
+            console.log(tokensByAddressApiUrl)
             const request = await axios.get(tokensByAddressApiUrl);
-            logger.debug(`[TokenWorkerService Request tokens by address response ${JSON.stringify(request.data)}`);
+            logger.debug(`[TokenWorkerService] Request tokens by address response ${JSON.stringify(request.data)}`);
             return <Token[]>(request.data);
         }catch (e){
             logger.error(`[TokenWorkerService] Error requesting tokens in address, error: ${e}`);
