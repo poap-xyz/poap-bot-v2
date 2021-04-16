@@ -29,6 +29,10 @@ export class TokenWorkerServiceImpl implements TokenWorkerService{
             /* Publish to all subscribers the new token */
             await this.publisherService.publishToTokenChannel(value.tokenId.toString());
         });
+        newWorker.on("failed", (job: Job, failedReason: string) => {
+            // Do something with the return value.
+            logger.error(`[TokenWorkerService] Job ${JSON.stringify(job.data)}, failed. Reason: ${failedReason}`);
+        });
         this.workers.push(newWorker);
 
         return newWorker;
@@ -88,7 +92,6 @@ export class TokenWorkerServiceImpl implements TokenWorkerService{
     private async getAccount(address: string): Promise<Account>{
         try {
             let cachedAccount = await this.getAccountCached(address);
-            console.log(cachedAccount + "hola")
             if (!cachedAccount){
                 cachedAccount = await this.requestAndCacheAccount(address);
             }
@@ -113,7 +116,6 @@ export class TokenWorkerServiceImpl implements TokenWorkerService{
     }
 
     private async requestAndCacheAccount(address: string): Promise<Account>{
-        console.log("hola");
         const tokens = await TokenWorkerServiceImpl.requestTokensByAddressFromAPI(address);
         const ens = await TokenWorkerServiceImpl.requestENSByAddress(address);
         const account: Account = {address: address, ens: ens, tokens: tokens};

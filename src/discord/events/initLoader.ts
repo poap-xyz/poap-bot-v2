@@ -28,15 +28,22 @@ export class InitLoader {
     }
 
     async init(){
-        if(!(await this.maintenanceDBService.isDBReady()))
-            throw new Error("DB Not ready!");
-
-        if(!(await this.maintenanceDBService.checkTablesCreated()))
-            await this.maintenanceDBService.createTables();
-
+        await this.initDB();
         await this.eventScheduleService.schedulePendingEvents();
         await this.mintChannelService.initSubscribers();
         await this.mintService.cacheLastMintedTokens();
         this.tokenWorkerService.createWorker();
+    }
+
+    private async initDB(){
+        if(!(await this.maintenanceDBService.isDBReady()))
+            throw new Error("DB Not ready!");
+
+        try {
+            if (!(await this.maintenanceDBService.checkTablesCreated()))
+                await this.maintenanceDBService.createTables();
+        }catch (e){
+            throw new Error(`DB populate error: ${e}`);
+        }
     }
 }

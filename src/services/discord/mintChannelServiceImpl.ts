@@ -1,15 +1,12 @@
 import {MintChannelService} from "../../interfaces/services/discord/mintChannelService";
-import {Channel, Guild, GuildChannel, MessageEmbed, TextChannel} from "discord.js";
+import {MessageEmbed, TextChannel} from "discord.js";
 import {SubscriberService} from "../../interfaces/services/pubsub/subscriberService";
 import {SubscriberCallback} from "../../interfaces/callback/subscriberCallback";
 import {inject, injectable} from "inversify";
 import {TYPES} from "../../config/types";
 import {logger} from "../../logger";
 import {MintService} from "../../interfaces/services/core/mintService";
-import {BotEvent} from "../../models/core/botEvent";
-import {TimeToEvent} from "../../interfaces/services/schedule/eventScheduleService";
 import {Token} from "../../models/poap/token";
-import {GuildService} from "../../interfaces/services/discord/guildService";
 import {ChannelService} from "../../interfaces/services/discord/channelService";
 
 @injectable()
