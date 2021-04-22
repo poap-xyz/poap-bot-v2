@@ -2,16 +2,10 @@ import {BotEvent} from "../../models/core/botEvent";
 import {inject, injectable} from "inversify";
 import {EventService} from "../../interfaces/services/core/eventService";
 import {TYPES} from "../../config/types";
-import {
-    EventSchedule,
-    EventScheduleService,
-    TimeToEvent
-} from "../../interfaces/services/schedule/eventScheduleService";
+import {EventSchedule, EventScheduleService, TimeToEvent } from "../../interfaces/services/schedule/eventScheduleService";
 import {ScheduleCallback} from "../../interfaces/callback/schedeuleCallback";
 import {ScheduleService} from "../../interfaces/services/schedule/scheduleService";
 import {logger} from "../../logger";
-import {Guild, GuildChannel, TextChannel} from "discord.js";
-import {GuildService} from "../../interfaces/services/discord/guildService";
 import {ChannelService} from "../../interfaces/services/discord/channelService";
 
 @injectable()

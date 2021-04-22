@@ -15,7 +15,13 @@ export const TYPES = {
     EventDao: Symbol("EventDao"),
     CodeDao: Symbol("CodeDao"),
     UserDao: Symbol("UserDao"),
+    SubscribedChannelDao: Symbol("SubscribedChannelDao"),
+
     MaintenanceDB: Symbol("MaintenanceDB"),
+
+    /* Cache Types */
+    TokenCacheService: Symbol("TokenCacheService"),
+    AccountCacheService: Symbol("AccountCacheService"),
 
     /* Services Types */
     EventService: Symbol("EventService"),

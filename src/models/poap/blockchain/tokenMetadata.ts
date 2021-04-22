@@ -1,4 +1,3 @@
-import {Account} from "../account";
 import {EventMetadata} from "./eventMetadata";
 import {AccountMetadata} from "./accountMetadata";
 

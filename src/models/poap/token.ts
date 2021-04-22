@@ -1,4 +1,3 @@
-import {Account} from "./account";
 import {PoapEvent} from "./poapEvent";
 import {Chain} from "./blockchain/tokenMetadata";
 

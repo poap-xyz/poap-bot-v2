@@ -10,16 +10,21 @@ import axios from "axios";
 import {BotConfig} from "../../config/bot.config";
 import {TokenWorkerService} from "../../interfaces/services/queue/tokenWorkerService";
 import {PublisherService} from "../../interfaces/services/pubsub/publisherService";
+import {TokenCacheService} from "../../interfaces/services/cache/tokenCacheService";
+import {AccountCacheService} from "../../interfaces/services/cache/accountCacheService";
 @injectable()
 export class TokenWorkerServiceImpl implements TokenWorkerService{
     private readonly publisherService: PublisherService;
-    private readonly redisClient: Redis;
+    private readonly tokenCacheService: TokenCacheService;
+    private readonly accountCacheService: AccountCacheService;
     private workers: Worker[];
 
-    constructor(@inject(TYPES.Cache) redisClient: Redis,
-                @inject(TYPES.PublisherService) publisherService: PublisherService) {
-        this.redisClient = redisClient;
+    constructor(@inject(TYPES.PublisherService) publisherService: PublisherService,
+                @inject(TYPES.TokenCacheService) tokenCacheService: TokenCacheService,
+                @inject(TYPES.AccountCacheService) accountCacheService: AccountCacheService) {
         this.publisherService = publisherService;
+        this.tokenCacheService = tokenCacheService;
+        this.accountCacheService = accountCacheService;
         this.workers = [];
     }
 

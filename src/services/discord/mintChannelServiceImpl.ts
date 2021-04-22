@@ -5,7 +5,7 @@ import {SubscriberCallback} from "../../interfaces/callback/subscriberCallback";
 import {inject, injectable} from "inversify";
 import {TYPES} from "../../config/types";
 import {logger} from "../../logger";
-import {MintService} from "../../interfaces/services/core/mintService";
+import {ContractService} from "../../interfaces/services/core/contract/contractService";
 import {Token} from "../../models/poap/token";
 import {ChannelService} from "../../interfaces/services/discord/channelService";
 
@@ -13,13 +13,12 @@ import {ChannelService} from "../../interfaces/services/discord/channelService";
 export class MintChannelServiceImpl implements MintChannelService{
     private readonly channels: TextChannel[];
     private readonly subscriberService: SubscriberService;
-    private readonly mintService: MintService;
+    private readonly mintService: ContractService;
     private readonly channelService: ChannelService;
     private subscriberCallback: SubscriberCallback;
 
-
     constructor(@inject(TYPES.SubscriberService) subscriberService: SubscriberService,
-                @inject(TYPES.MintService) mintService: MintService,
+                @inject(TYPES.MintService) mintService: ContractService,
                 @inject(TYPES.ChannelService) channelService: ChannelService) {
         this.channels = [];
         this.mintService = mintService;

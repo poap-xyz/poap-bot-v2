@@ -4,7 +4,7 @@ import {TYPES} from "../../config/types";
 import {EventScheduleService} from "../../interfaces/services/schedule/eventScheduleService";
 import {MaintenanceDBService} from "../../interfaces/services/maintenance/maintenanceDBService";
 import {MintChannelService} from "../../interfaces/services/discord/mintChannelService";
-import {MintService} from "../../interfaces/services/core/mintService";
+import {ContractService} from "../../interfaces/services/core/contract/contractService";
 import {TokenWorkerService} from "../../interfaces/services/queue/tokenWorkerService";
 
 @injectable()
@@ -13,13 +13,13 @@ export class InitLoader {
     private readonly maintenanceDBService: MaintenanceDBService;
     private readonly mintChannelService: MintChannelService;
     private readonly tokenWorkerService: TokenWorkerService;
-    private readonly mintService: MintService;
+    private readonly mintService: ContractService;
 
     constructor(@inject(TYPES.EventScheduleService) eventScheduleService: EventScheduleService,
                 @inject(TYPES.MaintenanceDBService) maintenanceDBService: MaintenanceDBService,
                 @inject(TYPES.TokenWorkerService) tokenWorkerService: TokenWorkerService,
                 @inject(TYPES.MintChannelService) mintChannelService: MintChannelService,
-                @inject(TYPES.MintService) mintService: MintService) {
+                @inject(TYPES.MintService) mintService: ContractService) {
         this.eventScheduleService = eventScheduleService;
         this.maintenanceDBService = maintenanceDBService;
         this.tokenWorkerService = tokenWorkerService;
@@ -31,7 +31,7 @@ export class InitLoader {
         await this.initDB();
         await this.eventScheduleService.schedulePendingEvents();
         await this.mintChannelService.initSubscribers();
-        await this.mintService.cacheLastMintedTokens();
+        await this.mintService.initListener();
         this.tokenWorkerService.createWorker();
     }
 

@@ -1,19 +1,16 @@
-import {MintService} from "../../interfaces/services/core/mintService";
+import {ContractService} from "../../../interfaces/services/core/contract/contractService";
 import axios from "axios";
-import {logger} from "../../logger";
-import {BotConfig} from "../../config/bot.config";
-import {TokenMetadata} from "../../models/poap/blockchain/tokenMetadata";
+import {logger} from "../../../logger";
+import {BotConfig} from "../../../config/bot.config";
+import {TokenMetadata} from "../../../models/poap/blockchain/tokenMetadata";
 import {Redis} from "ioredis";
 import {inject, injectable} from "inversify";
-import {TYPES} from "../../config/types";
-import {CodeInput} from "../../models/input/codeInput";
-import {TokenQueueService} from "../../interfaces/services/queue/tokenQueueService";
-import { Token } from "../../models/poap/token";
-import json = Mocha.reporters.json;
+import {TYPES} from "../../../config/types";
+import {TokenQueueService} from "../../../interfaces/services/queue/tokenQueueService";
+import { Token } from "../../../models/poap/token";
 
 @injectable()
-export class MintServiceImpl implements MintService {
-    private static readonly POAP_API_ADDRESS_POAPS = BotConfig.poapCoreAPI + BotConfig.poapCoreScanAPIURI;
+export class ContractServiceTheGraphImpl implements ContractService {
     private readonly redisClient: Redis;
     private readonly tokenQueueService: TokenQueueService;
 
@@ -21,7 +18,6 @@ export class MintServiceImpl implements MintService {
         this.redisClient = redisClient;
         this.tokenQueueService = tokenQueueService;
     }
-
     async getTokenFromCache(tokenId: string | number): Promise<Token> {
         return JSON.parse(await this.redisClient.hget("tokens", tokenId.toString()));
     }
@@ -30,7 +26,8 @@ export class MintServiceImpl implements MintService {
         return JSON.parse(await this.redisClient.hget("accounts", address));
     }
 
-    async cacheLastMintedTokens() {
+    async initListener() {
+        //add a cron job here
         const timestamp = await this.getLastOrDefaultTimestamp();
         const mintedxDaiPoaps = await this.requestLastMintedPoapsByTimestamp(BotConfig.poapSubgraphxDai, timestamp);
         this.tokenQueueService.addTokensMetadataToQueue(mintedxDaiPoaps);
@@ -38,7 +35,6 @@ export class MintServiceImpl implements MintService {
 
     private async getLastOrDefaultTimestamp(): Promise<string>{
         const defaultTimestamp = new Date();
-        defaultTimestamp.setHours(defaultTimestamp.getHours() - 200); //TODO remove this after testing, default date should be now
         try {
             const lastTimestamp = await this.getLastTimestamp();
             if(lastTimestamp)
@@ -68,13 +64,13 @@ export class MintServiceImpl implements MintService {
         let mintedPoaps: TokenMetadata[] = [];
         do {
             try {
-                const queryJSON = MintServiceImpl.getLastTokensByTimestampQuery(last_id, timestamp);
+                const queryJSON = ContractServiceTheGraphImpl.getLastTokensByTimestampQuery(last_id, timestamp);
                 const stringifiedQuery = JSON.stringify(queryJSON);
                 const axiosResponse = await axios.post(url, stringifiedQuery);
                 logger.debug(`[MintService] Blockchain Thegraph query: ${stringifiedQuery}, response: ${JSON.stringify(axiosResponse.data)}`);
 
                 const partialMintedPoaps: TokenMetadata[] = axiosResponse.data && axiosResponse.data.data && axiosResponse.data.data.tokens;
-                last_id = MintServiceImpl.addTokensToListAndGetLastId(partialMintedPoaps, mintedPoaps);
+                last_id = ContractServiceTheGraphImpl.addTokensToListAndGetLastId(partialMintedPoaps, mintedPoaps);
 
                 if(!last_id){
                     await this.setLastTimestamp();

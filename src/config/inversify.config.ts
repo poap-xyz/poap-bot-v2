@@ -35,18 +35,22 @@ import {MaintenanceDB} from "../interfaces/persistence/maintenance/maintenanceDB
 import {ChannelService} from "../interfaces/services/discord/channelService";
 import {ChannelServiceImpl} from "../services/discord/channelServiceImpl";
 import {Redis} from "ioredis";
-import {MintService} from "../interfaces/services/core/mintService";
+import {ContractService} from "../interfaces/services/core/contract/contractService";
 import {SubscriberServiceImpl} from "../services/pubsub/subscriberServiceImpl";
 import {PublisherService} from "../interfaces/services/pubsub/publisherService";
 import {SubscriberService} from "../interfaces/services/pubsub/subscriberService";
 import {MintChannelService} from "../interfaces/services/discord/mintChannelService";
 import {MintChannelServiceImpl} from "../services/discord/mintChannelServiceImpl";
 import {PublisherServiceImpl} from "../services/pubsub/publisherServiceImpl";
-import {MintServiceImpl} from "../services/core/mintServiceImpl";
+import {ContractServiceTheGraphImpl} from "../services/core/contract/contractServiceTheGraphImpl";
 import {TokenQueueServiceImpl} from "../services/queue/tokenQueueServiceImpl";
 import {TokenQueueService} from "../interfaces/services/queue/tokenQueueService";
 import {TokenWorkerServiceImpl} from "../services/queue/tokenWorkerServiceImpl";
 import {TokenWorkerService} from "../interfaces/services/queue/tokenWorkerService";
+import {AccountCacheService} from "../interfaces/services/cache/accountCacheService";
+import {AccountCacheServiceImpl} from "../services/cache/accountCacheServiceImpl";
+import {TokenCacheService} from "../interfaces/services/cache/tokenCacheService";
+import {TokenCacheServiceImpl} from "../services/cache/tokenCacheServiceImpl";
 
 
 let container = new Container();
@@ -68,11 +72,16 @@ container.bind<UserDao>(TYPES.UserDao).to(UserDaoImpl).inSingletonScope();
 /* DB Maintenance persistence binds */
 container.bind<MaintenanceDB>(TYPES.MaintenanceDB).to(MaintenanceDBImpl).inSingletonScope();
 
+/* Cache binds */
+container.bind<TokenCacheService>(TYPES.TokenCacheService).to(TokenCacheServiceImpl).inSingletonScope();
+container.bind<AccountCacheService>(TYPES.AccountCacheService).to(AccountCacheServiceImpl).inSingletonScope();
+
 /* Core Services binds */
 container.bind<EventService>(TYPES.EventService).to(EventServiceImpl).inSingletonScope();
 container.bind<CodeService>(TYPES.CodeService).to(CodeServiceImpl).inSingletonScope();
 container.bind<UserService>(TYPES.UserService).to(UserServiceImpl).inSingletonScope();
-container.bind<MintService>(TYPES.MintService).to(MintServiceImpl).inSingletonScope();
+container.bind<ContractService>(TYPES.MintService).to(ContractServiceTheGraphImpl).inSingletonScope();
+
 /* PubSub Services binds */
 container.bind<SubscriberService>(TYPES.SubscriberService).to(SubscriberServiceImpl).inSingletonScope();
 container.bind<PublisherService>(TYPES.PublisherService).to(PublisherServiceImpl).inSingletonScope();
