@@ -2,7 +2,7 @@ import {ContractService} from "../../../interfaces/services/core/contract/contra
 import axios from "axios";
 import {logger} from "../../../logger";
 import {BotConfig} from "../../../config/bot.config";
-import {Chain, TokenMetadata} from "../../../models/poap/blockchain/tokenMetadata";
+import {TokenMetadata} from "../../../models/poap/blockchain/tokenMetadata";
 import {Redis} from "ioredis";
 import {inject, injectable} from "inversify";
 import {TYPES} from "../../../config/types";
@@ -12,6 +12,8 @@ import {AccountCacheService} from "../../../interfaces/services/cache/accountCac
 import {PoapAbi} from "../../../config/poap.abi";
 import Web3 from 'web3';
 import {Web3Config} from "../../../config/web3.config";
+import {Chain} from "../../../models/poap/blockchain/chainType";
+import {Action} from "../../../models/poap/blockchain/actionType";
 
 @injectable()
 export class ContractServiceImpl implements ContractService {
@@ -41,9 +43,9 @@ export class ContractServiceImpl implements ContractService {
     }
 
     private subscribeToTransfer(provider: string, address: string, network: Chain){
-        new Web3.providers.WebsocketProvider(provider, Web3Config.WSOptions);
-        const web3 = new Web3(
 
+        const web3 = new Web3(
+            new Web3.providers.WebsocketProvider(provider, Web3Config.WSOptions)
         );
 
         const PoapContract = new web3.eth.Contract(PoapAbi, address);
@@ -58,6 +60,7 @@ export class ContractServiceImpl implements ContractService {
                     event: result.returnValues.eventId,
                     to: result.returnValues.to,
                     from: result.returnValues.from,
+                    action: ContractServiceImpl.getTokenAction(result.returnValues.from, result.returnValues.to),
                     chain: network,
                 };
 
@@ -73,5 +76,15 @@ export class ContractServiceImpl implements ContractService {
                 logger.info(`[ContractService] Error to ${network} - ${error} `);
             });
         return web3;
-    };
+    }
+
+    private static getTokenAction(from: string, to: string): Action{
+        if(from === Web3Config.zeroAddress)
+            return "MINT";
+
+        if(to === Web3Config.zeroAddress)
+            return "BURN";
+
+        return "TRANSFER";
+    }
 }

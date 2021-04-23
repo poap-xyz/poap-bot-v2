@@ -1,4 +1,4 @@
-import * as moment from "moment";
+import moment from 'moment'
 import {BotConfig} from "../../../../config/bot.config";
 import {SetupState, SetupStep, SetupStepId} from "../../../../interfaces/command/setup/setup.interface";
 import {Message} from "discord.js";

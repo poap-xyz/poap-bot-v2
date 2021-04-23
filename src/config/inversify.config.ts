@@ -1,8 +1,8 @@
 import "reflect-metadata";
 import {DBConfig} from "./db.config";
-import * as pgPromise from 'pg-promise';
+import pgPromise from 'pg-promise';
 import {RedisConfig} from "./redis.config";
-import * as IORedis from "ioredis";
+import IORedis from "ioredis";
 import {Container} from "inversify";
 import {TYPES} from "./types";
 import {Bot} from "../bot";

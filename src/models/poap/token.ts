@@ -1,5 +1,5 @@
 import {PoapEvent} from "./poapEvent";
-import {Chain} from "./blockchain/tokenMetadata";
+import {Chain} from "./blockchain/chainType";
 
 export interface Token {
     tokenId: number,
