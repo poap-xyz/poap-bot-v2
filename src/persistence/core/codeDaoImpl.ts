@@ -38,15 +38,14 @@ export class CodeDaoImpl implements CodeDao{
         return await this.db.task(async (t) => {
             let code = await t.oneOrNone(
                 "SELECT code FROM codes WHERE event_id = $1 AND username = $2::text",
-                [event_id, username]);
+                [event_id, username], (a: {code: string}) => a.code);
             if(code)
                 return code;
 
             // TODO check whitelisted for event_id
             code = await t.one(
                 "UPDATE codes SET username = $1, claimed_date = $3::timestamp WHERE code in (SELECT code FROM codes WHERE event_id = $2 AND username IS NULL ORDER BY RANDOM() LIMIT 1) RETURNING code",
-                [username, event_id, now]
-            );
+                [username, event_id, now], (a: {code: string}) => a.code);
             return code;
         })
     }

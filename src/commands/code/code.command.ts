@@ -10,6 +10,7 @@ import {logger} from "../../logger";
 import {CodeService} from "../../interfaces/services/core/codeService";
 import {ChannelService} from "../../interfaces/services/discord/channelService";
 import {BotConfig} from "../../config/bot.config";
+import {BotEvent} from "../../models/core/botEvent";
 
 export default class CodeCommand extends Command{
     @lazyInject(TYPES.EventService) readonly eventService: EventService;
@@ -32,13 +33,19 @@ export default class CodeCommand extends Command{
 
     protected async execute(commandContext: CommandContext): Promise<Message>{
         const event = await this.eventService.getEventFromPass(commandContext.message.content);
-        const claimCode = this.codeService.checkCodeForEventUsername(event.id, commandContext.message.author.id);
+        const claimCode = await this.codeService.checkCodeForEventUsername(event.id, commandContext.message.author.id);
+
         if(claimCode){
-            const response = event.response_message.replace(BotConfig.responseMessageReplace, claimCode);
+            const response = CodeCommand.setClaimInResponseMessage(event, claimCode);
             return await commandContext.message.reply(response);
         }
 
         await commandContext.message.react("🤔");
         return await commandContext.message.reply("Sorry there are no more POAPs available for this event!");
+    }
+
+    private static setClaimInResponseMessage(event: BotEvent, claimCode: string){
+        const claimUrl = BotConfig.PoapClaimUrl + claimCode;
+        return event.response_message.replace(BotConfig.responseMessageReplace, claimUrl);
     }
 }

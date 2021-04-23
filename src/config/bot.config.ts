@@ -17,6 +17,8 @@ export const BotConfig = {
         100: "🔥"
     },
 
+    PoapClaimUrl: "https://poap.xyz/claim/",
+
     commandFilePrefix: 'command',
 }
 
