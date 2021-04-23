@@ -22,7 +22,7 @@ export class TokenCacheServiceImpl implements TokenCacheService{
     }
 
     async saveTokenInCache(token: Token) {
-        const response = await this.redisClient.hset("tokens", token.tokenId, JSON.stringify(token));
+        const response = await this.redisClient.hset("tokens", token.tokenId.toString(), JSON.stringify(token));
         return token;
     }
 

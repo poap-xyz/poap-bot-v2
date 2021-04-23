@@ -87,7 +87,7 @@ export class MintChannelServiceImpl implements MintChannelService{
                     inline: true,
                 },
                 { name: "Token ID", value: `#${token.tokenId}`, inline: true },
-                { name: "Event ID", value: `#${token.event.fancy_id}`, inline: true }
+                { name: "Event ID", value: `#${token.event.id}`, inline: true }
             )
             .setURL(`https://poap.gallery/event/${token.event.id}/?utm_share=discordfeed`)
             .setTimestamp()
@@ -105,7 +105,7 @@ export class MintChannelServiceImpl implements MintChannelService{
         let lastKey;
 
         for (let key in powerEmoji) {
-            if (powerEmoji.hasOwnProperty(key) && Number.isInteger(key)) {
+            if (powerEmoji.hasOwnProperty(key)) {
                 if(poapPower < parseInt(key)){
                     return powerEmoji[key];
                 }

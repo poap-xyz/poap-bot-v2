@@ -54,8 +54,8 @@ export class TokenWorkerServiceImpl implements TokenWorkerService{
             // Do something with the return value.
             logger.error(`[TokenWorkerService] Job ${JSON.stringify(job.data)}, failed. Reason: ${failedReason}`);
         });
-        this.workers.push(newWorker);
 
+        this.workers.push(newWorker);
         return newWorker;
     }
 
@@ -64,8 +64,6 @@ export class TokenWorkerServiceImpl implements TokenWorkerService{
         logger.debug(`[TokenWorkerService] Token metadata: ${JSON.stringify(tokenMetadata)}`);
 
         const account = await this.getAccount(tokenMetadata.to);
-        logger.debug(`[TokenWorkerService] Account fetched: ${JSON.stringify(account)}`);
-
         const token = await this.getAndCacheTokenWithMetadata(tokenMetadata, account);
         logger.debug(`[TokenWorkerService] Token fetched: ${JSON.stringify(token)}`);
 
@@ -80,25 +78,41 @@ export class TokenWorkerServiceImpl implements TokenWorkerService{
         if(!token)
             return undefined;
 
-        const tokenWithMetadata = {
-            ...token,
-            chain: tokenMetadata.chain,
-            action: tokenMetadata.action
-        }
+        const tokenWithMetadata = TokenWorkerServiceImpl.addMetadataToToken(token, tokenMetadata);
+
         /* Cache token for further use */
-        await this.saveTokenToCache(tokenWithMetadata, tokenMetadata.to);
+        await this.saveTokenToCache(tokenWithMetadata);
 
         return tokenWithMetadata;
     }
 
+    private static addMetadataToToken(token: Token, tokenMetadata: TokenMetadata){
+        return {
+            ...token,
+            chain: tokenMetadata.chain,
+            action: tokenMetadata.action
+        }
+    }
+
+    private async saveTokenToCache(token: Token){
+        try {
+            await this.tokenCacheService.saveTokenInCache(token);
+        }catch (e){
+            logger.error(`[TokenWorkerService] Error saving token to cache, message: ${e}`);
+            return Promise.reject(e);
+        }
+    }
     private async getToken(tokenMetadata: TokenMetadata, account?: Account): Promise<Token>{
         let token = this.getTokenFromAccount(tokenMetadata, account);
         if(token)
             return token;
 
         try{
-            return await TokenWorkerServiceImpl.requestTokenFromAPI(tokenMetadata.id);
+            const token = await TokenWorkerServiceImpl.requestTokenFromAPI(tokenMetadata.id);
+            await this.saveTokenToAccountCache(token, tokenMetadata);
+            return token;
         }catch (e){
+            logger.error(`[TokenWorkerService] GetToken error: ${e}`);
             return undefined;
         }
     }
@@ -111,32 +125,20 @@ export class TokenWorkerServiceImpl implements TokenWorkerService{
         return account.tokens.find((value => value.tokenId === token.id));
     }
 
-    private async saveTokenToCache(token: Token, address: string){
-        try {
-            await this.tokenCacheService.saveTokenInCache(token);
-            await this.saveTokenToAccountCache(token, address);
-        }catch (e){
-            logger.error(`[TokenWorkerService] Error saving token to cache, message: ${e}`);
-            return Promise.reject(e);
-        }
-    }
-
-    private async saveTokenToAccountCache(tokenWithMetadata: Token, address: string): Promise<number>{
-        const account = await this.accountCacheService.getAccountFromCache(address);
+    private async saveTokenToAccountCache(token: Token, tokenMetadata: TokenMetadata): Promise<number>{
+        const account = await this.accountCacheService.getAccountFromCache(token.owner);
         if(!(account && account.tokens))
             return undefined;
 
-        account.tokens.push(tokenWithMetadata);
-        await this.accountCacheService.saveAccountInCache(account);
-
-        return account.tokens.length;
+        account.tokens.push(TokenWorkerServiceImpl.addMetadataToToken(token, tokenMetadata));
+        return await this.accountCacheService.saveAccountInCache(account);
     }
 
     private static async requestTokenFromAPI(tokenId: number): Promise<Token>{
         const tokenByIdApiUrl = Web3Config.poapCoreAPI + Web3Config.poapCoreTokenAPIURI + tokenId;
         try {
             const request = await axios.get(tokenByIdApiUrl);
-            logger.debug(`[TokenWorkerService] token from api request response ${JSON.stringify(request.data)}`);
+            logger.debug(`[TokenWorkerService] Token from api request response ${JSON.stringify(request.data)}`);
             return <Token>(request.data);
         }catch (e){
             logger.error(`[TokenWorkerService] Error requesting token by id, URL: ${tokenByIdApiUrl}, error: ${e}`);
@@ -187,7 +189,7 @@ export class TokenWorkerServiceImpl implements TokenWorkerService{
             const ensLookupApiUrl = Web3Config.poapCoreAPI + Web3Config.poapCoreENSLookupAPIURI + address;
 
             const request = await axios.get(ensLookupApiUrl);
-            logger.debug(`[TokenWorkerService] ENS request response ${JSON.stringify(request.data)}`);
+            logger.debug(`[TokenWorkerService] ENS request response OK`); //${JSON.stringify(request.data)}
 
             const {valid, ens} = request.data;
             if(valid)
@@ -204,7 +206,7 @@ export class TokenWorkerServiceImpl implements TokenWorkerService{
         const tokensByAddressApiUrl = Web3Config.poapCoreAPI + Web3Config.poapCoreScanAPIURI + address;
         try {
             const request = await axios.get(tokensByAddressApiUrl);
-            logger.debug(`[TokenWorkerService] Request tokens by address response ${JSON.stringify(request.data)}`);
+            logger.debug(`[TokenWorkerService] Request tokens by address response OK`); //${JSON.stringify(request.data)}
             return <Token[]>(request.data);
         }catch (e){
             logger.error(`[TokenWorkerService] Error requesting tokens in address, URL: ${tokensByAddressApiUrl}, error: ${e}`);

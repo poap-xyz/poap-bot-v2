@@ -14,7 +14,8 @@ export const BotConfig = {
         10: "🟢",
         20: "🟡",
         50: "🔴",
-        100: "🔥"},
+        100: "🔥"
+    },
 
     commandFilePrefix: 'command',
 }

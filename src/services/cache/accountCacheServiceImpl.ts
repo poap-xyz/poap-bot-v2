@@ -1,4 +1,3 @@
-import {TokenCacheService} from "../../interfaces/services/cache/tokenCacheService";
 import {Redis} from "ioredis";
 import {TokenQueueService} from "../../interfaces/services/queue/tokenQueueService";
 import {inject, injectable} from "inversify";
@@ -18,14 +17,14 @@ export class AccountCacheServiceImpl implements AccountCacheService{
     }
 
     async getAccountFromCache(address: string): Promise<Account> {
-        const account = await this.redisClient.hget("accounts", address);
+        const account = await this.redisClient.hget("accounts", address.toLowerCase());
         if(!account)
             return undefined;
         return JSON.parse(account);
     }
 
     async saveAccountInCache(account: Account) {
-        const response = await this.redisClient.hset("accounts", account.address, JSON.stringify(account));
+        const response = await this.redisClient.hset("accounts", account.address.toLowerCase(), JSON.stringify(account));
         return account;
     }
 
