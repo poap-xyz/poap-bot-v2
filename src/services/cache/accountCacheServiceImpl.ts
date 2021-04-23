@@ -25,9 +25,7 @@ export class AccountCacheServiceImpl implements AccountCacheService{
     }
 
     async saveAccountInCache(account: Account) {
-        const response = await this.redisClient.set("accounts", JSON.stringify(account));
-        if(response !== "OK")
-            return Promise.reject(response);
+        const response = await this.redisClient.hset("accounts", account.address, JSON.stringify(account));
         return account;
     }
 

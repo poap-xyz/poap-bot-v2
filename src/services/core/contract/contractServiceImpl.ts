@@ -43,7 +43,6 @@ export class ContractServiceImpl implements ContractService {
     }
 
     private subscribeToTransfer(provider: string, address: string, network: Chain){
-
         const web3 = new Web3(
             new Web3.providers.WebsocketProvider(provider, Web3Config.WSOptions)
         );
@@ -57,7 +56,6 @@ export class ContractServiceImpl implements ContractService {
 
                 const tokenInfo: TokenMetadata = {
                     id: result.returnValues.tokenId,
-                    event: result.returnValues.eventId,
                     to: result.returnValues.to,
                     from: result.returnValues.from,
                     action: ContractServiceImpl.getTokenAction(result.returnValues.from, result.returnValues.to),
@@ -75,6 +73,7 @@ export class ContractServiceImpl implements ContractService {
             .on("error", (error) => {
                 logger.info(`[ContractService] Error to ${network} - ${error} `);
             });
+
         return web3;
     }
 

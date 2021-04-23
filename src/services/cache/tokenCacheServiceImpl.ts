@@ -22,9 +22,7 @@ export class TokenCacheServiceImpl implements TokenCacheService{
     }
 
     async saveTokenInCache(token: Token) {
-        const response = await this.redisClient.set("lastBlockchainPeekTimestamp", JSON.stringify(token));
-        if(response !== "OK")
-            return Promise.reject(response);
+        const response = await this.redisClient.hset("tokens", token.tokenId, JSON.stringify(token));
         return token;
     }
 

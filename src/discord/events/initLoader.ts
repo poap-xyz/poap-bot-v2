@@ -28,11 +28,11 @@ export class InitLoader {
     }
 
     async init(){
-        await this.contractService.initListener();
         await this.initDB();
         await this.eventScheduleService.schedulePendingEvents();
         await this.mintChannelService.initSubscribers();
-        this.tokenWorkerService.createWorker();
+        await this.contractService.initListener();
+        this.tokenWorkerService.createWorker(); //TODO Think if this should be in another process or docker image
     }
 
     private async initDB(){

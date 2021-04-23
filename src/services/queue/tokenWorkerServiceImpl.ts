@@ -12,6 +12,7 @@ import {TokenWorkerService} from "../../interfaces/services/queue/tokenWorkerSer
 import {PublisherService} from "../../interfaces/services/pubsub/publisherService";
 import {TokenCacheService} from "../../interfaces/services/cache/tokenCacheService";
 import {AccountCacheService} from "../../interfaces/services/cache/accountCacheService";
+import {Web3Config} from "../../config/web3.config";
 @injectable()
 export class TokenWorkerServiceImpl implements TokenWorkerService{
     private readonly publisherService: PublisherService;
@@ -32,11 +33,23 @@ export class TokenWorkerServiceImpl implements TokenWorkerService{
     }
 
     createWorker(): Worker {
-        const newWorker = new Worker<TokenMetadata, Token>('token', async (m) => await this.workerProcessor(m), { connection: this.redisClient });
+        logger.info(`[TokenWorkerService] Creating worker for Token Metadata`);
+        const newWorker = new Worker<TokenMetadata, Token>('token',
+            async (m) => await this.workerProcessor(m),
+            {
+                connection: this.redisClient,
+                limiter: {
+                    max: 50,
+                    duration: 5000,
+                    groupKey: 'tokenId'
+                }
+        });
+
         newWorker.on("completed", async (job: Job, value: Token) => {
             /* Publish to all subscribers the new token */
             await this.publisherService.publishToTokenChannel(value.tokenId.toString());
         });
+
         newWorker.on("failed", (job: Job, failedReason: string) => {
             // Do something with the return value.
             logger.error(`[TokenWorkerService] Job ${JSON.stringify(job.data)}, failed. Reason: ${failedReason}`);
@@ -48,25 +61,34 @@ export class TokenWorkerServiceImpl implements TokenWorkerService{
 
     private async workerProcessor(job: Job<TokenMetadata, Token>): Promise<Token>{
         const tokenMetadata: TokenMetadata = job.data;
+        logger.debug(`[TokenWorkerService] Token metadata: ${JSON.stringify(tokenMetadata)}`);
 
         const account = await this.getAccount(tokenMetadata.to);
         logger.debug(`[TokenWorkerService] Account fetched: ${JSON.stringify(account)}`);
 
-        const token = await this.getToken(tokenMetadata, account);
+        const token = await this.getAndCacheTokenWithMetadata(tokenMetadata, account);
         logger.debug(`[TokenWorkerService] Token fetched: ${JSON.stringify(token)}`);
 
         if(!token)
             return Promise.reject("No token could be fetched");
 
-        /* Cache token for further use */
-        try {
-            await this.tokenCacheService.saveTokenInCache(token);
-        }catch (e){
-            logger.error(`[TokenWorkerService] Error saving token to cache, message: ${e}`);
-            return Promise.reject(e);
-        }
-
         return token;
+    }
+
+    private async getAndCacheTokenWithMetadata(tokenMetadata: TokenMetadata, account?: Account): Promise<Token>{
+        const token = await this.getToken(tokenMetadata, account);
+        if(!token)
+            return undefined;
+
+        const tokenWithMetadata = {
+            ...token,
+            chain: tokenMetadata.chain,
+            action: tokenMetadata.action
+        }
+        /* Cache token for further use */
+        await this.saveTokenToCache(tokenWithMetadata, tokenMetadata.to);
+
+        return tokenWithMetadata;
     }
 
     private async getToken(tokenMetadata: TokenMetadata, account?: Account): Promise<Token>{
@@ -89,14 +111,35 @@ export class TokenWorkerServiceImpl implements TokenWorkerService{
         return account.tokens.find((value => value.tokenId === token.id));
     }
 
-    private static async requestTokenFromAPI(tokenId: number): Promise<Token>{
+    private async saveTokenToCache(token: Token, address: string){
         try {
-            const tokenByIdApiUrl = BotConfig.poapCoreAPI + BotConfig.poapCoreTokenAPIURI + tokenId;
+            await this.tokenCacheService.saveTokenInCache(token);
+            await this.saveTokenToAccountCache(token, address);
+        }catch (e){
+            logger.error(`[TokenWorkerService] Error saving token to cache, message: ${e}`);
+            return Promise.reject(e);
+        }
+    }
+
+    private async saveTokenToAccountCache(tokenWithMetadata: Token, address: string): Promise<number>{
+        const account = await this.accountCacheService.getAccountFromCache(address);
+        if(!(account && account.tokens))
+            return undefined;
+
+        account.tokens.push(tokenWithMetadata);
+        await this.accountCacheService.saveAccountInCache(account);
+
+        return account.tokens.length;
+    }
+
+    private static async requestTokenFromAPI(tokenId: number): Promise<Token>{
+        const tokenByIdApiUrl = Web3Config.poapCoreAPI + Web3Config.poapCoreTokenAPIURI + tokenId;
+        try {
             const request = await axios.get(tokenByIdApiUrl);
             logger.debug(`[TokenWorkerService] token from api request response ${JSON.stringify(request.data)}`);
             return <Token>(request.data);
         }catch (e){
-            logger.error(`[TokenWorkerService] Error requesting token by id, error: ${e}`);
+            logger.error(`[TokenWorkerService] Error requesting token by id, URL: ${tokenByIdApiUrl}, error: ${e}`);
             return Promise.reject(e);
         }
     }
@@ -141,7 +184,7 @@ export class TokenWorkerServiceImpl implements TokenWorkerService{
 
     private static async requestENSByAddress(address: string): Promise<string>{
         try {
-            const ensLookupApiUrl = BotConfig.poapCoreAPI + BotConfig.poapCoreENSLookupAPIURI + address;
+            const ensLookupApiUrl = Web3Config.poapCoreAPI + Web3Config.poapCoreENSLookupAPIURI + address;
 
             const request = await axios.get(ensLookupApiUrl);
             logger.debug(`[TokenWorkerService] ENS request response ${JSON.stringify(request.data)}`);
@@ -158,13 +201,13 @@ export class TokenWorkerServiceImpl implements TokenWorkerService{
     }
 
     private static async requestTokensByAddressFromAPI(address: string): Promise<Token[]>{
+        const tokensByAddressApiUrl = Web3Config.poapCoreAPI + Web3Config.poapCoreScanAPIURI + address;
         try {
-            const tokensByAddressApiUrl = BotConfig.poapCoreAPI + BotConfig.poapCoreScanAPIURI + address;
             const request = await axios.get(tokensByAddressApiUrl);
             logger.debug(`[TokenWorkerService] Request tokens by address response ${JSON.stringify(request.data)}`);
             return <Token[]>(request.data);
         }catch (e){
-            logger.error(`[TokenWorkerService] Error requesting tokens in address, error: ${e}`);
+            logger.error(`[TokenWorkerService] Error requesting tokens in address, URL: ${tokensByAddressApiUrl}, error: ${e}`);
             return Promise.reject(e);
         }
     }

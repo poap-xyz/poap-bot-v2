@@ -14,6 +14,7 @@ import {AccountCacheService} from "../../interfaces/services/cache/accountCacheS
 import {Redis} from "ioredis";
 import {Worker} from "bullmq";
 import {Account} from "../../models/poap/account";
+import {BotConfig} from "../../config/bot.config";
 
 @injectable()
 export class MintChannelServiceImpl implements MintChannelService{
@@ -75,16 +76,44 @@ export class MintChannelServiceImpl implements MintChannelService{
     }
 
     private static getTokenEmbed(token: Token, account: Account){
+        const poapPower = account.tokens.length;
         return new MessageEmbed()
-            .setColor('#0099ff')
-            .setTitle(`title`)
-            .setDescription(`description`)
-
-            .addField('Token', `${JSON.stringify(token.event)}`, false)
-
-
-            .setTimestamp(new Date())
+            .setTitle(`${token.action}: ${token.event.name} `)
+            .setColor(token.chain == "Mainnet" ? "#5762cf" : "#48A9A9")
+            .addFields(
+                {
+                    name: "POAP Power",
+                    value: `${MintChannelServiceImpl.getEmojiByPoapPower(poapPower)}  ${poapPower}`,
+                    inline: true,
+                },
+                { name: "Token ID", value: `#${token.tokenId}`, inline: true },
+                { name: "Event ID", value: `#${token.event.fancy_id}`, inline: true }
+            )
+            .setURL(`https://poap.gallery/event/${token.event.id}/?utm_share=discordfeed`)
+            .setTimestamp()
+            .setAuthor(
+                account.ens ? account.ens : account.address.toLowerCase(),
+                ``,
+                `https://app.poap.xyz/scan/${account.address}/?utm_share=discordfeed`
+            )
+            .setThumbnail(token.event.image_url)
             .setFooter('POAP Bot', 'https://media-exp1.licdn.com/dms/image/C4E0BAQH41LILaTN3cw/company-logo_200_200/0/1561273941114?e=2159024400&v=beta&t=ty-jdXGeZd1OE4V-WQP4owQ1_qvdEzgDJq5jOUw2S-s');
+    }
+
+    private static getEmojiByPoapPower(poapPower: number): string{
+        const powerEmoji = BotConfig.powerEmoji;
+        let lastKey;
+
+        for (let key in powerEmoji) {
+            if (powerEmoji.hasOwnProperty(key) && Number.isInteger(key)) {
+                if(poapPower < parseInt(key)){
+                    return powerEmoji[key];
+                }
+                lastKey = key;
+            }
+        }
+
+        return powerEmoji[lastKey];
     }
 
     private async sendMintInfoToChannels(tokenId: string){

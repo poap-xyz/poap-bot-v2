@@ -13,4 +13,10 @@ export const Web3Config = {
 
     poapSubgraphMainnet: "https://api.thegraph.com/subgraphs/name/poap-xyz/poap",
     poapSubgraphxDai: "https://api.thegraph.com/subgraphs/name/poap-xyz/poap-xdai",
+
+    poapCoreAPI: "https://api.poap.xyz",
+    poapCoreTokenAPIURI: "/token/",
+    poapCoreScanAPIURI: "/actions/scan/",
+    poapCoreENSLookupAPIURI: "/actions/ens_lookup/",
+    poapCoreEventAPIURI: "/events/id/",
 }
