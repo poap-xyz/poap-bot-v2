@@ -9,7 +9,11 @@ export const TYPES = {
     /* Core Types */
     Bot: Symbol("Bot"),
     Client: Symbol("Client"),
+
+    /* Environment Types */
     Token: Symbol("Token"),
+    ProviderXDai: Symbol("ProviderXDai"),
+    ProviderMainnet: Symbol("ProviderMainnet"),
 
     /* Persistence Types */
     EventDao: Symbol("EventDao"),
@@ -27,7 +31,7 @@ export const TYPES = {
     EventService: Symbol("EventService"),
     CodeService: Symbol("CodeService"),
     UserService: Symbol("UserService"),
-    MintService: Symbol("MintService"),
+    ContractService: Symbol("MintService"),
 
     /* Schedule Services */
     EventScheduleService: Symbol("EventScheduleService"),

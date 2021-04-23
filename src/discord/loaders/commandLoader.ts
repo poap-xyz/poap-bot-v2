@@ -47,7 +47,7 @@ export class CommandLoader{
         return readdirSync(commandPath)
             .filter(cmd => {
                 const split = cmd.split(".");
-                return split.pop() === "js" && split.pop() === BotConfig.commandPrefix;
+                return split.pop() === "js" && split.pop() === BotConfig.commandFilePrefix;
             });
         //.map(dir => commandPath + dir + path.sep);
     }

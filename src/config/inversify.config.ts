@@ -51,6 +51,7 @@ import {AccountCacheService} from "../interfaces/services/cache/accountCacheServ
 import {AccountCacheServiceImpl} from "../services/cache/accountCacheServiceImpl";
 import {TokenCacheService} from "../interfaces/services/cache/tokenCacheService";
 import {TokenCacheServiceImpl} from "../services/cache/tokenCacheServiceImpl";
+import {ContractServiceImpl} from "../services/core/contract/contractServiceImpl";
 
 
 let container = new Container();
@@ -62,7 +63,11 @@ container.bind<Redis>(TYPES.Cache).toConstantValue(new IORedis(RedisConfig));
 /* Core binds */
 container.bind<Bot>(TYPES.Bot).to(Bot).inSingletonScope();
 container.bind<Client>(TYPES.Client).toConstantValue(new Client());
+
+/* Environment binds */
 container.bind<string>(TYPES.Token).toConstantValue(process.env.BOT_TOKEN);
+container.bind<string>(TYPES.ProviderXDai).toConstantValue(process.env.XDAI_WS_PROVIDER);
+container.bind<string>(TYPES.ProviderMainnet).toConstantValue(process.env.MAINNET_WS_PROVIDER);
 
 /* Persistence binds */
 container.bind<EventDao>(TYPES.EventDao).to(EventDaoImpl).inSingletonScope();
@@ -80,7 +85,7 @@ container.bind<AccountCacheService>(TYPES.AccountCacheService).to(AccountCacheSe
 container.bind<EventService>(TYPES.EventService).to(EventServiceImpl).inSingletonScope();
 container.bind<CodeService>(TYPES.CodeService).to(CodeServiceImpl).inSingletonScope();
 container.bind<UserService>(TYPES.UserService).to(UserServiceImpl).inSingletonScope();
-container.bind<ContractService>(TYPES.MintService).to(ContractServiceTheGraphImpl).inSingletonScope();
+container.bind<ContractService>(TYPES.ContractService).to(ContractServiceImpl).inSingletonScope();
 
 /* PubSub Services binds */
 container.bind<SubscriberService>(TYPES.SubscriberService).to(SubscriberServiceImpl).inSingletonScope();

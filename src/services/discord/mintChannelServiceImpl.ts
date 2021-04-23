@@ -8,22 +8,31 @@ import {logger} from "../../logger";
 import {ContractService} from "../../interfaces/services/core/contract/contractService";
 import {Token} from "../../models/poap/token";
 import {ChannelService} from "../../interfaces/services/discord/channelService";
+import {PublisherService} from "../../interfaces/services/pubsub/publisherService";
+import {TokenCacheService} from "../../interfaces/services/cache/tokenCacheService";
+import {AccountCacheService} from "../../interfaces/services/cache/accountCacheService";
+import {Redis} from "ioredis";
+import {Worker} from "bullmq";
+import {Account} from "../../models/poap/account";
 
 @injectable()
 export class MintChannelServiceImpl implements MintChannelService{
     private readonly channels: TextChannel[];
     private readonly subscriberService: SubscriberService;
-    private readonly mintService: ContractService;
     private readonly channelService: ChannelService;
     private subscriberCallback: SubscriberCallback;
+    private readonly tokenCacheService: TokenCacheService;
+    private readonly accountCacheService: AccountCacheService;
 
     constructor(@inject(TYPES.SubscriberService) subscriberService: SubscriberService,
-                @inject(TYPES.MintService) mintService: ContractService,
-                @inject(TYPES.ChannelService) channelService: ChannelService) {
+                @inject(TYPES.ChannelService) channelService: ChannelService,
+                @inject(TYPES.TokenCacheService) tokenCacheService: TokenCacheService,
+                @inject(TYPES.AccountCacheService) accountCacheService: AccountCacheService) {
         this.channels = [];
-        this.mintService = mintService;
         this.subscriberService = subscriberService;
         this.channelService = channelService;
+        this.tokenCacheService = tokenCacheService;
+        this.accountCacheService = accountCacheService;
     }
 
     async initSubscribers(){
@@ -56,8 +65,8 @@ export class MintChannelServiceImpl implements MintChannelService{
 
     private async sendMintInfoToChannel(channel: TextChannel, tokenId: string | number){
         try {
-            const token = await this.mintService.getTokenFromCache(tokenId);
-            const account = await this.mintService.getAccountFromCache(token.owner);
+            const token = await this.tokenCacheService.getTokenFromCache(tokenId);
+            const account = await this.accountCacheService.getAccountFromCache(token.owner);
             const embedToSend = MintChannelServiceImpl.getTokenEmbed(token, account);
             await channel.send(embedToSend)
         }catch (e){

@@ -13,25 +13,25 @@ export class InitLoader {
     private readonly maintenanceDBService: MaintenanceDBService;
     private readonly mintChannelService: MintChannelService;
     private readonly tokenWorkerService: TokenWorkerService;
-    private readonly mintService: ContractService;
+    private readonly contractService: ContractService;
 
     constructor(@inject(TYPES.EventScheduleService) eventScheduleService: EventScheduleService,
                 @inject(TYPES.MaintenanceDBService) maintenanceDBService: MaintenanceDBService,
                 @inject(TYPES.TokenWorkerService) tokenWorkerService: TokenWorkerService,
                 @inject(TYPES.MintChannelService) mintChannelService: MintChannelService,
-                @inject(TYPES.MintService) mintService: ContractService) {
+                @inject(TYPES.ContractService) contractService: ContractService) {
         this.eventScheduleService = eventScheduleService;
         this.maintenanceDBService = maintenanceDBService;
         this.tokenWorkerService = tokenWorkerService;
         this.mintChannelService = mintChannelService;
-        this.mintService = mintService;
+        this.contractService = contractService;
     }
 
     async init(){
+        await this.contractService.initListener();
         await this.initDB();
         await this.eventScheduleService.schedulePendingEvents();
         await this.mintChannelService.initSubscribers();
-        await this.mintService.initListener();
         this.tokenWorkerService.createWorker();
     }
 

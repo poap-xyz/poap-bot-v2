@@ -8,6 +8,7 @@ import {inject, injectable} from "inversify";
 import {TYPES} from "../../../config/types";
 import {TokenQueueService} from "../../../interfaces/services/queue/tokenQueueService";
 import { Token } from "../../../models/poap/token";
+import {Web3Config} from "../../../config/web3.config";
 
 @injectable()
 export class ContractServiceTheGraphImpl implements ContractService {
@@ -29,7 +30,7 @@ export class ContractServiceTheGraphImpl implements ContractService {
     async initListener() {
         //add a cron job here
         const timestamp = await this.getLastOrDefaultTimestamp();
-        const mintedxDaiPoaps = await this.requestLastMintedPoapsByTimestamp(BotConfig.poapSubgraphxDai, timestamp);
+        const mintedxDaiPoaps = await this.requestLastMintedPoapsByTimestamp(Web3Config.poapSubgraphxDai, timestamp);
         this.tokenQueueService.addTokensMetadataToQueue(mintedxDaiPoaps);
     }
 

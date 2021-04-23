@@ -2,16 +2,16 @@ import {ContractService} from "../../../interfaces/services/core/contract/contra
 import axios from "axios";
 import {logger} from "../../../logger";
 import {BotConfig} from "../../../config/bot.config";
-import {TokenMetadata} from "../../../models/poap/blockchain/tokenMetadata";
+import {Chain, TokenMetadata} from "../../../models/poap/blockchain/tokenMetadata";
 import {Redis} from "ioredis";
 import {inject, injectable} from "inversify";
 import {TYPES} from "../../../config/types";
 import {TokenQueueService} from "../../../interfaces/services/queue/tokenQueueService";
-import { Token } from "../../../models/poap/token";
-import {PublisherService} from "../../../interfaces/services/pubsub/publisherService";
 import {TokenCacheService} from "../../../interfaces/services/cache/tokenCacheService";
 import {AccountCacheService} from "../../../interfaces/services/cache/accountCacheService";
-import {Worker} from "bullmq";
+import {PoapAbi} from "../../../config/poap.abi";
+import Web3 from 'web3';
+import {Web3Config} from "../../../config/web3.config";
 
 @injectable()
 export class ContractServiceImpl implements ContractService {
@@ -19,16 +19,59 @@ export class ContractServiceImpl implements ContractService {
     private readonly tokenCacheService: TokenCacheService;
     private readonly accountCacheService: AccountCacheService;
 
+    private readonly xDaiWeb3Provider: string;
+    private readonly mainnetWeb3Provider: string;
+
     constructor(@inject(TYPES.TokenQueueService) tokenQueueService: TokenQueueService,
                 @inject(TYPES.TokenCacheService) tokenCacheService: TokenCacheService,
-                @inject(TYPES.AccountCacheService) accountCacheService: AccountCacheService) {
+                @inject(TYPES.AccountCacheService) accountCacheService: AccountCacheService,
+                @inject(TYPES.ProviderXDai) xDaiWeb3Provider: string,
+                @inject(TYPES.ProviderMainnet) mainnetWeb3Provider: string
+    ) {
         this.tokenQueueService = tokenQueueService;
         this.tokenCacheService = tokenCacheService;
         this.accountCacheService = accountCacheService;
-    }
-    
-    async initListener() {
-
+        this.xDaiWeb3Provider = xDaiWeb3Provider;
+        this.mainnetWeb3Provider = mainnetWeb3Provider;
     }
 
+    initListener() {
+        const web3xDai = this.subscribeToTransfer(this.xDaiWeb3Provider, Web3Config.poapContract, "XDAI");
+        const web3Mainnet = this.subscribeToTransfer(this.mainnetWeb3Provider, Web3Config.poapContract, "Mainnet");
+    }
+
+    private subscribeToTransfer(provider: string, address: string, network: Chain){
+        new Web3.providers.WebsocketProvider(provider, Web3Config.WSOptions);
+        const web3 = new Web3(
+
+        );
+
+        const PoapContract = new web3.eth.Contract(PoapAbi, address);
+
+        logger.info(`[ContractService] Subscribing to ${network} - ${address} `);
+        PoapContract.events.Transfer(null)
+            .on("data", async (result) => {
+                logger.debug(`[ContractService] Transfer data ${JSON.stringify(result)}`);
+
+                const tokenInfo: TokenMetadata = {
+                    id: result.returnValues.tokenId,
+                    event: result.returnValues.eventId,
+                    to: result.returnValues.to,
+                    from: result.returnValues.from,
+                    chain: network,
+                };
+
+                await this.tokenQueueService.addTokenMetadataToQueue(tokenInfo);
+            })
+            .on("connected", (subscriptionId) => {
+                logger.info(`[ContractService] Connected to ${network} - ${subscriptionId} `);
+            })
+            .on("changed", (log) => {
+                logger.info(`[ContractService] Changed to ${network} - ${log} `);
+            })
+            .on("error", (error) => {
+                logger.info(`[ContractService] Error to ${network} - ${error} `);
+            });
+        return web3;
+    };
 }

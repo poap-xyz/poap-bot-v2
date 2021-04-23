@@ -1,12 +1,13 @@
 import {TokenCacheService} from "../../interfaces/services/cache/tokenCacheService";
 import {Redis} from "ioredis";
 import {TokenQueueService} from "../../interfaces/services/queue/tokenQueueService";
-import {inject} from "inversify";
+import {inject, injectable} from "inversify";
 import {TYPES} from "../../config/types";
 import {Token} from "../../models/poap/token";
 import {AccountCacheService} from "../../interfaces/services/cache/accountCacheService";
 import {Account} from "../../models/poap/account";
 
+@injectable()
 export class AccountCacheServiceImpl implements AccountCacheService{
     private readonly redisClient: Redis;
     private readonly tokenQueueService: TokenQueueService;

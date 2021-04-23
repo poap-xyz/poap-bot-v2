@@ -17,14 +17,17 @@ export class TokenWorkerServiceImpl implements TokenWorkerService{
     private readonly publisherService: PublisherService;
     private readonly tokenCacheService: TokenCacheService;
     private readonly accountCacheService: AccountCacheService;
+    private readonly redisClient: Redis;
     private workers: Worker[];
 
     constructor(@inject(TYPES.PublisherService) publisherService: PublisherService,
                 @inject(TYPES.TokenCacheService) tokenCacheService: TokenCacheService,
-                @inject(TYPES.AccountCacheService) accountCacheService: AccountCacheService) {
+                @inject(TYPES.AccountCacheService) accountCacheService: AccountCacheService,
+                @inject(TYPES.Cache) redisClient: Redis) {
         this.publisherService = publisherService;
         this.tokenCacheService = tokenCacheService;
         this.accountCacheService = accountCacheService;
+        this.redisClient = redisClient;
         this.workers = [];
     }
 
@@ -45,15 +48,19 @@ export class TokenWorkerServiceImpl implements TokenWorkerService{
 
     private async workerProcessor(job: Job<TokenMetadata, Token>): Promise<Token>{
         const tokenMetadata: TokenMetadata = job.data;
-        const account = await this.getAccount(tokenMetadata.owner.id);
-        logger.debug(`ACCOUNT ${JSON.stringify(account)}`)
+
+        const account = await this.getAccount(tokenMetadata.to);
+        logger.debug(`[TokenWorkerService] Account fetched: ${JSON.stringify(account)}`);
+
         const token = await this.getToken(tokenMetadata, account);
+        logger.debug(`[TokenWorkerService] Token fetched: ${JSON.stringify(token)}`);
+
         if(!token)
             return Promise.reject("No token could be fetched");
 
         /* Cache token for further use */
         try {
-            await this.redisClient.hset("tokens", token.tokenId, JSON.stringify(token));
+            await this.tokenCacheService.saveTokenInCache(token);
         }catch (e){
             logger.error(`[TokenWorkerService] Error saving token to cache, message: ${e}`);
             return Promise.reject(e);
@@ -109,11 +116,7 @@ export class TokenWorkerServiceImpl implements TokenWorkerService{
 
     private async getAccountCached(address: string): Promise<Account>{
         try {
-            const tokensInAddress = await this.redisClient.hget("accounts", address);
-            if(!tokensInAddress)
-                return undefined;
-
-            return JSON.parse(tokensInAddress);
+            return await this.accountCacheService.getAccountFromCache(address);
         }catch (e){
             logger.error(`[TokenWorkerService] Error getting tokens in address cached, error: ${e}`);
             return Promise.reject(e);
@@ -129,8 +132,7 @@ export class TokenWorkerServiceImpl implements TokenWorkerService{
 
     private async cacheAccount(account: Account): Promise<Account>{
         try{
-            await this.redisClient.hset("accounts", account.address, JSON.stringify(account));
-            return account;
+            return await this.accountCacheService.saveAccountInCache(account);
         }catch (e){
             logger.error(`[TokenWorkerService] Error saving cache, error: ${e}`);
             return Promise.reject(e);
@@ -158,7 +160,6 @@ export class TokenWorkerServiceImpl implements TokenWorkerService{
     private static async requestTokensByAddressFromAPI(address: string): Promise<Token[]>{
         try {
             const tokensByAddressApiUrl = BotConfig.poapCoreAPI + BotConfig.poapCoreScanAPIURI + address;
-            console.log(tokensByAddressApiUrl)
             const request = await axios.get(tokensByAddressApiUrl);
             logger.debug(`[TokenWorkerService] Request tokens by address response ${JSON.stringify(request.data)}`);
             return <Token[]>(request.data);

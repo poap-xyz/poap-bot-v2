@@ -1,10 +1,11 @@
 import {TokenCacheService} from "../../interfaces/services/cache/tokenCacheService";
 import {Redis} from "ioredis";
 import {TokenQueueService} from "../../interfaces/services/queue/tokenQueueService";
-import {inject} from "inversify";
+import {inject, injectable} from "inversify";
 import {TYPES} from "../../config/types";
 import {Token} from "../../models/poap/token";
 
+@injectable()
 export class TokenCacheServiceImpl implements TokenCacheService{
     private readonly redisClient: Redis;
     private readonly tokenQueueService: TokenQueueService;

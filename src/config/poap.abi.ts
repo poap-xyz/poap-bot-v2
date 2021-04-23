@@ -1,4 +1,5 @@
-export const PoapAbi = [
+import {AbiItem} from "web3-utils";
+export const PoapAbi: AbiItem[] = [
     {
         "constant": true,
         "inputs": [

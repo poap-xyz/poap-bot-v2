@@ -5,8 +5,8 @@ export type Chain = "XDAI" | "Mainnet";
 
 export interface TokenMetadata{
     id: number,
-    event: EventMetadata,
-    owner: AccountMetadata,
-    created: Date,
+    event: number,
+    to: string,
+    from: string,
     chain: Chain,
 }
