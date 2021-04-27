@@ -45,7 +45,7 @@ export default class CodeCommand extends Command{
     }
 
     private static setClaimInResponseMessage(event: BotEvent, claimCode: string){
-        const claimUrl = BotConfig.PoapClaimUrl + claimCode;
+        const claimUrl = BotConfig.poapClaimUrl + claimCode;
         return event.response_message.replace(BotConfig.responseMessageReplace, claimUrl);
     }
 }

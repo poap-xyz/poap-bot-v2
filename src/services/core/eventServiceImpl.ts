@@ -6,7 +6,7 @@ import {EventDao} from "../../interfaces/persistence/core/eventDao";
 import {CodeService} from "../../interfaces/services/core/codeService";
 import {logger} from "../../logger";
 import {CodeInput} from "../../models/input/codeInput";
-import {EventInput} from "../../models/input/eventInput";
+import {BotEventInput} from "../../models/input/botEventInput";
 import {EventScheduleService} from "../../interfaces/services/schedule/eventScheduleService";
 
 @injectable()
@@ -44,7 +44,7 @@ export class EventServiceImpl implements EventService{
         return await this.eventDao.getEventFromPass(messageContent);
     }
 
-    public async saveEvent(event: EventInput, username: string){
+    public async saveEvent(event: BotEventInput, username: string){
         const savedEvent: BotEvent = await this.eventDao.saveEvent(event);
         if(event.codes){
             const codes = EventServiceImpl.createCodeInputByEvent(savedEvent, event.codes);

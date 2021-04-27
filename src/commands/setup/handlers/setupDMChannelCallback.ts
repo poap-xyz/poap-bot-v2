@@ -12,7 +12,7 @@ import {SetupPassStepHandler} from "./steps/setupPassStepHandler";
 import {SetupFileStepHandler} from "./steps/setupFileStepHandler";
 import {ChannelService} from "../../../interfaces/services/discord/channelService";
 
-export class SetupDMChannelHandler implements DMChannelCallback{
+export class SetupDMChannelCallback implements DMChannelCallback{
     private readonly setup: Setup;
     private readonly setupSteps: SetupStep[];
     private readonly eventService: EventService;

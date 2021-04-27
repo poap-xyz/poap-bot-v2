@@ -1,5 +1,5 @@
 import {BotEvent} from "../../../models/core/botEvent";
-import {EventInput} from "../../../models/input/eventInput";
+import {BotEventInput} from "../../../models/input/botEventInput";
 
 export interface EventService{
     /**
@@ -69,6 +69,6 @@ export interface EventService{
      * @param {string} username who is saving the Event
      * @returns {Promise<BotEvent>} the saved Event
      */
-    saveEvent(event: EventInput, username: string): Promise<BotEvent>;
+    saveEvent(event: BotEventInput, username: string): Promise<BotEvent>;
 
 }

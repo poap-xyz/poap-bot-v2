@@ -1,8 +1,8 @@
 import {BotEvent} from "../core/botEvent";
 import {Code} from "../core/code";
-import {EventInput} from "../input/eventInput";
+import {BotEventInput} from "../input/botEventInput";
 
-export class EventInputBuilder {
+export class EventBuilder {
     private _id: number;
     private _server: string;
     private _channel: string;

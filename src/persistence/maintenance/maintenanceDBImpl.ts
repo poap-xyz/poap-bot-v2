@@ -32,7 +32,7 @@ export class MaintenanceDBImpl implements MaintenanceDB {
 
             await t.none("CREATE SEQUENCE IF NOT EXISTS subscribed_channels_token_id_seq;");
             await t.none("CREATE TABLE IF NOT EXISTS subscribed_channels_token ( id integer PRIMARY KEY NOT NULL DEFAULT nextval('subscribed_channels_token_id_seq'), server VARCHAR ( 50 ) NOT NULL, channel TEXT NOT NULL," +
-                " is_active BOOLEAN DEFAULT TRUE, xdai BOOLEAN DEFAULT TRUE, UNIQUE (server, channel));");
+                " mainnet BOOLEAN DEFAULT TRUE, xdai BOOLEAN DEFAULT TRUE, UNIQUE (server, channel));");
             await t.none("ALTER SEQUENCE subscribed_channels_token_id_seq OWNED BY subscribed_channels_token.id;");
         });
     }

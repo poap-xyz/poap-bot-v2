@@ -1,5 +1,5 @@
 import {BotEvent} from "../../../models/core/botEvent";
-import {EventInput} from "../../../models/input/eventInput";
+import {BotEventInput} from "../../../models/input/botEventInput";
 
 export interface EventDao{
     /**
@@ -65,9 +65,9 @@ export interface EventDao{
     /**
      * @method
      * Check if a pass is available to use in a new Event
-     * @param {EventInput} event to save
+     * @param {BotEventInput} event to save
      * @returns {Promise<BotEvent>} the saved Event
      */
-    saveEvent(event: EventInput): Promise<BotEvent>;
+    saveEvent(event: BotEventInput): Promise<BotEvent>;
 
 }

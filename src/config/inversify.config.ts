@@ -13,6 +13,7 @@ import {EventServiceImpl} from "../services/core/eventServiceImpl";
 import {EventService} from "../interfaces/services/core/eventService";
 import {EventDaoImpl} from "../persistence/core/eventDaoImpl";
 import {EventDao} from "../interfaces/persistence/core/eventDao";
+import {SubscribedChannelDao} from "../interfaces/persistence/core/subscribedChannelDao";
 import {CodeDaoImpl} from "../persistence/core/codeDaoImpl";
 import {UserDaoImpl} from "../persistence/core/userDaoImpl";
 import {CodeDao} from "../interfaces/persistence/core/codeDao";
@@ -21,6 +22,7 @@ import {CodeService} from "../interfaces/services/core/codeService";
 import {UserService} from "../interfaces/services/core/userService";
 import {CodeServiceImpl} from "../services/core/codeServiceImpl";
 import {UserServiceImpl} from "../services/core/userServiceImpl";
+import {SubscribedChannelService} from "../interfaces/services/core/subscribedChannelService";
 import {ScheduleServiceImpl} from "../services/schedule/scheduleServiceImpl";
 import {ScheduleService} from "../interfaces/services/schedule/scheduleService";
 import {GuildService} from "../interfaces/services/discord/guildService";
@@ -42,7 +44,6 @@ import {SubscriberService} from "../interfaces/services/pubsub/subscriberService
 import {MintChannelService} from "../interfaces/services/discord/mintChannelService";
 import {MintChannelServiceImpl} from "../services/discord/mintChannelServiceImpl";
 import {PublisherServiceImpl} from "../services/pubsub/publisherServiceImpl";
-import {ContractServiceTheGraphImpl} from "../services/core/contract/contractServiceTheGraphImpl";
 import {TokenQueueServiceImpl} from "../services/queue/tokenQueueServiceImpl";
 import {TokenQueueService} from "../interfaces/services/queue/tokenQueueService";
 import {TokenWorkerServiceImpl} from "../services/queue/tokenWorkerServiceImpl";
@@ -51,7 +52,9 @@ import {AccountCacheService} from "../interfaces/services/cache/accountCacheServ
 import {AccountCacheServiceImpl} from "../services/cache/accountCacheServiceImpl";
 import {TokenCacheService} from "../interfaces/services/cache/tokenCacheService";
 import {TokenCacheServiceImpl} from "../services/cache/tokenCacheServiceImpl";
+import {SubscribedChannelServiceImpl} from "../services/core/subscribedChannelServiceImpl";
 import {ContractServiceImpl} from "../services/core/contract/contractServiceImpl";
+import {SubscribedChannelDaoImpl} from "../persistence/core/subscribedChannelDaoImpl";
 
 
 let container = new Container();
@@ -73,6 +76,7 @@ container.bind<string>(TYPES.ProviderMainnet).toConstantValue(process.env.MAINNE
 container.bind<EventDao>(TYPES.EventDao).to(EventDaoImpl).inSingletonScope();
 container.bind<CodeDao>(TYPES.CodeDao).to(CodeDaoImpl).inSingletonScope();
 container.bind<UserDao>(TYPES.UserDao).to(UserDaoImpl).inSingletonScope();
+container.bind<SubscribedChannelDao>(TYPES.SubscribedChannelDao).to(SubscribedChannelDaoImpl).inSingletonScope();
 
 /* DB Maintenance persistence binds */
 container.bind<MaintenanceDB>(TYPES.MaintenanceDB).to(MaintenanceDBImpl).inSingletonScope();
@@ -86,6 +90,7 @@ container.bind<EventService>(TYPES.EventService).to(EventServiceImpl).inSingleto
 container.bind<CodeService>(TYPES.CodeService).to(CodeServiceImpl).inSingletonScope();
 container.bind<UserService>(TYPES.UserService).to(UserServiceImpl).inSingletonScope();
 container.bind<ContractService>(TYPES.ContractService).to(ContractServiceImpl).inSingletonScope();
+container.bind<SubscribedChannelService>(TYPES.SubscribedChannelService).to(SubscribedChannelServiceImpl).inSingletonScope();
 
 /* PubSub Services binds */
 container.bind<SubscriberService>(TYPES.SubscriberService).to(SubscriberServiceImpl).inSingletonScope();

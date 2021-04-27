@@ -17,7 +17,8 @@ export const BotConfig = {
         100: "🔥"
     },
 
-    PoapClaimUrl: "https://poap.xyz/claim/",
+    poapClaimUrl: "https://poap.xyz/claim/",
+    poapLogoURL: 'https://media-exp1.licdn.com/dms/image/C4E0BAQH41LILaTN3cw/company-logo_200_200/0/1561273941114?e=2159024400&v=beta&t=ty-jdXGeZd1OE4V-WQP4owQ1_qvdEzgDJq5jOUw2S-s',
 
     commandFilePrefix: 'command',
 }

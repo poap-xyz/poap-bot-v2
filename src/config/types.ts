@@ -32,6 +32,7 @@ export const TYPES = {
     CodeService: Symbol("CodeService"),
     UserService: Symbol("UserService"),
     ContractService: Symbol("MintService"),
+    SubscribedChannelService: Symbol("SubscribedChannelService"),
 
     /* Schedule Services */
     EventScheduleService: Symbol("EventScheduleService"),

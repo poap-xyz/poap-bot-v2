@@ -1,5 +1,5 @@
 /* https://github.com/hopskipnfall/discord-typescript-bot/blob/master/src/models/command_context.ts */
-import {Message, User} from "discord.js";
+import {Guild, Message, User} from "discord.js";
 import {inject} from "inversify";
 import {BotConfig} from "../config/bot.config";
 import {PermissionManager, PermissionStatus} from "../_helpers/utils/permissionManager";
@@ -22,8 +22,11 @@ export class CommandContext {
 
     readonly commandOptions: CommandOptions;
 
+    readonly guild: Guild | null;
+
     constructor(message: Message, commandName: string, commandOptions: CommandOptions) {
         this.message = message;
+        this.guild = message.guild;
         this.commandName = commandName.toLowerCase();
         this.commandOptions = commandOptions;
         this.commandPrefix = BotConfig.prefix;

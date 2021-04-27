@@ -1,7 +1,7 @@
 import {BotEvent} from "../core/botEvent";
 import {CodeInput} from "./codeInput";
 
-export interface EventInput {
+export interface BotEventInput {
     server: BotEvent['server'];
     channel: BotEvent['channel'];
     start_date: BotEvent['start_date'];

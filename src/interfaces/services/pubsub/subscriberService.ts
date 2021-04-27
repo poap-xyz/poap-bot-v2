@@ -1,6 +1,6 @@
-import {SubscriberCallback} from "../../callback/subscriberCallback";
+import {MintSubscriberCallback} from "../../callback/mintSubscriberCallback";
 
 export interface SubscriberService {
-    subscribeToTokenChannel(subscriberCallback: SubscriberCallback) : Promise<void>;
+    subscribeToTokenChannel(subscriberCallback: MintSubscriberCallback) : Promise<void>;
     unsubscribeToTokenChannel(): Promise<void>;
 }

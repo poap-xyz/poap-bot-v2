@@ -9,8 +9,8 @@ import {TYPES} from "../../config/types";
 import getDecorators from "inversify-inject-decorators";
 import container from "../../config/inversify.config";
 import {SetupState} from "../../interfaces/command/setup/setup.interface";
-import {SetupDMChannelHandler} from "./handlers/setupDMChannelHandler";
-import {EventInput} from "../../models/input/eventInput";
+import {SetupDMChannelCallback} from "./handlers/setupDMChannelCallback";
+import {BotEventInput} from "../../models/input/botEventInput";
 import {EventScheduleService} from "../../interfaces/services/schedule/eventScheduleService";
 import {ChannelService} from "../../interfaces/services/discord/channelService";
 import {BotEvent} from "../../models/core/botEvent";
@@ -19,7 +19,7 @@ const { lazyInject } = getDecorators(container);
 
 export default class SetupCommand extends Command{
     private setupUsers: Map<Snowflake, SetupState>;
-    private readonly setupDMChannelHandler: SetupDMChannelHandler;
+    private readonly setupDMChannelHandler: SetupDMChannelCallback;
 
     @lazyInject(TYPES.EventService) readonly eventService: EventService;
     @lazyInject(TYPES.ChannelService) readonly channelService: ChannelService;
@@ -31,7 +31,7 @@ export default class SetupCommand extends Command{
                                         botPermissions: [],
                                         memberPermissions: [Permissions.FLAGS.MANAGE_GUILD]});
         this.setupUsers = new Map();
-        this.setupDMChannelHandler = new SetupDMChannelHandler(this);
+        this.setupDMChannelHandler = new SetupDMChannelCallback(this);
     }
 
     protected async execute(commandContext: CommandContext): Promise<Message | Message[]> {
@@ -46,7 +46,6 @@ export default class SetupCommand extends Command{
         return await this.initializeSetup(user, guild, message);
     }
 
-    //TODO expiry clear user from map
     private async initializeSetup(user: User, guild: Guild, message: Message) {
         const defaultSetup = SetupCommand.getDefaultSetupNotInitialized(user, guild, message);
 
@@ -116,7 +115,7 @@ export default class SetupCommand extends Command{
     public async saveEvent(setupState: SetupState): Promise<Message>{
         logger.info(`[SetupCommand] Saving event for user id ${setupState.user.id} and guild id ${setupState.guild.id}`);
         logger.debug(`[SetupCommand] Saving event: ${JSON.stringify(setupState.event)}`);
-        const event: EventInput = setupState.event.build();
+        const event: BotEventInput = setupState.event.build();
         try {
             const savedEvent = await this.eventService.saveEvent(event, setupState.user.username);
             await this.eventScheduleService.scheduleEvent(savedEvent);
@@ -127,10 +126,10 @@ export default class SetupCommand extends Command{
         }
     }
 
-    private static async checkSavedEvent(setupState: SetupState, eventInput: EventInput, savedEvent: BotEvent): Promise<Message>{
+    private static async checkSavedEvent(setupState: SetupState, eventInput: BotEventInput, savedEvent: BotEvent): Promise<Message>{
         logger.info(`[SetupCommand] Saved event: ${JSON.stringify(savedEvent)}`);
         if(eventInput.codes.length !== savedEvent.codes.length)
-            return await setupState.dmChannel.send(`Event saved but some codes may be repeated. Please check with command !status and !setup addcodes to add more codes!`);
+            return await setupState.dmChannel.send(`Event saved but some codes may be repeated. Please check with command !status and !addcodes ${savedEvent.id} to add more codes!`);
 
         return await setupState.dmChannel.send(`Thank you. That's everything. I'll start the event at the appointed time.`);
     }

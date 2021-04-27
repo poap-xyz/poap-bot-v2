@@ -3,7 +3,7 @@ import {ExtendedProtocol, TYPES} from "../../config/types";
 import {BotEvent} from "../../models/core/botEvent";
 import {EventDao} from "../../interfaces/persistence/core/eventDao";
 import {CodeInput} from "../../models/input/codeInput";
-import {EventInput} from "../../models/input/eventInput";
+import {BotEventInput} from "../../models/input/botEventInput";
 
 @injectable()
 export class EventDaoImpl implements EventDao{
@@ -68,7 +68,7 @@ export class EventDaoImpl implements EventDao{
         return eventsWithPass === 0;
     }
 
-    public async saveEvent(event: EventInput): Promise<BotEvent>{
+    public async saveEvent(event: BotEventInput): Promise<BotEvent>{
         return await this.db.one<BotEvent>(
             "INSERT INTO events " +
             "(server, channel, start_date, end_date, response_message, pass, file_url, created_by, created_date, is_whitelisted) " +
