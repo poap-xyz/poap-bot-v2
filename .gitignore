@@ -79,3 +79,4 @@ typings/
 dist/
 **/*.js
 **/*.js.map
+.DS_Store

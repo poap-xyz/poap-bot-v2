@@ -1,0 +1,66 @@
+version: '3'
+services:
+  db:
+    image: postgres
+    restart: unless-stopped
+    ports:
+      - '5432:5432'
+    env_file: .env
+    environment:
+      - POSTGRES_USER=$DB_USER
+      - POSTGRES_PASSWORD=$DB_PASSWORD
+      - POSTGRES_DB=$DB_DATABASE
+    volumes:
+      - dbdata:/var/lib/postgresql/data
+    networks:
+      - app-network
+  cache:
+    image: redis
+    restart: unless-stopped
+    ports:
+      - '6379:6379'
+    volumes:
+      - cache:/data
+    networks:
+      - app-network
+  nodejs:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: nodejs
+    container_name: nodejs
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      - DB_USER=$DB_USER
+      - DB_PASSWORD=$DB_PASSWORD
+      - BOT_TOKEN=$BOT_TOKEN
+      - XDAI_WS_PROVIDER=$XDAI_WS_PROVIDER
+      - MAINNET_WS_PROVIDER=$MAINNET_WS_PROVIDER
+      - DB_HOST=db
+      - DB_DATABASE=$DB_DATABASE
+      - REDIS_HOST=cache
+      - WAIT_HOSTS=db:5432
+      - WAIT_HOSTS_TIMEOUT=300
+      - WAIT_SLEEP_INTERVAL=30
+      - WAIT_HOST_CONNECT_TIMEOUT=30
+    #ports:
+    #  - "80:80"
+    volumes:
+      - .:/home/node/app
+      - node_modules:/home/node/app/node_modules
+    networks:
+      - app-network
+    depends_on:
+      - db
+      - cache
+    command: sh -c "/wait && node ./dist/src/index.js"
+
+networks:
+  app-network:
+    driver: bridge
+
+volumes:
+  dbdata:
+  cache:
+  node_modules:

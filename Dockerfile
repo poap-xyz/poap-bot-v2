@@ -25,4 +25,4 @@ ADD https://github.com/ufoscout/docker-compose-wait/releases/download/$WAIT_VERS
 RUN chmod +x /wait
 
 #EXPOSE 80
-CMD [ "node", "./dist/index.js" ]
+CMD [ "node", "dist/src/index.js" ]

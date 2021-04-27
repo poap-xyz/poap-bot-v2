@@ -5,6 +5,7 @@
   "main": "index.js",
   "scripts": {
     "start": "tsc && node dist/src/index.js",
+    "build": "npm run clean && tsc",
     "debug": "set DEBUG=* && npm start",
     "watch": "tsc -p tsconfig.json -w",
     "clean": "rm -rf dist/",
