@@ -1,5 +1,8 @@
+import {Snowflake} from "discord.js";
+
 export interface SubscribedChannelInput{
-    server: string,
-    channel: string,
+    server: string | Snowflake,
+    channel: string | Snowflake,
     xDai: boolean,
+    mainnet: boolean,
 }

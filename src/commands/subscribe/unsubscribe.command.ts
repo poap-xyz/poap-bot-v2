@@ -11,13 +11,13 @@ import {logger} from "../../logger";
 import {SubscribedChannelInput} from "../../models/input/subscribedChannelInput";
 const { lazyInject } = getDecorators(container);
 
-export default class SubscribeCommand extends Command{
+export default class UnsubscribeCommand extends Command{
 
     @lazyInject(TYPES.ChannelService) readonly channelService: ChannelService;
     @lazyInject(TYPES.SubscribedChannelService) readonly subscribedChannelService: SubscribedChannelService;
     constructor() {
-        super("subscribe",
-            {aliases: ["subs"],
+        super("unsubscribe",
+            {aliases: ["unsubs"],
                 commandType: {DMCommand: false, GuildCommand: true},
                 botPermissions: [Permissions.FLAGS.SEND_MESSAGES],
                 memberPermissions: [Permissions.FLAGS.MANAGE_GUILD]})
@@ -25,21 +25,27 @@ export default class SubscribeCommand extends Command{
 
     protected async execute(commandContext: CommandContext) {
         const message = commandContext.message;
-        const subscribedChannel = await SubscribeCommand.getSubscribedChannel(commandContext);
-        if(!subscribedChannel)
+        const channelInfo = await UnsubscribeCommand.getChannelInfo(commandContext);
+        if(!channelInfo)
             return;
 
         try{
-            this.subscribedChannelService.saveSubscribedChannel(subscribedChannel);
+            const subscribedChannel = await this.subscribedChannelService.getSubscribedChannel(channelInfo.server, channelInfo.channel);
+            if(!subscribedChannel){
+                return await message.reply("This channel is not subscribed currently.");
+            }
+
+            await this.subscribedChannelService.deleteSubscribedChannel(subscribedChannel);
+
         }catch (e) {
             logger.error(`[SubscribeCommand] Subscribing error, message: ${e} (CommandContext: ${JSON.stringify(commandContext)})`);
-            return await message.reply("Could not subscribe, please try again later.");
+            return await message.reply("Could not unsubscribe, please try again later.");
         }
 
         await message.react("🙌");
     }
 
-    private static async getSubscribedChannel(commandContext: CommandContext): Promise<SubscribedChannelInput> {
+    private static async getChannelInfo(commandContext: CommandContext){
         const message = commandContext.message;
         const channel = commandContext.message.channel;
         const guild = commandContext.guild;
@@ -48,36 +54,7 @@ export default class SubscribeCommand extends Command{
             return undefined;
         }
 
-        const parsedArgs = await SubscribeCommand.parseSubscribeArgs(commandContext);
-        if(!parsedArgs){
-            await commandContext.message.reply(`Invalid arguments, valid e.g. xDai or Mainnet`);
-            return undefined;
-        }
-
-        return {
-            server: guild.id,
-            channel: channel.id,
-            mainnet: parsedArgs.xDai,
-            xDai: parsedArgs.mainnet
-        }
+        return {channel: channel.id, server: guild.id}
     }
 
-    private static async parseSubscribeArgs(commandContext) {
-        //Default all true
-        let xDai: boolean = true;
-        let mainnet: boolean = true;
-
-        if (commandContext.args.length > 0) {
-            const arg = commandContext.args[0].toLowerCase().trim();
-            if (arg === "mainnet") {
-                xDai = false;
-            }else if (arg === "xdai"){
-                mainnet = false;
-            }else {
-                return undefined;
-            }
-        }
-
-        return {xDai: xDai, mainnet}
-    }
 }

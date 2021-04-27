@@ -1,3 +1,3 @@
 export interface MintSubscriberCallback {
-    callback(message: string): Promise<void>;
+    callback(tokenId: string): Promise<void>;
 }

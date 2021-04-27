@@ -3,4 +3,5 @@ export interface SubscribedChannel {
     server: string,
     channel: string,
     xDai: boolean,
+    mainnet: boolean,
 }

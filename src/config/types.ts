@@ -41,7 +41,6 @@ export const TYPES = {
     /* Discord Services */
     GuildService: Symbol("GuildService"),
     ChannelService: Symbol("ChannelService"),
-    MintChannelService: Symbol("MintChannelService"),
 
     /* DB Maintenance Service */
     MaintenanceDBService: Symbol("MaintenanceDBService"),

@@ -41,8 +41,6 @@ import {ContractService} from "../interfaces/services/core/contract/contractServ
 import {SubscriberServiceImpl} from "../services/pubsub/subscriberServiceImpl";
 import {PublisherService} from "../interfaces/services/pubsub/publisherService";
 import {SubscriberService} from "../interfaces/services/pubsub/subscriberService";
-import {MintChannelService} from "../interfaces/services/discord/mintChannelService";
-import {MintChannelServiceImpl} from "../services/discord/mintChannelServiceImpl";
 import {PublisherServiceImpl} from "../services/pubsub/publisherServiceImpl";
 import {TokenQueueServiceImpl} from "../services/queue/tokenQueueServiceImpl";
 import {TokenQueueService} from "../interfaces/services/queue/tokenQueueService";
@@ -107,7 +105,6 @@ container.bind<TokenWorkerService>(TYPES.TokenWorkerService).to(TokenWorkerServi
 /* Discord Services binds */
 container.bind<GuildService>(TYPES.GuildService).to(GuildServiceImpl).inSingletonScope();
 container.bind<ChannelService>(TYPES.ChannelService).to(ChannelServiceImpl).inSingletonScope();
-container.bind<MintChannelService>(TYPES.MintChannelService).to(MintChannelServiceImpl).inSingletonScope();
 
 /* DB Maintenance Service binds */
 container.bind<MaintenanceDBService>(TYPES.MaintenanceDBService).to(MaintenanceDBServiceImpl).inSingletonScope();

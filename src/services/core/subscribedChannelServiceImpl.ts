@@ -2,15 +2,16 @@ import {SubscribedChannelService} from "../../interfaces/services/core/subscribe
 import {SubscribedChannel} from "../../models/core/subscribedChannel";
 import {inject, injectable} from "inversify";
 import {SubscribedChannelDao} from "../../interfaces/persistence/core/subscribedChannelDao";
-import {TextChannel} from "discord.js";
+import {Snowflake, TextChannel} from "discord.js";
 import {SubscriberService} from "../../interfaces/services/pubsub/subscriberService";
 import {ChannelService} from "../../interfaces/services/discord/channelService";
 import {MintSubscriberCallback} from "../../interfaces/callback/mintSubscriberCallback";
 import {TokenCacheService} from "../../interfaces/services/cache/tokenCacheService";
 import {AccountCacheService} from "../../interfaces/services/cache/accountCacheService";
+import {MintSubscriberCallbackImpl} from "../../discord/callbacks/mintSubscriberCallbackImpl";
+import {SubscribedChannelInput} from "../../models/input/subscribedChannelInput";
 import {logger} from "../../logger";
 import {TYPES} from "../../config/types";
-import {MintSubscriberCallbackImpl} from "../discord/mintSubscriberCallbackImpl";
 
 @injectable()
 export class SubscribedChannelServiceImpl implements SubscribedChannelService {
@@ -46,11 +47,23 @@ export class SubscribedChannelServiceImpl implements SubscribedChannelService {
     }
 
     async loadChannels() {
-        const channel = await this.channelService.getTextChannel("752004977676910594", "752318357587624038");
-        this.addTextChannel(channel);
+        const channels = await this.getAllSubscribedChannel();
+        for(let i = 0; i < channels.length;i++){
+            const textChannel = await this.channelService.getTextChannel(channels[i].server, channels[i].channel);
+            if(textChannel) {
+                this.addTextChannel(textChannel);
+                logger.info(`[SubscribedChannelService] Adding to subscriber channel ${channels[i].channel} in server ${channels[i].server}`);
+            }else{
+                logger.error(`[SubscribedChannelService] Could not found channel ${channels[i].channel} in server ${channels[i].server}`);
+            }
+        }
     }
 
-    async saveSubscribedChannel(subscribedChannel: SubscribedChannel) {
+    getAllSubscribedChannel(): Promise<SubscribedChannel[]> {
+        return this.subscribedChannelDao.getAllSubscribedChannel();
+    }
+
+    async saveSubscribedChannel(subscribedChannel: SubscribedChannelInput) {
         const textChannel = await this.channelService.getTextChannel(subscribedChannel.server, subscribedChannel.channel);
         if (!textChannel)
             return Promise.reject("No discord text channel found");
@@ -59,6 +72,10 @@ export class SubscribedChannelServiceImpl implements SubscribedChannelService {
         this.addTextChannel(textChannel);
 
         return savedSubscribedChannel;
+    }
+
+    private addTextChannel(channel: TextChannel) {
+        this.channels.push(channel);
     }
 
     async deleteSubscribedChannel(subscribedChannel: SubscribedChannel): Promise<void> {
@@ -70,11 +87,7 @@ export class SubscribedChannelServiceImpl implements SubscribedChannelService {
         return [...this.channels];
     }
 
-    getAllSubscribedChannel(): Promise<SubscribedChannel[]> {
-        return this.subscribedChannelDao.getAllSubscribedChannel();
-    }
-
-    private addTextChannel(channel: TextChannel) {
-        this.channels.push(channel);
+    getSubscribedChannel(guildId: string | Snowflake, channelId: string | Snowflake): Promise<SubscribedChannel | null> {
+        return this.subscribedChannelDao.getSubscribedChannel(guildId, channelId);
     }
 }

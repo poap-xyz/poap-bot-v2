@@ -2,7 +2,7 @@ import {Redis} from "ioredis";
 import {inject, injectable} from "inversify";
 import {TYPES} from "../../config/types";
 import {logger} from "../../logger";
-import {SubscriberCallback} from "../../interfaces/callback/subscriberCallback";
+import {MintSubscriberCallback} from "../../interfaces/callback/mintSubscriberCallback";
 import {SubscriberService} from "../../interfaces/services/pubsub/subscriberService";
 @injectable()
 export class SubscriberServiceImpl implements SubscriberService{
@@ -14,11 +14,11 @@ export class SubscriberServiceImpl implements SubscriberService{
         this.subscriptions = new Map();
     }
 
-    subscribeToTokenChannel(subscriberCallback: SubscriberCallback): Promise<void> {
+    subscribeToTokenChannel(subscriberCallback: MintSubscriberCallback): Promise<void> {
         return this.subscribeAndAddCallbackToChannel("tokenChannelQueue", subscriberCallback);
     }
 
-    private async subscribeAndAddCallbackToChannel(channelName, subscriberCallback: SubscriberCallback): Promise<void> {
+    private async subscribeAndAddCallbackToChannel(channelName, subscriberCallback: MintSubscriberCallback): Promise<void> {
         try{
             const redisSubscriber = await this.subscribeToChannel(channelName);
             this.addCallbackToChannel(channelName, redisSubscriber, subscriberCallback);
@@ -46,7 +46,7 @@ export class SubscriberServiceImpl implements SubscriberService{
         });
     }
 
-    private addCallbackToChannel(channelName: string, subscriberClient: Redis, subscriberCallback: SubscriberCallback): Redis{
+    private addCallbackToChannel(channelName: string, subscriberClient: Redis, subscriberCallback: MintSubscriberCallback): Redis{
         return subscriberClient.on("message", (channel, message) => {
             if(channel === channelName)
                 subscriberCallback.callback(message);

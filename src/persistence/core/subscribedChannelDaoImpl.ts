@@ -3,6 +3,7 @@ import {inject, injectable} from "inversify";
 import {SubscribedChannel} from "../../models/core/subscribedChannel";
 import {ExtendedProtocol, TYPES} from "../../config/types";
 import {SubscribedChannelInput} from "../../models/input/subscribedChannelInput";
+import {Snowflake} from "discord.js";
 
 @injectable()
 export class SubscribedChannelDaoImpl implements SubscribedChannelDao{
@@ -12,7 +13,7 @@ export class SubscribedChannelDaoImpl implements SubscribedChannelDao{
     }
 
     async getAllSubscribedChannel(): Promise<SubscribedChannel[]> {
-        return await this.db.any<SubscribedChannel>("SELECT * FROM subscribed_channels;");
+        return await this.db.any<SubscribedChannel>("SELECT * FROM subscribed_channels_token;");
     }
 
     async saveSubscribedChannel(subscribedChannel: SubscribedChannelInput): Promise<SubscribedChannel> {
@@ -26,11 +27,11 @@ export class SubscribedChannelDaoImpl implements SubscribedChannelDao{
     }
 
     async deleteSubscribedChannel(subscribedChannel: SubscribedChannel): Promise<void> {
-        return await this.db.none(
-            "DELETE FROM subscribed_channels_token " +
-            "WHERE server::text = $1 AND guild::text = $2 ",
-            [subscribedChannel.server, subscribedChannel.channel]
-        );
+        return await this.db.none("DELETE FROM subscribed_channels_token WHERE id = $1", [subscribedChannel.id]);
+    }
+
+    getSubscribedChannel(guildId: string | Snowflake, channelId: string | Snowflake): Promise<SubscribedChannel | null> {
+        return this.db.oneOrNone<SubscribedChannel>("SELECT * FROM subscribed_channels_token WHERE server::text = $1 AND channel::text = $2;", [guildId, channelId]);
     }
 
 }

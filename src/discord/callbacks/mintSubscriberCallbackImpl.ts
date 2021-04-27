@@ -41,8 +41,11 @@ export class MintSubscriberCallbackImpl implements MintSubscriberCallback{
         try {
             const token = await this.tokenCacheService.getTokenFromCache(tokenId);
             const account = await this.accountCacheService.getAccountFromCache(token.owner);
+            if(!(token && account))
+                return;
+
             const embedToSend = MintSubscriberCallbackImpl.getTokenEmbed(token, account);
-            await channel.send(embedToSend)
+            await channel.send(embedToSend);
         }catch (e){
             logger.error(`[MintChannelService] Executing sendMintInfoToChannel, error: ${e}`);
         }
