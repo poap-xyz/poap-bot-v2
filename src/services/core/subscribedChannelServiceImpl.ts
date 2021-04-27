@@ -52,7 +52,7 @@ export class SubscribedChannelServiceImpl implements SubscribedChannelService {
             const textChannel = await this.channelService.getTextChannel(channels[i].server, channels[i].channel);
             if(textChannel) {
                 this.addTextChannel(textChannel);
-                logger.info(`[SubscribedChannelService] Adding to subscriber channel ${channels[i].channel} in server ${channels[i].server}`);
+                logger.info(`[SubscribedChannelService] Adding to subscriber channel ${textChannel.name} in server ${textChannel.guild.id}`);
             }else{
                 logger.error(`[SubscribedChannelService] Could not found channel ${channels[i].channel} in server ${channels[i].server}`);
             }
