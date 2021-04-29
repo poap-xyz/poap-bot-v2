@@ -1,7 +1,7 @@
 import {Code} from "./code";
 
 export interface BotEvent {
-    id: number;
+    id: number | string;
     server: string;
     channel: string;
     start_date: Date;

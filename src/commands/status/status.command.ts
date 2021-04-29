@@ -4,13 +4,14 @@ import {TYPES} from "../../config/types";
 import {EventService} from "../../interfaces/services/core/eventService";
 import getDecorators from "inversify-inject-decorators";
 import container from "../../config/inversify.config";
-import {Channel, Guild, GuildChannel, Message, MessageEmbed, Permissions} from "discord.js";
+import {Channel, DMChannel, Guild, GuildChannel, Message, MessageEmbed, Permissions} from "discord.js";
 import {logger} from "../../logger";
 import {BotEvent} from "../../models/core/botEvent";
 import {CodeService} from "../../interfaces/services/core/codeService";
 import {EventScheduleService, TimeToEvent} from "../../interfaces/services/schedule/eventScheduleService";
 import {GuildService} from "../../interfaces/services/discord/guildService";
 import {ChannelService} from "../../interfaces/services/discord/channelService";
+import {BotConfig} from "../../config/bot.config";
 const { lazyInject } = getDecorators(container);
 
 export default class StatusCommand extends Command{
@@ -30,7 +31,9 @@ export default class StatusCommand extends Command{
 
     protected async execute(commandContext: CommandContext): Promise<Message> {
 
-        const response = commandContext.message.reply("Please check your DM.");
+        if(!(commandContext.message.channel instanceof DMChannel))
+            await commandContext.message.reply("Please check your DM.");
+
         try {
             const events = await this.getEventsByUserOrGuild(commandContext);
 
@@ -44,7 +47,8 @@ export default class StatusCommand extends Command{
             logger.error(`[StatusCommand] Error fetching guild events, error: ${e}`);
             await commandContext.message.reply("Error fetching status, please try again in a few minutes.");
         }
-        return response;
+
+        return;
     }
 
     private getEventsByUserOrGuild(commandContext: CommandContext){
@@ -87,7 +91,7 @@ export default class StatusCommand extends Command{
             .addField('Total codes', `${totalCodes}`, true)
 
             .setTimestamp(new Date())
-            .setFooter('POAP Bot', 'https://media-exp1.licdn.com/dms/image/C4E0BAQH41LILaTN3cw/company-logo_200_200/0/1561273941114?e=2159024400&v=beta&t=ty-jdXGeZd1OE4V-WQP4owQ1_qvdEzgDJq5jOUw2S-s');
+            .setFooter('POAP Bot', BotConfig.poapLogoURL);
     }
 
     private static getEventStatus(event: BotEvent, timeToEvent: TimeToEvent){

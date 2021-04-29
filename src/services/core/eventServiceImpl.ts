@@ -32,6 +32,10 @@ export class EventServiceImpl implements EventService{
         return await this.eventDao.getAllEvents();
     }
 
+    public async getEventById(eventId: BotEvent['id']): Promise<BotEvent>{
+        return await this.eventDao.getEventById(eventId);
+    }
+
     public async getGuildEvents(server: BotEvent['server']): Promise<BotEvent[]>{
         return await this.eventDao.getGuildEvents(server);
     }
@@ -40,12 +44,18 @@ export class EventServiceImpl implements EventService{
         return await this.eventDao.getGuildActiveEvents(server);
     }
 
-    public async getEventFromPass(messageContent: string): Promise<BotEvent | null>{
-        return await this.eventDao.getEventFromPass(messageContent);
+    async saveEvent(event: BotEventInput): Promise<BotEvent>{
+        const savedEvent: BotEvent = await this.eventDao.saveEvent(event);
+        if(event.codes){
+            const codes = EventServiceImpl.createCodeInputByEvent(savedEvent, event.codes);
+            savedEvent.codes = await this.codeService.addCodes(codes);
+        }
+
+        return savedEvent;
     }
 
-    public async saveEvent(event: BotEventInput, username: string){
-        const savedEvent: BotEvent = await this.eventDao.saveEvent(event);
+    async updateEvent(event: BotEvent): Promise<BotEvent> {
+        const savedEvent: BotEvent = await this.eventDao.updateEvent(event);
         if(event.codes){
             const codes = EventServiceImpl.createCodeInputByEvent(savedEvent, event.codes);
             savedEvent.codes = await this.codeService.addCodes(codes);
@@ -63,7 +73,13 @@ export class EventServiceImpl implements EventService{
     }
 
     isPassAvailable(messageContent: string): Promise<boolean> {
-        return this.eventDao.isPassAvailable(messageContent);
+        const eventPass = messageContent.trim().toLowerCase();
+        return this.eventDao.isPassAvailable(eventPass);
+    }
+
+    public async getEventByPass(messageContent: string): Promise<BotEvent | null>{
+        const eventPass = messageContent.trim().toLowerCase();
+        return await this.eventDao.getEventByPass(eventPass);
     }
 
     getUserActiveEvents(user: BotEvent["created_by"]): Promise<BotEvent[]> {

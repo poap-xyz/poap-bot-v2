@@ -50,24 +50,37 @@ export interface EventDao{
     getUserActiveEvents(user: BotEvent['created_by']): Promise<BotEvent[]>;
     /**
      * @method
-     * Get event using a specific pass
-     * @param {string} messageContent
-     * @returns {Promise<BotEvent> | null} Array of Events using the pass or null if pass does not exists
+     * Get event by id
+     * @param {Event['id']} eventId
+     * @returns {Promise<BotEvent[]>}
      */
-    getEventFromPass(messageContent: string): Promise<BotEvent | null>;
+    getEventById(eventId: BotEvent['id']): Promise<BotEvent>;
+    /**
+     * @method
+     * Get event using a specific pass
+     * @param {string} eventPass
+     * @returns {Promise<BotEvent> | null} Event using the pass or null if pass does not exists
+     */
+    getEventByPass(eventPass: string): Promise<BotEvent | null>;
     /**
      * @method
      * Check if a pass is available to use in a new Event
-     * @param {string} messageContent
+     * @param {string} eventPass
      * @returns {Promise<boolean>} true if pass is available
      */
-    isPassAvailable(messageContent: string): Promise<boolean>;
+    isPassAvailable(eventPass: string): Promise<boolean>;
     /**
      * @method
-     * Check if a pass is available to use in a new Event
+     * Save event in DB
      * @param {BotEventInput} event to save
      * @returns {Promise<BotEvent>} the saved Event
      */
     saveEvent(event: BotEventInput): Promise<BotEvent>;
-
+    /**
+     * @method
+     * Modify existing event in DB
+     * @param {BotEvent} event to update
+     * @returns {Promise<BotEvent>} the updated Event
+     */
+    updateEvent(event: BotEvent): Promise<BotEvent>
 }

@@ -50,11 +50,18 @@ export interface EventService{
     getGuildActiveEvents(server: BotEvent['server']): Promise<BotEvent[]>;
     /**
      * @method
+     * Get event by id
+     * @param {Event['id']} eventId
+     * @returns {Promise<BotEvent[]>}
+     */
+    getEventById(eventId: BotEvent['id']): Promise<BotEvent>;
+    /**
+     * @method
      * Get event using a specific pass
      * @param {string} messageContent
-     * @returns {Promise<BotEvent> | null} Array of Events usign the pass or null if pass does not exists
+     * @returns {Promise<BotEvent> | null} Event using the pass or null if pass does not exists
      */
-    getEventFromPass(messageContent: string): Promise<BotEvent | null>;
+    getEventByPass(messageContent: string): Promise<BotEvent | null>;
     /**
      * @method
      * Check if a pass is available to use in a new Event
@@ -64,11 +71,17 @@ export interface EventService{
     isPassAvailable(messageContent: string): Promise<boolean>;
     /**
      * @method
-     * Check if a pass is available to use in a new Event
-     * @param {BotEvent} event to save
-     * @param {string} username who is saving the Event
+     * Save event in DB
+     * @param {BotEventInput} event to save
      * @returns {Promise<BotEvent>} the saved Event
      */
-    saveEvent(event: BotEventInput, username: string): Promise<BotEvent>;
+    saveEvent(event: BotEventInput): Promise<BotEvent>;
+    /**
+     * @method
+     * Modify existing event in DB
+     * @param {BotEvent} event to update
+     * @returns {Promise<BotEvent>} the updated Event
+     */
+    updateEvent(event: BotEvent): Promise<BotEvent>
 
 }

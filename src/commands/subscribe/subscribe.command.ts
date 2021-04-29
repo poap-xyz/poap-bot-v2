@@ -25,12 +25,17 @@ export default class SubscribeCommand extends Command{
 
     protected async execute(commandContext: CommandContext) {
         const message = commandContext.message;
-        const subscribedChannel = await SubscribeCommand.getSubscribedChannel(commandContext);
-        if(!subscribedChannel)
+        const channelToSubscribe = await SubscribeCommand.getSubscribedChannel(commandContext);
+        if(!channelToSubscribe)
             return;
 
         try{
-            this.subscribedChannelService.saveSubscribedChannel(subscribedChannel);
+            const subscribedChannel = await this.subscribedChannelService.getSubscribedChannel(channelToSubscribe.server, channelToSubscribe.channel);
+            if(subscribedChannel){
+                return await message.reply("This channel is currently subscribed.");
+            }
+
+            this.subscribedChannelService.saveSubscribedChannel(channelToSubscribe);
         }catch (e) {
             logger.error(`[SubscribeCommand] Subscribing error, message: ${e} (CommandContext: ${JSON.stringify(commandContext)})`);
             return await message.reply("Could not subscribe, please try again later.");

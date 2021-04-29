@@ -12,7 +12,7 @@ import {ChannelService} from "../../interfaces/services/discord/channelService";
 import {BotConfig} from "../../config/bot.config";
 import {BotEvent} from "../../models/core/botEvent";
 
-export default class CodeCommand extends Command{
+export default class CheckCodeCommand extends Command{
     @lazyInject(TYPES.EventService) readonly eventService: EventService;
     @lazyInject(TYPES.CodeService) readonly codeService: CodeService;
     @lazyInject(TYPES.ChannelService) readonly channelService: ChannelService;
@@ -36,7 +36,7 @@ export default class CodeCommand extends Command{
         const claimCode = await this.codeService.checkCodeForEventUsername(event.id, commandContext.message.author.id);
 
         if(claimCode){
-            const response = CodeCommand.setClaimInResponseMessage(event, claimCode);
+            const response = CheckCodeCommand.setClaimInResponseMessage(event, claimCode);
             return await commandContext.message.reply(response);
         }
 

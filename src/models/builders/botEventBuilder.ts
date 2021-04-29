@@ -2,7 +2,7 @@ import {BotEvent} from "../core/botEvent";
 import {Code} from "../core/code";
 import {BotEventInput} from "../input/botEventInput";
 
-export class EventBuilder {
+export class BotEventBuilder {
     private _id: number;
     private _server: string;
     private _channel: string;
@@ -37,6 +37,27 @@ export class EventBuilder {
             codes: this._codes,
             is_active: this._isActive,
         }
+    }
+
+    static builderFromBotEvent(botEvent: BotEvent){
+        const botEventBuilder = new BotEventBuilder();
+
+        botEventBuilder.setId(botEvent.id);
+        botEventBuilder.setChannel(botEvent.channel);
+        botEventBuilder.setServer(botEvent.server);
+        botEventBuilder.setPass(botEvent.pass);
+        botEventBuilder.setCreatedBy(botEvent.created_by);
+        botEventBuilder.setCreatedDate(botEvent.created_date);
+        botEventBuilder.setStartDate(botEvent.start_date);
+        botEventBuilder.setEndDate(botEvent.end_date);
+        botEventBuilder.setFileUrl(botEvent.file_url);
+        botEventBuilder.setResponseMessage(botEvent.response_message);
+        botEventBuilder.setIsWhitelisted(botEvent.is_whitelisted);
+        botEventBuilder.setWhitelistFileUrl(botEvent.whitelist_file_url);
+        botEventBuilder.setCodes(botEvent.codes);
+        botEventBuilder.setIsActive(botEvent.is_active);
+
+        return botEventBuilder;
     }
 
     setId(value: number) {

@@ -57,13 +57,15 @@ export class EventDaoImpl implements EventDao{
                   "AND server = $2::text AND is_active = $3", [now, server, true]);
     }
 
-    public async getEventFromPass(messageContent: string): Promise<BotEvent | null> {
-        const eventPass = messageContent.trim().toLowerCase();
+    public async getEventById(eventId: BotEvent["id"]): Promise<BotEvent> {
+        return await this.db.oneOrNone<BotEvent>("SELECT * FROM events WHERE id = $1;", [eventId]);
+    }
+
+    public async getEventByPass(eventPass: string): Promise<BotEvent | null> {
         return await this.db.oneOrNone<BotEvent>("SELECT * FROM events WHERE pass = $1::text AND is_active = $2", [eventPass, true]);
     }
 
-    public async isPassAvailable(messageContent: string): Promise<boolean>{
-        const eventPass = messageContent.trim().toLowerCase();
+    public async isPassAvailable(eventPass: string): Promise<boolean>{
         const eventsWithPass = await this.db.one<number>("SELECT count(*) FROM events WHERE pass = $1::text", [eventPass], (a: { count: string }) => +a.count);
         return eventsWithPass === 0;
     }
@@ -76,6 +78,16 @@ export class EventDaoImpl implements EventDao{
             "RETURNING id, server, channel, start_date, end_date, response_message, pass, file_url, created_by, created_date, is_whitelisted;",
             [event.server, event.channel, event.start_date, event.end_date, event.response_message, event.pass,
                     event.file_url, event.created_by, event.created_date, false,]
+        );
+    }
+
+    public async updateEvent(event: BotEvent): Promise<BotEvent>{
+        return await this.db.one<BotEvent>(
+            "UPDATE events " +
+            " SET server = $1, channel = $2, start_date = $3, end_date = $4, response_message = $5, pass = $6, file_url = $7, created_by = $8, created_date = $9, is_whitelisted = $10 " +
+            " WHERE id = $11 RETURNING id, server, channel, start_date, end_date, response_message, pass, file_url, created_by, created_date, is_whitelisted;",
+            [event.server, event.channel, event.start_date, event.end_date, event.response_message, event.pass,
+                event.file_url, event.created_by, event.created_date, false, event.id]
         );
     }
 }
