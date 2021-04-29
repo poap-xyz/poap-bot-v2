@@ -1,6 +1,6 @@
 import {Channel, Message} from "discord.js";
 import {BotConfig} from "../../../../config/bot.config";
-import {SetupState, SetupStep, SetupStepId} from "../../../../interfaces/command/setup/setup.interface";
+import {EventState, EventABMStep, EventABMStepId} from "../../../../interfaces/command/event/eventABM.interface";
 import {SetupAbstractHandler} from "./setupAbstractHandler";
 import {ChannelService} from "../../../../interfaces/services/discord/channelService";
 
@@ -11,26 +11,26 @@ export class SetupChannelStepHandler extends SetupAbstractHandler {
         this.channelService = channelService;
     }
 
-    async sendInitMessage(setupState: SetupState): Promise<Message>{
-        return await setupState.dmChannel.send(`Which channel should I speak in public? (${setupState.channel || ""}) *Hint: only for start and end event`);
+    async sendInitMessage(EventState: EventState): Promise<Message>{
+        return await EventState.dmChannel.send(`Which channel should I speak in public? (${EventState.channel || ""}) *Hint: only for start and end event`);
     }
 
-    async handler(message: Message, setupState: SetupState):Promise<string> {
+    async handler(message: Message, EventState: EventState):Promise<string> {
         const messageContent:string = message.content;
         let selectedChannel: Channel;
 
-        selectedChannel = this.channelService.getChannelFromGuild(setupState.guild, messageContent);
+        selectedChannel = this.channelService.getChannelFromGuild(EventState.guild, messageContent);
         //Check for default channel
         if (messageContent === BotConfig.defaultOptionMessage)
-            selectedChannel = setupState.channel;
+            selectedChannel = EventState.channel;
 
         if (!selectedChannel) {
-            const channels = this.channelService.getChannelsString(setupState.guild);
-            await setupState.dmChannel.send(`I can't find a channel named ${messageContent}. Try again -> ${channels}`);
+            const channels = this.channelService.getChannelsString(EventState.guild);
+            await EventState.dmChannel.send(`I can't find a channel named ${messageContent}. Try again -> ${channels}`);
             return Promise.reject(`Invalid channel, message content: ${messageContent}`);
         }
 
-        setupState.event = setupState.event.setChannel(selectedChannel.id);
+        EventState.event = EventState.event.setChannel(selectedChannel.id);
         return selectedChannel.toString();
     };
 

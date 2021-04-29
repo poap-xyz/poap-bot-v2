@@ -1,5 +1,5 @@
 import {Message, User} from "discord.js";
-import {SetupState, SetupStep} from "../../../interfaces/command/setup/setup.interface";
+import {EventState, EventABMStep} from "../../../interfaces/command/event/eventABM.interface";
 import {logger} from "../../../logger";
 import Setup from "../setup.command";
 import {EventService} from "../../../interfaces/services/core/eventService";
@@ -14,7 +14,7 @@ import {ChannelService} from "../../../interfaces/services/discord/channelServic
 
 export class SetupDMChannelCallback implements DMChannelCallback{
     private readonly setup: Setup;
-    private readonly setupSteps: SetupStep[];
+    private readonly EventABMSteps: EventABMStep[];
     private readonly eventService: EventService;
     private readonly channelService: ChannelService;
 
@@ -22,10 +22,10 @@ export class SetupDMChannelCallback implements DMChannelCallback{
         this.setup = setup;
         this.eventService = setup.eventService;
         this.channelService = setup.channelService;
-        this.setupSteps = this.initializeSetupStepsList();
+        this.EventABMSteps = this.initializeEventABMStepsList();
     }
 
-    private initializeSetupStepsList(): SetupStep[]{
+    private initializeEventABMStepsList(): EventABMStep[]{
         return [
             new SetupChannelStepHandler(this.channelService),
             new SetupDateStartStepHandler(),
@@ -36,25 +36,25 @@ export class SetupDMChannelCallback implements DMChannelCallback{
         ];
     }
 
-    public async sendInitMessage(setupState: SetupState): Promise<Message>{
-        return await this.setupSteps[setupState.step].sendInitMessage(setupState);
+    public async sendInitMessage(EventState: EventState): Promise<Message>{
+        return await this.EventABMSteps[EventState.step].sendInitMessage(EventState);
     }
 
     async DMCallback(message: Message, user: User): Promise<Message>{
-        const setupState: SetupState = this.setup.getSetupStateByUser(user.id);
-        if(!setupState){
+        const EventState: EventState = this.setup.getEventStateByUser(user.id);
+        if(!EventState){
             logger.info(`DM Handler, setup not found for user ${user.id}, closing DM Channel...`);
-            await this.setup.clearSetupState(user);
+            await this.setup.clearEventState(user);
             return message.channel.send("No setup found, please try again sending the !setup command.")
         }
 
-        logger.debug(`DM Handler, message content: ${message.content}, step: ${setupState.step}`);
-        if(setupState.step > this.setupSteps.length)
+        logger.debug(`DM Handler, message content: ${message.content}, step: ${EventState.step}`);
+        if(EventState.step > this.EventABMSteps.length)
             return undefined;
 
         try {
-            await this.setupSteps[setupState.step].handler(message, setupState);
-            return await this.nextSetupStep(setupState, this.setup);
+            await this.EventABMSteps[EventState.step].handler(message, EventState);
+            return await this.nextEventABMStep(EventState, this.setup);
         }catch (e) {
             logger.error(`Invalid setup step, error: ${e}`);
         }
@@ -62,14 +62,14 @@ export class SetupDMChannelCallback implements DMChannelCallback{
         return undefined;
     }
 
-    private async nextSetupStep(setupState: SetupState, setup: Setup): Promise<Message>{
-        setupState.step++;
-        if(setupState.step < this.setupSteps.length){
-            return await this.setupSteps[setupState.step].sendInitMessage(setupState);
+    private async nextEventABMStep(EventState: EventState, setup: Setup): Promise<Message>{
+        EventState.step++;
+        if(EventState.step < this.EventABMSteps.length){
+            return await this.EventABMSteps[EventState.step].sendInitMessage(EventState);
         }
 
-        await setup.clearSetupState(setupState.user);
-        return await setup.saveEvent(setupState);
+        await setup.clearEventState(EventState.user);
+        return await setup.saveEvent(EventState);
     }
 
 }

@@ -8,16 +8,16 @@ import {EventService} from "../../interfaces/services/core/eventService";
 import {TYPES} from "../../config/types";
 import getDecorators from "inversify-inject-decorators";
 import container from "../../config/inversify.config";
+import {EventState} from "../../interfaces/command/event/eventABM.interface";
 import {SetupDMChannelCallback} from "./handlers/setupDMChannelCallback";
 import {BotEventInput} from "../../models/input/botEventInput";
 import {EventScheduleService} from "../../interfaces/services/schedule/eventScheduleService";
 import {ChannelService} from "../../interfaces/services/discord/channelService";
 import {BotEvent} from "../../models/core/botEvent";
-import {EventABMStep, EventState} from "../../interfaces/command/event/eventABM.interface";
 
 const { lazyInject } = getDecorators(container);
 
-export default class SetupCommand extends Command{
+export default class ModifyCommand extends Command{
     private setupUsers: Map<Snowflake, EventState>;
     private readonly setupDMChannelHandler: SetupDMChannelCallback;
 
@@ -25,7 +25,7 @@ export default class SetupCommand extends Command{
     @lazyInject(TYPES.ChannelService) readonly channelService: ChannelService;
     @lazyInject(TYPES.EventScheduleService) readonly eventScheduleService: EventScheduleService;
     constructor() {
-        super("setup", {
+        super("modify", {
                                         aliases: [],
                                         commandType: {DMCommand: false, GuildCommand: true},
                                         botPermissions: [],
@@ -58,7 +58,7 @@ export default class SetupCommand extends Command{
         return await message.reply("Setup initialized please continue configuration in DM");
     }
 
-    private static getDefaultSetupNotInitialized(user: User, guild: Guild, message: Message): EventABMStep{
+    private static getDefaultSetupNotInitialized(user: User, guild: Guild, message: Message){
         const defaultEventInput: EventInputBuilder = new EventInputBuilder()
             .setCreatedDate(new Date())
             .setCreatedBy(user.id)
@@ -74,7 +74,7 @@ export default class SetupCommand extends Command{
         };
     }
 
-    private async initializeDMChannel(defaultSetup: EventABMStep): Promise<EventState>{
+    private async initializeDMChannel(defaultSetup: EventState): Promise<EventState>{
         const {user} = defaultSetup;
         const dmChannel = await this.channelService.createDMChannelWithHandler(user, this.setupDMChannelHandler);
         const initializedSetup: EventState = {...defaultSetup, dmChannel: dmChannel};
@@ -83,10 +83,10 @@ export default class SetupCommand extends Command{
         return initializedSetup;
     }
 
-    private async sendInitialDM(eventState: EventState){
-        await eventState.dmChannel.send(`Hi ${eventState.user.username}! You want to set me up for an event in ${eventState.guild}? I'll ask for the details, one at a time.`);
-        await eventState.dmChannel.send(`To accept the suggested value, respond with "${BotConfig.defaultOptionMessage}"`);
-        await this.setupDMChannelHandler.sendInitMessage(eventState);
+    private async sendInitialDM(EventState: EventState){
+        await EventState.dmChannel.send(`Hi ${EventState.user.username}! You want to set me up for an event in ${EventState.guild}? I'll ask for the details, one at a time.`);
+        await EventState.dmChannel.send(`To accept the suggested value, respond with "${BotConfig.defaultOptionMessage}"`);
+        await this.setupDMChannelHandler.sendInitMessage(EventState);
     }
 
     public userHasStartedSetup(user: User): boolean {
@@ -100,8 +100,8 @@ export default class SetupCommand extends Command{
     }
 
     public async clearEventState(user: User): Promise<void>{
-        const eventState = this.getEventStateByUser(user.id);
-        if(!eventState)
+        const EventState = this.getEventStateByUser(user.id);
+        if(!EventState)
             return;
 
         try {
@@ -112,25 +112,25 @@ export default class SetupCommand extends Command{
         }
     }
 
-    public async saveEvent(eventState: EventState): Promise<Message>{
-        logger.info(`[SetupCommand] Saving event for user id ${eventState.user.id} and guild id ${eventState.guild.id}`);
-        logger.debug(`[SetupCommand] Saving event: ${JSON.stringify(eventState.event)}`);
-        const event: BotEventInput = eventState.event.build();
+    public async saveEvent(EventState: EventState): Promise<Message>{
+        logger.info(`[SetupCommand] Saving event for user id ${EventState.user.id} and guild id ${EventState.guild.id}`);
+        logger.debug(`[SetupCommand] Saving event: ${JSON.stringify(EventState.event)}`);
+        const event: BotEventInput = EventState.event.build();
         try {
             const savedEvent = await this.eventService.saveEvent(event);
             await this.eventScheduleService.scheduleEvent(savedEvent);
-            return SetupCommand.checkSavedEvent(eventState, event, savedEvent);
+            return SetupCommand.checkSavedEvent(EventState, event, savedEvent);
         }catch(e){
             logger.error(`[SetupCommand] Error saving event, error: ${e}`);
-            return await eventState.dmChannel.send(`Something went wrong, please try again in a few minutes or contact support.`);
+            return await EventState.dmChannel.send(`Something went wrong, please try again in a few minutes or contact support.`);
         }
     }
 
-    private static async checkSavedEvent(eventState: EventState, eventInput: BotEventInput, savedEvent: BotEvent): Promise<Message>{
+    private static async checkSavedEvent(EventState: EventState, eventInput: BotEventInput, savedEvent: BotEvent): Promise<Message>{
         logger.info(`[SetupCommand] Saved event: ${JSON.stringify(savedEvent)}`);
         if(eventInput.codes.length !== savedEvent.codes.length)
-            return await eventState.dmChannel.send(`Event saved but some codes may be repeated. Please check with command !status and !addcodes ${savedEvent.id} to add more codes!`);
+            return await EventState.dmChannel.send(`Event saved but some codes may be repeated. Please check with command !status and !addcodes ${savedEvent.id} to add more codes!`);
 
-        return await eventState.dmChannel.send(`Thank you. That's everything. I'll start the event at the appointed time.`);
+        return await EventState.dmChannel.send(`Thank you. That's everything. I'll start the event at the appointed time.`);
     }
 }
