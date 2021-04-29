@@ -10,13 +10,13 @@ export class SetupFileStepHandler extends SetupAbstractHandler{
         super('FILE');
     }
 
-    async sendInitMessage(EventState: EventState): Promise<Message> {
-        return await EventState.dmChannel.send(`Please attach your links.txt file`);
+    async sendInitMessage(eventState: EventState): Promise<Message> {
+        return await eventState.dmChannel.send(`Please attach your links.txt file`);
     }
 
-    async handler(message: Message, EventState: EventState): Promise<string> {
+    async handler(message: Message, eventState: EventState): Promise<string> {
         if (message.attachments.size <= 0) {
-            await EventState.dmChannel.send(`No file attachment found!`);
+            await eventState.dmChannel.send(`No file attachment found!`);
             return Promise.reject("Invalid file step, no file attached");
         }
 
@@ -24,8 +24,8 @@ export class SetupFileStepHandler extends SetupAbstractHandler{
         logger.info(`[FileEventABMStep] File ${messageAttachment.name} ${messageAttachment.url} ${messageAttachment.id} is attached`);
 
         let codes: CodeInput[] = await CodesCsvHelper.readCsvAttachment(messageAttachment.url);
-        EventState.event.setCodes(codes);
-        EventState.event.setFileUrl(messageAttachment.url);
+        eventState.event.setCodes(codes);
+        eventState.event.setFileUrl(messageAttachment.url);
 
         return codes.toString();
     }

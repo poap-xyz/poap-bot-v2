@@ -3,7 +3,7 @@ import {Client, DMChannel, Guild, GuildChannel, Message, Snowflake, TextChannel,
 import {inject, injectable} from "inversify";
 import {TYPES} from "../../config/types";
 import {ChannelService} from "../../interfaces/services/discord/channelService";
-import {DMChannelCallback} from "../../interfaces/callback/DMChannelCallback";
+import {DMChannelCallback} from "../../commands/event/handlers/DMChannelCallback";
 import {BotConfig} from "../../config/bot.config";
 import {ChannelType} from "../../interfaces/services/discord/channelService";
 import {logger} from "../../logger";

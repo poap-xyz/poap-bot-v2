@@ -10,20 +10,20 @@ export class SetupDateStartStepHandler extends SetupAbstractHandler{
         super('START');
     }
 
-    async sendInitMessage(EventState: EventState): Promise<Message>{
+    async sendInitMessage(eventState: EventState): Promise<Message>{
         const hintDate = moment(new Date()).add(1, "h").format("YYYY-MM-DD HH:mm");
-        return await EventState.dmChannel.send(`Date and time to START 🛫 ? *Hint: Time in UTC this format 👉  yyyy-mm-dd hh:mm (${hintDate})`);
+        return await eventState.dmChannel.send(`Date and time to START 🛫 ? *Hint: Time in UTC this format 👉  yyyy-mm-dd hh:mm (${hintDate})`);
     }
 
-    async handler(message: Message, EventState: EventState):Promise<string> {
+    async handler(message: Message, eventState: EventState):Promise<string> {
         const messageContent:string = message.content.trim();
         let startDate = SetupDateStartStepHandler.validateStartDate(messageContent);
         if(!startDate){
-            await EventState.dmChannel.send(`mmmm ${messageContent} It's a valid date? Try again 🙏`);
+            await eventState.dmChannel.send(`mmmm ${messageContent} It's a valid date? Try again 🙏`);
             return Promise.reject(`Invalid date, message content: ${messageContent}`)
         }
 
-        EventState.event = EventState.event.setStartDate(startDate);
+        eventState.event = eventState.event.setStartDate(startDate);
         return startDate.toUTCString();
     }
 

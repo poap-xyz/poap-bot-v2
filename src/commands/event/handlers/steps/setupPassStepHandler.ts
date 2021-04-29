@@ -13,20 +13,20 @@ export class SetupPassStepHandler extends SetupAbstractHandler{
         this.eventService = eventService;
     }
 
-    async sendInitMessage(EventState: EventState): Promise<Message> {
-        return await EventState.dmChannel.send(`Choose secret 🔒  pass (like a word, a hash from youtube or a complete link). This pass is for your users.`);
+    async sendInitMessage(eventState: EventState): Promise<Message> {
+        return await eventState.dmChannel.send(`Choose secret 🔒  pass (like a word, a hash from youtube or a complete link). This pass is for your users.`);
     }
 
-    async handler(message: Message, EventState: EventState):Promise<string> {
+    async handler(message: Message, eventState: EventState):Promise<string> {
         const messageContent:string = message.content.trim();
         const passAvailable = await this.eventService.isPassAvailable(messageContent);
 
         if(!passAvailable){
-            await EventState.dmChannel.send(`Please choose another secret pass. Try again 🙏`);
+            await eventState.dmChannel.send(`Please choose another secret pass. Try again 🙏`);
             return Promise.reject(`Repeated pass for event, message content: ${messageContent}`);
         }
 
-        EventState.event.setPass(messageContent);
+        eventState.event.setPass(messageContent);
         return messageContent;
     }
 }

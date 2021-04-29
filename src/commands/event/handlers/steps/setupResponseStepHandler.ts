@@ -9,11 +9,11 @@ export class SetupResponseStepHandler extends SetupAbstractHandler{
         super('RESPONSE');
     }
 
-    async sendInitMessage(EventState: EventState): Promise<Message> {
-        return await EventState.dmChannel.send(`Response to send privately to members during the event? (${BotConfig.defaultResponseMessage})`);
+    async sendInitMessage(eventState: EventState): Promise<Message> {
+        return await eventState.dmChannel.send(`Response to send privately to members during the event? (${BotConfig.defaultResponseMessage})`);
     }
 
-    async handler(message: Message, EventState: EventState):Promise<string> {
+    async handler(message: Message, eventState: EventState):Promise<string> {
         const messageContent: string = message.content.trim();
         let responseMessage: string;
 
@@ -21,16 +21,16 @@ export class SetupResponseStepHandler extends SetupAbstractHandler{
             responseMessage = BotConfig.defaultResponseMessage;
 
         if(!messageContent || !messageContent.length){
-            await EventState.dmChannel.send(`Please provide a response or send '-' for default `);
+            await eventState.dmChannel.send(`Please provide a response or send '-' for default `);
             return Promise.reject("Invalid response (null or empty)");
         }
 
         if(messageContent.indexOf(BotConfig.responseMessageReplace) === -1){
-            await EventState.dmChannel.send(`Please provide a response containing the {code} word`);
+            await eventState.dmChannel.send(`Please provide a response containing the {code} word`);
             return Promise.reject("Invalid response, missing {code}");
         }
 
-        EventState.event.setResponseMessage(responseMessage);
+        eventState.event.setResponseMessage(responseMessage);
         return responseMessage;
     }
 }

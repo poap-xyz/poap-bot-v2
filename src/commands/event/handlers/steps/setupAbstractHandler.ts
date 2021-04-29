@@ -8,12 +8,12 @@ export abstract class SetupAbstractHandler implements EventABMStep{
         this.stepId = stepId;
     }
 
-    async sendErrorMessage(EventState: EventState): Promise<Message> {
-        return await EventState.dmChannel.send(`Server side error. Please try in a few minutes or contact support.`);
+    async sendErrorMessage(eventState: EventState): Promise<Message> {
+        return await eventState.dmChannel.send(`Server side error. Please try in a few minutes or contact support.`);
     }
 
-    abstract handler(message: Message, EventState: EventState): Promise<string>;
+    abstract handler(message: Message, eventState: EventState): Promise<string>;
 
-    abstract sendInitMessage(EventState: EventState): Promise<Message>;
+    abstract sendInitMessage(eventState: EventState): Promise<Message>;
 
 }

@@ -13,11 +13,11 @@ import {BotEventInput} from "../../models/input/botEventInput";
 import {EventScheduleService} from "../../interfaces/services/schedule/eventScheduleService";
 import {ChannelService} from "../../interfaces/services/discord/channelService";
 import {BotEvent} from "../../models/core/botEvent";
-import {EventABMStep, EventState} from "../../interfaces/command/event/eventABM.interface";
+import {EventABM, EventABMStep, EventState} from "../../interfaces/command/event/eventABM.interface";
 
 const { lazyInject } = getDecorators(container);
 
-export default class SetupCommand extends Command{
+export default class SetupCommand extends Command implements EventABM{
     private setupUsers: Map<Snowflake, EventState>;
     private readonly setupDMChannelHandler: SetupDMChannelCallback;
 
@@ -26,7 +26,7 @@ export default class SetupCommand extends Command{
     @lazyInject(TYPES.EventScheduleService) readonly eventScheduleService: EventScheduleService;
     constructor() {
         super("setup", {
-                                        aliases: [],
+                                        aliases: ["createevent", "newevent"],
                                         commandType: {DMCommand: false, GuildCommand: true},
                                         botPermissions: [],
                                         memberPermissions: [Permissions.FLAGS.MANAGE_GUILD]});
@@ -58,7 +58,7 @@ export default class SetupCommand extends Command{
         return await message.reply("Setup initialized please continue configuration in DM");
     }
 
-    private static getDefaultSetupNotInitialized(user: User, guild: Guild, message: Message): EventABMStep{
+    private static getDefaultSetupNotInitialized(user: User, guild: Guild, message: Message): EventState{
         const defaultEventInput: EventInputBuilder = new EventInputBuilder()
             .setCreatedDate(new Date())
             .setCreatedBy(user.id)
@@ -74,7 +74,7 @@ export default class SetupCommand extends Command{
         };
     }
 
-    private async initializeDMChannel(defaultSetup: EventABMStep): Promise<EventState>{
+    private async initializeDMChannel(defaultSetup: EventState): Promise<EventState>{
         const {user} = defaultSetup;
         const dmChannel = await this.channelService.createDMChannelWithHandler(user, this.setupDMChannelHandler);
         const initializedSetup: EventState = {...defaultSetup, dmChannel: dmChannel};

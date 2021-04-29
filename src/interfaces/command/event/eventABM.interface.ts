@@ -1,5 +1,9 @@
-import {Channel, DMChannel, Guild, Message, User} from "discord.js";
+import {Channel, DMChannel, Guild, Message, Snowflake, User} from "discord.js";
 import {EventInputBuilder} from "../../../models/builders/eventInputBuilder";
+import {TYPES} from "../../../config/types";
+import {EventService} from "../../services/core/eventService";
+import {ChannelService} from "../../services/discord/channelService";
+import {EventScheduleService} from "../../services/schedule/eventScheduleService";
 
 export type EventABMStepId = 'NONE' | 'CHANNEL' | 'START' | 'END' | 'START_MSG' |
     'END_MSG' | 'RESPONSE' |'REACTION' | 'PASS' | 'FILE';
@@ -18,4 +22,13 @@ export type EventState = {
     channel: Channel,
     dmChannel: DMChannel,
     event: EventInputBuilder,
+}
+
+export interface EventABM{
+    eventService: EventService;
+    channelService: ChannelService;
+    eventScheduleService: EventScheduleService;
+    getEventStateByUser(userId: string | Snowflake): EventState;
+    clearEventState(user: EventState["user"]): Promise<void>;
+    saveEvent(eventState: EventState): Promise<Message>;
 }
