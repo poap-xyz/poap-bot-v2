@@ -1,9 +1,10 @@
 import {BotEvent} from "../core/botEvent";
 import {Code} from "../core/code";
 import {BotEventInput} from "../input/botEventInput";
+import {CodeInput} from "../input/codeInput";
 
 export class BotEventBuilder {
-    private _id: number;
+    private _id: number | string;
     private _server: string;
     private _channel: string;
     private _startDate: Date;
@@ -16,7 +17,7 @@ export class BotEventBuilder {
     private _isActive: boolean;
     private _isWhitelisted: boolean | null;
     private _whitelistFileUrl: string | null;
-    private _codes?: Code[];
+    private _codes?: CodeInput[];
     constructor() {
     }
 
@@ -60,7 +61,7 @@ export class BotEventBuilder {
         return botEventBuilder;
     }
 
-    setId(value: number) {
+    setId(value: number | string) {
         this._id = value;
         return this;
     }
@@ -125,7 +126,7 @@ export class BotEventBuilder {
         return this;
     }
 
-    setCodes(value: Code[]){
+    setCodes(value: CodeInput[]){
         this._codes = value;
         return this;
     }

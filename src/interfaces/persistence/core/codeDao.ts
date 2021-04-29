@@ -3,7 +3,36 @@ import {CodeInput} from "../../../models/input/codeInput";
 import {BotEvent} from "../../../models/core/botEvent";
 
 export interface CodeDao{
+    /**
+     * @method
+     * Add code to an specific event
+     * @param {CodeInput} code to add
+     * @returns {Promise<Code>} The code saved in db
+     */
     addCode(code: CodeInput): Promise<Code>;
+
+    /**
+     * @method
+     * Delete code
+     * @param {Code['code']} code to delete
+     * @returns {Promise<void>}
+     */
+    deleteCode(code: Code['code']): Promise<void>;
+
+    /**
+     * @method
+     * Delete all codes of an specific event
+     * @param {Code['event_id']} event_id of the event to purge codes
+     * @returns {Promise<void>}
+     */
+    deleteCodesByEvent(event_id: Code['event_id']): Promise<void>;
+
+    /**
+     * @method
+     * Count all codes for an event
+     * @param {Event['id']} event_id
+     * @returns {Promise<number>} the number of codes for the event
+     */
     countTotalCodes(event_id: Code['event_id']): Promise<number>;
 
     /**
@@ -15,5 +44,11 @@ export interface CodeDao{
      */
     checkCodeForEventUsername(event_id: BotEvent['id'], username: string);
 
+    /**
+     * @method
+     * Count all claimed codes for an event
+     * @param {Event['id']} event_id
+     * @returns {Promise<number>} the number of claimed codes for the event
+     */
     countClaimedCodes(event_id: Code['event_id']): Promise<number>;
 }

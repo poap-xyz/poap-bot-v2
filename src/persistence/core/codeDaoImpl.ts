@@ -14,10 +14,17 @@ export class CodeDaoImpl implements CodeDao{
         this.db = db;
     }
 
+    async deleteCode(code: string): Promise<void> {
+        return await this.db.none("DELETE FROM codes WHERE code = $1::text;", [code]);
+    }
+
+    async deleteCodesByEvent(event_id: string | number): Promise<void> {
+        return await this.db.none("DELETE FROM codes WHERE event_id = $1;", [event_id]);
+    }
+
     public async addCode(code: CodeInput): Promise<Code> {
         const now = code.created_date? code.created_date : new Date();
-        return await this.db.one<Code>(
-            "INSERT INTO codes (code, event_id, created_date ) VALUES ( $1, $2, $3 ) " +
+        return await this.db.one<Code>("INSERT INTO codes (code, event_id, created_date ) VALUES ( $1, $2, $3 ) " +
             " RETURNING code, event_id, created_date;",
             [code.code, code.event_id, now]
         );
@@ -37,14 +44,14 @@ export class CodeDaoImpl implements CodeDao{
         logger.debug(`[CodeDao] checking event: ${event_id}, user: ${username} `);
         return await this.db.task(async (t) => {
             let code = await t.oneOrNone(
-                "SELECT code FROM codes WHERE event_id = $1 AND username = $2::text",
+                "SELECT code FROM codes WHERE event_id = $1 AND username = $2::text;",
                 [event_id, username], (a: {code: string}) => a.code);
             if(code)
                 return code;
 
             // TODO check whitelisted for event_id
             code = await t.one(
-                "UPDATE codes SET username = $1, claimed_date = $3::timestamp WHERE code in (SELECT code FROM codes WHERE event_id = $2 AND username IS NULL ORDER BY RANDOM() LIMIT 1) RETURNING code",
+                "UPDATE codes SET username = $1, claimed_date = $3::timestamp WHERE code in (SELECT code FROM codes WHERE event_id = $2 AND username IS NULL ORDER BY RANDOM() LIMIT 1) RETURNING code;",
                 [username, event_id, now], (a: {code: string}) => a.code);
             return code;
         })

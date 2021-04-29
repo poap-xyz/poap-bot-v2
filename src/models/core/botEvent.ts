@@ -1,4 +1,5 @@
 import {Code} from "./code";
+import {CodeInput} from "../input/codeInput";
 
 export interface BotEvent {
     id: number | string;
@@ -14,5 +15,5 @@ export interface BotEvent {
     is_active: boolean;
     is_whitelisted: boolean | null;
     whitelist_file_url: string | null;
-    codes?: Code[];
+    codes?: CodeInput[];
 }

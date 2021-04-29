@@ -25,7 +25,7 @@ export default class AddCodeCommand extends Command {
 
     constructor() {
         super("addcodes",
-            {aliases: ['addcode'],
+            {aliases: ['addcode', 'replacecodes', 'replacecode'],
                 commandType: {DMCommand: true, GuildCommand: false},
                 botPermissions: [],
                 memberPermissions: []})
@@ -44,16 +44,23 @@ export default class AddCodeCommand extends Command {
             return await message.reply(`No codes file attachment found!`);
 
         try{
-            const event = await this.getEventBuilderAndValidate(event_id, message.author.id);
-            if(!event)
+            const eventBuilder = await this.getEventBuilderAndValidate(event_id, message.author.id);
+            if(!eventBuilder)
                 return await message.reply(`This event cannot be edited because user credentials are invalid or it is not longer active`);
-            event.
+
+            const replaceCodes = AddCodeCommand.shouldReplaceExistingCodes(commandContext);
+            if(replaceCodes)
+                await this.codeService.deleteCodesByEvent(event_id);
+
+            /* Update codes for the event*/
+            const event = eventBuilder.setCodes(codes).build();
+            await this.eventService.updateEvent(event);
         }catch (e){
             logger.error(`[AddCodesCommand] Error modifying event, message: ${e}`);
             return await message.reply(`This event cannot be edited because user credentials are invalid or it is not longer active`);
         }
 
-        return codes.toString();
+        await message.react("🙌");
     }
 
     private static async getCodesFromCSV(message: Message): Promise<CodeInput[]>{
@@ -71,7 +78,7 @@ export default class AddCodeCommand extends Command {
     }
 
     private static async getEventIdFromArgs(commandContext: CommandContext){
-        if(commandContext.args.length !== 1 && Number.parseInt(commandContext.args[0].trim()){
+        if(commandContext.args.length !== 1 && Number.parseInt(commandContext.args[0].trim())){
             return commandContext.args[0];
         }
 
@@ -88,5 +95,9 @@ export default class AddCodeCommand extends Command {
 
     private static validateEvent(event: BotEvent, usernameId: string | Snowflake): boolean{
         return (event && event.is_active && event.created_by === usernameId);
+    }
+
+    private static shouldReplaceExistingCodes(commandContext: CommandContext): boolean{
+        return (commandContext.commandName.startsWith("replace"));
     }
 }

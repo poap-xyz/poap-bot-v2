@@ -45,4 +45,12 @@ export class CodeServiceImpl implements CodeService{
     public async countTotalCodes(event_id: Code["event_id"]): Promise<number> {
         return this.codeDao.countTotalCodes(event_id);
     }
+
+    public async deleteCode(code: Code["code"]): Promise<void> {
+        return await this.codeDao.deleteCode(code);
+    }
+
+    public async deleteCodesByEvent(event_id: Code["event_id"]): Promise<void> {
+        return await this.codeDao.deleteCodesByEvent(event_id);
+    }
 }

@@ -12,7 +12,7 @@ import {ChannelService} from "../../interfaces/services/discord/channelService";
 export class EventScheduleServiceImpl implements EventScheduleService{
     private eventService: EventService;
     private scheduleService: ScheduleService;
-    private scheduledEvents: Map<number, EventSchedule>;
+    private scheduledEvents: Map<BotEvent['id'], EventSchedule>;
     private channelService: ChannelService;
 
     constructor(@inject(TYPES.EventService) eventService: EventService, @inject(TYPES.ScheduleService) scheduleService: ScheduleService,

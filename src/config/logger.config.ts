@@ -8,7 +8,7 @@ export const loggerConfig = {
         messageKey: "msg", // --messageKey
         levelKey: "level", // --levelKey
         timestampKey: "time", // --timestampKey
-        translateTime: false, // --translateTime
+        translateTime: true, // --translateTime
         ignore: "pid,hostname", // --ignore,
     },
 };

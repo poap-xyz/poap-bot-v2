@@ -117,7 +117,7 @@ export default class SetupCommand extends Command{
         logger.debug(`[SetupCommand] Saving event: ${JSON.stringify(setupState.event)}`);
         const event: BotEventInput = setupState.event.build();
         try {
-            const savedEvent = await this.eventService.saveEvent(event, setupState.user.username);
+            const savedEvent = await this.eventService.saveEvent(event);
             await this.eventScheduleService.scheduleEvent(savedEvent);
             return SetupCommand.checkSavedEvent(setupState, event, savedEvent);
         }catch(e){
