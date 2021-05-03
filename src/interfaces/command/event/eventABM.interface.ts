@@ -1,5 +1,5 @@
 import {Channel, DMChannel, Guild, Message, Snowflake, User} from "discord.js";
-import {EventInputBuilder} from "../../../models/builders/eventInputBuilder";
+import {BotEventInputBuilder} from "../../../models/builders/eventInputBuilder";
 import {TYPES} from "../../../config/types";
 import {EventService} from "../../services/core/eventService";
 import {ChannelService} from "../../services/discord/channelService";
@@ -21,7 +21,7 @@ export type EventState = {
     guild: Guild,
     channel: Channel,
     dmChannel: DMChannel,
-    event: EventInputBuilder,
+    event: BotEventInputBuilder,
 }
 
 export interface EventABM{

@@ -3,7 +3,7 @@ import {Code} from "../core/code";
 import {BotEventInput} from "../input/botEventInput";
 import {CodeInput} from "../input/codeInput";
 
-export class EventInputBuilder {
+export class BotEventInputBuilder {
     private _id: number;
     private _server: string;
     private _channel: string;
