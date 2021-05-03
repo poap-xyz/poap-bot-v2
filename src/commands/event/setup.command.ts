@@ -1,5 +1,5 @@
 import {Guild, Message, Permissions, Snowflake, User} from "discord.js";
-import {BotEventInputBuilder} from "../../models/builders/eventInputBuilder";
+import {BotEventInputBuilder} from "../../models/builders/botEventInputBuilder";
 import {logger} from "../../logger";
 import {BotConfig} from "../../config/bot.config";
 import {BotEventInput} from "../../models/input/botEventInput";

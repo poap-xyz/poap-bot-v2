@@ -1,33 +1,30 @@
 import {Command} from "../command";
 import {CommandContext} from "../commandContext";
 import {Guild, Message, Permissions, Snowflake, User} from "discord.js";
-import {BotEventInputBuilder} from "../../models/builders/eventInputBuilder";
 import {logger} from "../../logger";
-import {BotConfig} from "../../config/bot.config";
 import {EventService} from "../../interfaces/services/core/eventService";
 import {TYPES} from "../../config/types";
 import getDecorators from "inversify-inject-decorators";
 import container from "../../config/inversify.config";
 import {EventABM, EventState} from "../../interfaces/command/event/eventABM.interface";
-import {SetupDMChannelCallback} from "./handlers/setupDMChannelCallback";
-import {BotEventInput} from "../../models/input/botEventInput";
+import {SetupDMChannelCallback} from "./handlers/callback/setupDMChannelCallback";
 import {EventScheduleService} from "../../interfaces/services/schedule/eventScheduleService";
 import {ChannelService} from "../../interfaces/services/discord/channelService";
-import {BotEvent} from "../../models/core/botEvent";
 import {CommandOptions} from "../../interfaces/command/commandOptions";
+import {DMChannelCallback} from "../../interfaces/callback/DMChannelCallback";
 
 const { lazyInject } = getDecorators(container);
 
 export default abstract class EventABMAbstractCommand extends Command implements EventABM{
     private static setupUsers: Map<Snowflake, EventState>;
-    protected readonly setupDMChannelHandler: SetupDMChannelCallback;
+    protected readonly dmChannelCallback: DMChannelCallback;
 
     @lazyInject(TYPES.EventService) readonly eventService: EventService;
     @lazyInject(TYPES.ChannelService) readonly channelService: ChannelService;
     @lazyInject(TYPES.EventScheduleService) readonly eventScheduleService: EventScheduleService;
-    protected constructor(name: string, commandOptions: CommandOptions) {
+    protected constructor(name: string, commandOptions: CommandOptions, dmChannelCallback: DMChannelCallback) {
         super(name, commandOptions);
-        this.setupDMChannelHandler = new SetupDMChannelCallback(this);
+        this.dmChannelCallback = new dmChannelCallback(this);
 
         /* Initialize static map */
         if(!EventABMAbstractCommand.setupUsers)
@@ -62,7 +59,7 @@ export default abstract class EventABMAbstractCommand extends Command implements
 
     private async initializeDMChannel(defaultSetup: EventState): Promise<EventState>{
         const {user} = defaultSetup;
-        const dmChannel = await this.channelService.createDMChannelWithHandler(user, this.setupDMChannelHandler);
+        const dmChannel = await this.channelService.createDMChannelWithHandler(user, this.dmChannelCallback);
         const initializedSetup: EventState = {...defaultSetup, dmChannel: dmChannel};
 
         await this.sendInitialDM(initializedSetup);

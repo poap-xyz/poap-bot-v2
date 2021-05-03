@@ -1,6 +1,6 @@
 import {DMChannel, Guild, GuildChannel, Message, Snowflake, TextChannel, User} from "discord.js";
-import {DMChannelCallback} from "../../../commands/event/handlers/DMChannelCallback";
 import {logger} from "../../../logger";
+import {DMChannelCallback} from "../../callback/DMChannelCallback";
 
 export type ChannelType = 'DM_COMMAND' | 'GUILD_COMMAND' | 'UNKNOWN';
 

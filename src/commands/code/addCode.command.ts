@@ -52,7 +52,7 @@ export default class AddCodeCommand extends Command {
             if(replaceCodes)
                 await this.codeService.deleteCodesByEvent(event_id);
 
-            /* Update codes for the event*/
+            /* Update codes for the event */
             const event = eventBuilder.setCodes(codes).build();
             await this.eventService.updateEvent(event);
         }catch (e){

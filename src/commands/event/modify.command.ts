@@ -1,12 +1,11 @@
 import {Guild, Message, Permissions, Snowflake, User} from "discord.js";
-import {EventInputBuilder} from "../../models/builders/eventInputBuilder";
 import {logger} from "../../logger";
 import {BotConfig} from "../../config/bot.config";
-import {BotEventInput} from "../../models/input/botEventInput";
-import {BotEvent} from "../../models/core/botEvent";
+import {BotEventBuilder} from "../../models/builders/botEventBuilder";
 import {EventABM, EventABMStep, EventState} from "../../interfaces/command/event/eventABM.interface";
 import EventABMAbstractCommand from "./eventABMAbstractCommand";
 import {CommandContext} from "../commandContext";
+import {ModifyDMChannelCallback} from "./handlers/callback/modifyDMChannelCallback";
 
 export default class ModifyCommand extends EventABMAbstractCommand{
     constructor() {
@@ -18,7 +17,7 @@ export default class ModifyCommand extends EventABMAbstractCommand{
 
     protected getInitialEventState(user: User, guild: Guild, commandContext: CommandContext): EventState{
         const message = commandContext.message;
-        const defaultEventInput: EventBuilder = new EventInputBuilder()
+        const defaultEventInput: BotEventBuilder = new BotEventBuilder()
             .setCreatedDate(new Date())
             .setCreatedBy(user.id)
             .setServer(guild.id);
@@ -40,28 +39,22 @@ export default class ModifyCommand extends EventABMAbstractCommand{
     }
 
     public async saveEvent(eventState: EventState): Promise<Message>{
-        logger.info(`[SetupCommand] Modifying event for user id ${eventState.user.id} and guild id ${eventState.guild.id}`);
-        logger.debug(`[SetupCommand] Modifying event: ${JSON.stringify(eventState.event)}`);
-        const eventInput: BotEventInput = eventState.event.build();
-        const event: BotEvent = {...eventInput,
-                                    is_active: true,
-                                    id:
-                                    };
+        logger.info(`[ModifyCommand] Modifying event for user id ${eventState.user.id} and guild id ${eventState.guild.id}`);
+        logger.debug(`[ModifyCommand] Modifying event: ${JSON.stringify(eventState.event)}`);
+        const event = eventState.event.build();
+
+        /* Type check just for secure programming */
+        if(!("id" in event))
+            throw new Error("Invalid type for modify command");
+
         try {
             const savedEvent = await this.eventService.updateEvent(event);
+            this.eventScheduleService.cancelEvent(event);
             await this.eventScheduleService.scheduleEvent(savedEvent);
-            return ModifyCommand.checkSavedEvent(eventState, event, savedEvent);
+            return await eventState.dmChannel.send(`Thank you. That's everything. I'll start the event at the appointed time.`);
         }catch(e){
-            logger.error(`[SetupCommand] Error saving event, error: ${e}`);
+            logger.error(`[ModifyCommand] Error modifying event ${JSON.stringify(event)}, error: ${e}`);
             return await eventState.dmChannel.send(`Something went wrong, please try again in a few minutes or contact support.`);
         }
-    }
-
-    private static async checkSavedEvent(eventState: EventState, eventInput: BotEventInput, savedEvent: BotEvent): Promise<Message>{
-        logger.info(`[SetupCommand] Saved event: ${JSON.stringify(savedEvent)}`);
-        if(eventInput.codes.length !== savedEvent.codes.length)
-            return await eventState.dmChannel.send(`Event saved but some codes may be repeated. Please check with command !status and !addcodes ${savedEvent.id} to add more codes!`);
-
-        return await eventState.dmChannel.send(`Thank you. That's everything. I'll start the event at the appointed time.`);
     }
 }

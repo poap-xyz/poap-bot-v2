@@ -1,10 +1,11 @@
-import {Message, User} from "discord.js";
-import {EventABM, EventABMStep, EventState} from "../../../interfaces/command/event/eventABM.interface";
-import {EventService} from "../../../interfaces/services/core/eventService";
-import {ChannelService} from "../../../interfaces/services/discord/channelService";
-import {logger} from "../../../logger";
+import {DMChannel, Message, User} from "discord.js";
+import {EventABM, EventABMStep, EventState} from "../../../../interfaces/command/event/eventABM.interface";
+import {EventService} from "../../../../interfaces/services/core/eventService";
+import {ChannelService} from "../../../../interfaces/services/discord/channelService";
+import {logger} from "../../../../logger";
+import {DMChannelCallback} from "../../../../interfaces/callback/DMChannelCallback";
 
-export abstract class DMChannelCallback {
+export abstract class DMChannelAbstractCallback implements DMChannelCallback{
     protected readonly eventABM: EventABM;
     protected readonly eventABMSteps: EventABMStep[];
     protected readonly eventService: EventService;
@@ -19,7 +20,7 @@ export abstract class DMChannelCallback {
 
     protected abstract initializeEventABMStepsList(): EventABMStep[];
 
-    public async sendInitMessage(eventState: EventState): Promise<Message>{
+    async sendInitMessage(eventState: EventState): Promise<Message>{
         return await this.eventABMSteps[eventState.step].sendInitMessage(eventState);
     }
 
