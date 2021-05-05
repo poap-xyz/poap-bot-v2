@@ -18,7 +18,6 @@ export class ModifyDMChannelCallback extends DMChannelAbstractCallback{
             new SetupDateStartStepHandler(),
             new SetupDateEndStepHandler(),
             new SetupResponseStepHandler(),
-            new SetupPassStepHandler(this.eventService),
         ];
     }
 }
