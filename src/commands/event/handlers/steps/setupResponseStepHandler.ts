@@ -18,16 +18,15 @@ export class SetupResponseStepHandler extends SetupAbstractHandler{
         let responseMessage: string;
 
         if (messageContent === BotConfig.defaultOptionMessage)
-            responseMessage = BotConfig.defaultResponseMessage;
+            responseMessage = eventState.event.responseMessage? eventState.event.responseMessage : BotConfig.defaultResponseMessage;
 
-        if(!messageContent || !messageContent.length){
-            await eventState.dmChannel.send(`Please provide a response or send '-' for default `);
-            return Promise.reject("Invalid response (null or empty)");
+        if(messageContent && messageContent.length){
+            responseMessage = messageContent;
         }
 
-        if(messageContent.indexOf(BotConfig.responseMessageReplace) === -1){
-            await eventState.dmChannel.send(`Please provide a response containing the {code} word`);
-            return Promise.reject("Invalid response, missing {code}");
+        if(!(responseMessage && responseMessage.indexOf(BotConfig.responseMessageReplace) !== -1)){
+            await eventState.dmChannel.send(`Please provide a response containing the {code} word or send '-' for default`);
+            return Promise.reject("Invalid response (null or empty)");
         }
 
         eventState.event.setResponseMessage(responseMessage);

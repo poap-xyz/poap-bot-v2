@@ -16,7 +16,7 @@ export class SetupDateEndStepHandler extends SetupAbstractHandler{
 
     async handler(message: Message, eventState: EventState):Promise<string> {
         const messageContent:string = message.content.trim();
-        let endDate = SetupDateEndStepHandler.validateEndDate(messageContent, eventState.event.startDate);
+        let endDate = SetupDateEndStepHandler.validateEndDate(messageContent, eventState.event.startDate, eventState);
         if(!endDate){
             await eventState.dmChannel.send(`mmmm ${messageContent} It's a valid date? Try again 🙏`);
             return Promise.reject(`Invalid date, message content: ${messageContent}`)
@@ -26,12 +26,12 @@ export class SetupDateEndStepHandler extends SetupAbstractHandler{
         return endDate.toUTCString();
     }
 
-    private static validateEndDate(messageContent: string, startDate: Date): Date{
+    private static validateEndDate(messageContent: string, startDate: Date, eventState: EventState): Date{
         const defaultDate = new Date(startDate);
         defaultDate.setHours(startDate.getHours() + 1);
 
         if (messageContent === BotConfig.defaultOptionMessage)
-            return defaultDate;
+            return eventState.event.endDate? eventState.event.endDate : defaultDate;
 
         const endDate = moment(messageContent).isValid() && new Date(messageContent);
         if(endDate && endDate > startDate){

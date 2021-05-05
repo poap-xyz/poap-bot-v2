@@ -16,21 +16,26 @@ export class SetupChannelStepHandler extends SetupAbstractHandler {
     }
 
     async handler(message: Message, eventState: EventState):Promise<string> {
-        const messageContent:string = message.content;
+        const messageContent:string = message.content.trim();
         let selectedChannel: Channel;
+        let selectedChannelId: string;
 
-        selectedChannel = this.channelService.getChannelFromGuild(eventState.guild, messageContent);
         //Check for default channel
-        if (messageContent === BotConfig.defaultOptionMessage)
-            selectedChannel = eventState.channel;
+        if (messageContent === BotConfig.defaultOptionMessage) {
+            selectedChannelId = eventState.event.channel ? eventState.event.channel : eventState.channel.id;
+        }else{
+            selectedChannel = this.channelService.getChannelFromGuild(eventState.guild, messageContent);
+            if(selectedChannel)
+                selectedChannelId = selectedChannel.id;
+        }
 
-        if (!selectedChannel) {
+        if (!selectedChannelId) {
             const channels = this.channelService.getChannelsString(eventState.guild);
             await eventState.dmChannel.send(`I can't find a channel named ${messageContent}. Try again -> ${channels}`);
             return Promise.reject(`Invalid channel, message content: ${messageContent}`);
         }
 
-        eventState.event = eventState.event.setChannel(selectedChannel.id);
+        eventState.event = eventState.event.setChannel(selectedChannelId);
         return selectedChannel.toString();
     };
 
