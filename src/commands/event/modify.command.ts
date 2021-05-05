@@ -13,6 +13,7 @@ export default class ModifyCommand extends EventABMAbstractCommand{
             commandType: {DMCommand: false, GuildCommand: true},
             botPermissions: [],
             memberPermissions: [Permissions.FLAGS.MANAGE_GUILD]});
+        this.dmChannelCallback = new ModifyDMChannelCallback(this);
     }
 
     protected getInitialEventState(user: User, guild: Guild, commandContext: CommandContext): EventState{
@@ -33,9 +34,9 @@ export default class ModifyCommand extends EventABMAbstractCommand{
     }
 
     protected async sendInitialDM(eventState: EventState){
-        await eventState.dmChannel.send(`Hi ${eventState.user.username}! You want to modify the event (#${eventState.event}) in ${eventState.guild}? I'll ask for the details, one at a time.`);
+        await eventState.dmChannel.send(`Hi ${eventState.user.username}! You want to modify the event (ID#1) in ${eventState.guild.name}? I'll ask for the details, one at a time.`);
         await eventState.dmChannel.send(`To leave the current value, please skip the step by using "${BotConfig.defaultOptionMessage}"`);
-        await this.setupDMChannelHandler.sendInitMessage(eventState);
+        await this.dmChannelCallback.sendInitMessage(eventState);
     }
 
     public async saveEvent(eventState: EventState): Promise<Message>{

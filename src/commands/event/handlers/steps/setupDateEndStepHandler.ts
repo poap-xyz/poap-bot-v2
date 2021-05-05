@@ -10,13 +10,13 @@ export class SetupDateEndStepHandler extends SetupAbstractHandler{
     }
 
     async sendInitMessage(eventState: EventState): Promise<Message>{
-        const hintDate = moment(eventState.event.start_date).add(1, "h").format("YYYY-MM-DD HH:mm");
+        const hintDate = moment(eventState.event.startDate).add(1, "h").format("YYYY-MM-DD HH:mm");
         return await eventState.dmChannel.send(`Date and time to END 🛬  the event? *Hint: Time in UTC this format 👉  yyyy-mm-dd hh:mm (${hintDate})`);
     }
 
     async handler(message: Message, eventState: EventState):Promise<string> {
         const messageContent:string = message.content.trim();
-        let endDate = SetupDateEndStepHandler.validateEndDate(messageContent, eventState.event.start_date);
+        let endDate = SetupDateEndStepHandler.validateEndDate(messageContent, eventState.event.startDate);
         if(!endDate){
             await eventState.dmChannel.send(`mmmm ${messageContent} It's a valid date? Try again 🙏`);
             return Promise.reject(`Invalid date, message content: ${messageContent}`)

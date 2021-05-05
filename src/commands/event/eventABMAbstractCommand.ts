@@ -17,14 +17,13 @@ const { lazyInject } = getDecorators(container);
 
 export default abstract class EventABMAbstractCommand extends Command implements EventABM{
     private static setupUsers: Map<Snowflake, EventState>;
-    protected readonly dmChannelCallback: DMChannelCallback;
+    protected dmChannelCallback: DMChannelCallback;
 
     @lazyInject(TYPES.EventService) readonly eventService: EventService;
     @lazyInject(TYPES.ChannelService) readonly channelService: ChannelService;
     @lazyInject(TYPES.EventScheduleService) readonly eventScheduleService: EventScheduleService;
-    protected constructor(name: string, commandOptions: CommandOptions, dmChannelCallback: DMChannelCallback) {
+    protected constructor(name: string, commandOptions: CommandOptions) {
         super(name, commandOptions);
-        this.dmChannelCallback = new dmChannelCallback(this);
 
         /* Initialize static map */
         if(!EventABMAbstractCommand.setupUsers)

@@ -98,7 +98,59 @@ export class BotEventInputBuilder {
         return this;
     }
 
-    get start_date(): Date {
+    get id(): number {
+        return this._id;
+    }
+
+    get server(): string {
+        return this._server;
+    }
+
+    get channel(): string {
+        return this._channel;
+    }
+
+    get startDate(): Date {
         return this._startDate;
+    }
+
+    get endDate(): Date {
+        return this._endDate;
+    }
+
+    get responseMessage(): string {
+        return this._responseMessage;
+    }
+
+    get pass(): string {
+        return this._pass;
+    }
+
+    get createdBy(): string {
+        return this._createdBy;
+    }
+
+    get createdDate(): Date {
+        return this._createdDate;
+    }
+
+    get fileUrl(): string {
+        return this._fileUrl;
+    }
+
+    get isActive(): boolean {
+        return this._isActive;
+    }
+
+    get isWhitelisted(): boolean | null {
+        return this._isWhitelisted;
+    }
+
+    get whitelistFileUrl(): string | null {
+        return this._whitelistFileUrl;
+    }
+
+    get codes(): CodeInput[] {
+        return this._codes;
     }
 }

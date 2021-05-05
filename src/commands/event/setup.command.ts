@@ -7,6 +7,8 @@ import {BotEvent} from "../../models/core/botEvent";
 import {EventABM, EventABMStep, EventState} from "../../interfaces/command/event/eventABM.interface";
 import EventABMAbstractCommand from "./eventABMAbstractCommand";
 import {CommandContext} from "../commandContext";
+import {ModifyDMChannelCallback} from "./handlers/callback/modifyDMChannelCallback";
+import {SetupDMChannelCallback} from "./handlers/callback/setupDMChannelCallback";
 
 export default class SetupCommand extends EventABMAbstractCommand{
     constructor() {
@@ -14,6 +16,7 @@ export default class SetupCommand extends EventABMAbstractCommand{
                         commandType: {DMCommand: false, GuildCommand: true},
                         botPermissions: [],
                         memberPermissions: [Permissions.FLAGS.MANAGE_GUILD]});
+        this.dmChannelCallback = new SetupDMChannelCallback(this);
     }
 
     protected getInitialEventState(user: User, guild: Guild, commandContext: CommandContext): EventState{
@@ -36,7 +39,7 @@ export default class SetupCommand extends EventABMAbstractCommand{
     protected async sendInitialDM(eventState: EventState){
         await eventState.dmChannel.send(`Hi ${eventState.user.username}! You want to set me up for an event in ${eventState.guild}? I'll ask for the details, one at a time.`);
         await eventState.dmChannel.send(`To accept the suggested value, respond with "${BotConfig.defaultOptionMessage}"`);
-        await this.setupDMChannelHandler.sendInitMessage(eventState);
+        await this.dmChannelCallback.sendInitMessage(eventState);
     }
 
     public async saveEvent(eventState: EventState): Promise<Message>{
