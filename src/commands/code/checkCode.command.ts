@@ -45,7 +45,10 @@ export default class CheckCodeCommand extends Command{
     }
 
     private static setClaimInResponseMessage(event: BotEvent, claimCode: string){
-        const claimUrl = BotConfig.poapClaimUrl + claimCode;
+        let claimUrl = BotConfig.poapClaimUrl + claimCode;
+        if(claimCode.indexOf("http:") !== -1)
+            claimUrl = claimCode;
+
         return event.response_message.replace(BotConfig.responseMessageReplace, claimUrl);
     }
 }

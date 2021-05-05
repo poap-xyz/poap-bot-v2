@@ -44,14 +44,15 @@ export class CodeDaoImpl implements CodeDao{
         logger.debug(`[CodeDao] checking event: ${event_id}, user: ${username} `);
         return await this.db.task(async (t) => {
             let code = await t.oneOrNone(
-                "SELECT code FROM codes WHERE event_id = $1 AND username = $2::text;",
-                [event_id, username], (a: {code: string}) => a.code);
+                "SELECT code FROM codes WHERE event_id = $1 AND username = $2::numeric;",
+                [event_id, username], (a: {code: string}) => a? a.code : null);
             if(code)
                 return code;
 
             // TODO check whitelisted for event_id
+
             code = await t.one(
-                "UPDATE codes SET username = $1, claimed_date = $3::timestamp WHERE code in (SELECT code FROM codes WHERE event_id = $2 AND username IS NULL ORDER BY RANDOM() LIMIT 1) RETURNING code;",
+                "UPDATE codes SET username = $1::numeric, claimed_date = $3::timestamp WHERE code in (SELECT code FROM codes WHERE event_id = $2 AND username IS NULL ORDER BY RANDOM() LIMIT 1) RETURNING code;",
                 [username, event_id, now], (a: {code: string}) => a.code);
             return code;
         })
