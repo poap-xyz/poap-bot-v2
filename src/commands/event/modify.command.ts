@@ -34,7 +34,7 @@ export default class ModifyCommand extends EventABMAbstractCommand{
     }
 
     protected async sendInitialDM(eventState: EventState){
-        await eventState.dmChannel.send(`Hi ${eventState.user.username}! You want to modify the event (ID#1) in ${eventState.guild.name}? I'll ask for the details, one at a time.`);
+        await eventState.dmChannel.send(`Hi ${eventState.user.username}! You want to modify the event (ID#${eventState.event.id}) in ${eventState.guild.name}? I'll ask for the details, one at a time.`);
         await eventState.dmChannel.send(`To leave the current value, please skip the step by using "${BotConfig.defaultOptionMessage}"`);
         await this.dmChannelCallback.sendInitMessage(eventState);
     }

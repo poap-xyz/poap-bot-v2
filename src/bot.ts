@@ -39,8 +39,7 @@ export class Bot {
         });
 
         this.client.on('message', (message: Message) => {
-            logger.debug(`Message received! Contents: ${message.content}`);
-
+            logger.info(`[MSG] DM ${message.channel.type} - ${message.content} from ${message.author.username}`);
             this.messageHandler.handle(message).then((m) => {
                 logger.debug(`Message responded, Content: ${m}`);
             }).catch((e) => {

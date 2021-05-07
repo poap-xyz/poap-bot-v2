@@ -1,6 +1,6 @@
 import {Channel, Message} from "discord.js";
 import {BotConfig} from "../../../../config/bot.config";
-import {EventState, EventABMStep, EventABMStepId} from "../../../../interfaces/command/event/eventABM.interface";
+import {EventState} from "../../../../interfaces/command/event/eventABM.interface";
 import {SetupAbstractHandler} from "./setupAbstractHandler";
 import {ChannelService} from "../../../../interfaces/services/discord/channelService";
 
