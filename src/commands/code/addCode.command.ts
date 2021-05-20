@@ -49,8 +49,12 @@ export default class AddCodeCommand extends Command {
                 return await message.reply(`This event cannot be edited because user credentials are invalid or it is not longer active`);
 
             const replaceCodes = AddCodeCommand.shouldReplaceExistingCodes(commandContext);
-            if(replaceCodes)
+
+            if(replaceCodes){
+                console.log("SIII");
                 await this.codeService.deleteCodesByEvent(event_id);
+            }
+
 
             /* Update codes for the event */
             const event = eventBuilder.setCodes(codes).build();
@@ -78,7 +82,7 @@ export default class AddCodeCommand extends Command {
     }
 
     private static async getEventIdFromArgs(commandContext: CommandContext){
-        if(commandContext.args.length !== 1 && Number.parseInt(commandContext.args[0].trim())){
+        if(commandContext.args.length > 0 && Number.parseInt(commandContext.args[0].trim())){
             return commandContext.args[0];
         }
 
@@ -87,7 +91,7 @@ export default class AddCodeCommand extends Command {
 
     private async getEventBuilderAndValidate(eventId: string | number, usernameId: string): Promise<BotEventBuilder>{
         const event = await this.eventService.getEventById(eventId);
-        if(AddCodeCommand.validateEvent(event, usernameId))
+        if(!AddCodeCommand.validateEvent(event, usernameId))
             return undefined;
 
         return BotEventBuilder.builderFromBotEvent(event);
@@ -98,6 +102,6 @@ export default class AddCodeCommand extends Command {
     }
 
     private static shouldReplaceExistingCodes(commandContext: CommandContext): boolean{
-        return (commandContext.commandName.startsWith("replace"));
+        return (commandContext.parsedCommandName.indexOf("replace") !== -1);
     }
 }

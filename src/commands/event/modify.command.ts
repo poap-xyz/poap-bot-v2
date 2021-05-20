@@ -2,7 +2,7 @@ import {Guild, Message, Permissions, Snowflake, User} from "discord.js";
 import {logger} from "../../logger";
 import {BotConfig} from "../../config/bot.config";
 import {BotEventBuilder} from "../../models/builders/botEventBuilder";
-import {EventABM, EventABMStep, EventState} from "../../interfaces/command/event/eventABM.interface";
+import {EventState} from "../../interfaces/command/event/eventABM.interface";
 import EventABMAbstractCommand from "./eventABMAbstractCommand";
 import {CommandContext} from "../commandContext";
 import {ModifyDMChannelCallback} from "./handlers/callback/modifyDMChannelCallback";
@@ -44,7 +44,7 @@ export default class ModifyCommand extends EventABMAbstractCommand{
         logger.debug(`[ModifyCommand] Modifying event: ${JSON.stringify(eventState.event)}`);
         const event = eventState.event.build();
 
-        /* Type check just for secure programming */
+        /* Type check for secure programming */
         if(!("id" in event))
             throw new Error("Invalid type for modify command");
 

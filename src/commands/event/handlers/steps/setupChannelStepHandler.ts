@@ -24,7 +24,7 @@ export class SetupChannelStepHandler extends SetupAbstractHandler {
         if (messageContent === BotConfig.defaultOptionMessage) {
             selectedChannelId = eventState.event.channel ? eventState.event.channel : eventState.channel.id;
         }else{
-            selectedChannel = this.channelService.getChannelFromGuild(eventState.guild, messageContent);
+            selectedChannel = this.channelService.getChannelFromGuildByName(eventState.guild, messageContent);
             if(selectedChannel)
                 selectedChannelId = selectedChannel.id;
         }
@@ -36,7 +36,7 @@ export class SetupChannelStepHandler extends SetupAbstractHandler {
         }
 
         eventState.event = eventState.event.setChannel(selectedChannelId);
-        return selectedChannel.toString();
+        return selectedChannelId;
     };
 
 }

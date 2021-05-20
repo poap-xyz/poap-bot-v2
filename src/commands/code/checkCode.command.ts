@@ -6,7 +6,6 @@ import {EventService} from "../../interfaces/services/core/eventService";
 import getDecorators from "inversify-inject-decorators";
 import container from "../../config/inversify.config";
 const { lazyInject } = getDecorators(container);
-import {logger} from "../../logger";
 import {CodeService} from "../../interfaces/services/core/codeService";
 import {ChannelService} from "../../interfaces/services/discord/channelService";
 import {BotConfig} from "../../config/bot.config";

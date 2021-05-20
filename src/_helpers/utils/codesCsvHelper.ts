@@ -11,7 +11,6 @@ export class CodesCsvHelper{
             const csvArray = await CodesCsvHelper.readCsvString(codesCsv);
 
             logger.debug(`[FileEventABMStep] Response from attachment: ${codesCsv}`);
-            logger.debug(`[FileEventABMStep] CSV Array: ${csvArray}`);
 
             return csvArray;
         }catch (e){

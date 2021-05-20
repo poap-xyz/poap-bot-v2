@@ -8,7 +8,9 @@ import {CommandOptions} from "../interfaces/command/commandOptions";
 import {ChannelService} from "../interfaces/services/discord/channelService";
 
 export class CommandContext {
+    /** Command name in all lowercase or null if prefix is not correct */
     readonly commandName: string;
+
     /** Command name in all lowercase or null if prefix is not correct */
     readonly parsedCommandName: string | null;
 
