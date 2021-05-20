@@ -19,7 +19,6 @@ export class CodeDaoImpl implements CodeDao{
     }
 
     async deleteCodesByEvent(event_id: string | number): Promise<void> {
-        console.log(`DELETE FROM codes WHERE event_id = ${event_id};`);
         return await this.db.none("DELETE FROM codes WHERE event_id = $1;", [event_id]);
     }
 

@@ -61,7 +61,9 @@ export class EventDaoImpl implements EventDao{
     }
 
     public async getEventByPass(eventPass: string): Promise<BotEvent | null> {
-        return await this.db.oneOrNone<BotEvent>("SELECT * FROM events WHERE pass = $1::text AND is_active = $2::boolean", [eventPass, true]);
+        const now = new Date();
+        return await this.db.oneOrNone<BotEvent>("SELECT * FROM events WHERE pass = $1::text AND is_active = $2::boolean AND end_date >= $3::timestamp AND start_date <= $3::timestamp",
+            [eventPass, true, now]);
     }
 
     public async isPassAvailable(eventPass: string): Promise<boolean>{
