@@ -65,3 +65,20 @@ Note: You can find the event ID using the !status command
 
 ## Subscribing a channel to the Poap Feed
 - _!unsubscribe_ Administrators may issue this command to the bot by mentioning it in __a text channel__ and will stop sending the embed messages to the channel. 
+
+## Setup
+
+Install dependencies & start:
+
+    npm install
+    npm run debug
+
+### Development
+Builds will be created on `dist` folder.
+
+## Deployment
+
+    docker-compose build
+    docker-compose up -d
+
+- Make sure to create a .env file using all configurations (see .env-sample)
