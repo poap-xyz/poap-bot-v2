@@ -45,6 +45,7 @@ The bot will offer a default value for each parameter and it will be set if the 
 
 ## Get status from your events
 - _!status_ Will respond in a direct message with the information of all configured events by the user.
+
 Example:
 ![POAP-bot status example](https://github.com/poap-xyz/poap-bot-v2/blob/images/docs/examples/status_example.png?raw=true)
 
@@ -81,4 +82,4 @@ Builds will be created on `dist` folder.
     docker-compose build
     docker-compose up -d
 
-- Make sure to create a .env file using all configurations (see .env-sample)
+- Make sure to create a .env file using all configurations (see .env.sample)
