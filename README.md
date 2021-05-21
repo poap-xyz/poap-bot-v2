@@ -22,9 +22,10 @@ The bot will appear as a new member of the server (check for __Poap Bot#2760__).
 
 ## Setting up new POAP Event
 
-Administrators or users with a role called "POAP Master" may issue a command to the bot by mentioning it in __a text channel__, then adding the command in the message. Example:
+Administrators or users with a role called "POAP Master" may issue a command to the bot by mentioning it in __a Text Channel__, then adding the command in the message. 
 
-`!setup` or `@POAP-bot !setup`
+Using:
+`!setup` or `@POAP-bot !setup` __only inside a Text Channel__
 
 ![POAP-bot setup init example](https://github.com/poap-xyz/poap-bot-v2/blob/images/docs/examples/start_setup_example.png?raw=true)
 
