@@ -4,10 +4,8 @@ import {EventService} from "../../interfaces/services/core/eventService";
 import {TYPES} from "../../config/types";
 import {EventDao} from "../../interfaces/persistence/core/eventDao";
 import {CodeService} from "../../interfaces/services/core/codeService";
-import {logger} from "../../logger";
 import {CodeInput} from "../../models/input/codeInput";
 import {BotEventInput} from "../../models/input/botEventInput";
-import {EventScheduleService} from "../../interfaces/services/schedule/eventScheduleService";
 
 @injectable()
 export class EventServiceImpl implements EventService{
@@ -18,6 +16,10 @@ export class EventServiceImpl implements EventService{
                 @inject(TYPES.CodeService) codeService: CodeService) {
         this.eventDao = eventDao;
         this.codeService = codeService;
+    }
+
+    public async getActiveEventByPass(eventPass: string): Promise<BotEvent> {
+        return await this.eventDao.getActiveEventByPass(eventPass);
     }
 
     public async getRealtimeActiveEvents(): Promise<BotEvent[]>{

@@ -31,9 +31,12 @@ export default class CheckCodeCommand extends Command{
     }
 
     protected async execute(commandContext: CommandContext): Promise<Message>{
-        const event = await this.eventService.getEventByPass(commandContext.message.content);
-        const claimCode = await this.codeService.checkCodeForEventUsername(event.id, commandContext.message.author.id);
+        const event = await this.eventService.getActiveEventByPass(commandContext.message.content);
+        if(!event){
+            return await commandContext.message.reply("Sorry the event is no longer available!");
+        }
 
+        const claimCode = await this.codeService.checkCodeForEventUsername(event.id, commandContext.message.author.id);
         if(claimCode){
             const response = CheckCodeCommand.setClaimInResponseMessage(event, claimCode);
             return await commandContext.message.reply(response);

@@ -64,6 +64,13 @@ export interface EventService{
     getEventByPass(messageContent: string): Promise<BotEvent | null>;
     /**
      * @method
+     * Get active event using a specific pass
+     * @param {string} eventPass
+     * @returns {Promise<BotEvent> | null} Event using the pass or null if pass does not exists or event is inactive
+     */
+    getActiveEventByPass(eventPass: string): Promise<BotEvent | null>;
+    /**
+     * @method
      * Check if a pass is available to use in a new Event
      * @param {string} messageContent
      * @returns {Promise<boolean>} true if pass is available
