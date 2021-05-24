@@ -62,8 +62,7 @@ export class EventDaoImpl implements EventDao{
 
     public async getEventByPass(eventPass: string): Promise<BotEvent | null> {
         const now = new Date();
-        return await this.db.oneOrNone<BotEvent>("SELECT * FROM events WHERE pass = $1::text",
-            [eventPass, true, now]);
+        return await this.db.oneOrNone<BotEvent>("SELECT * FROM events WHERE pass = $1::text", [eventPass, true, now]);
     }
 
     public async getActiveEventByPass(eventPass: string): Promise<BotEvent | null> {
@@ -73,7 +72,7 @@ export class EventDaoImpl implements EventDao{
     }
 
     public async isPassAvailable(eventPass: string): Promise<boolean>{
-        const eventsWithPass = await this.db.one<number>("SELECT count(*) FROM events WHERE pass = $1::text", [eventPass], (a: { count: string }) => +a.count);
+        const eventsWithPass = await this.db.one<number>("SELECT count(*) FROM events WHERE LOWER(pass) = $1::text", [eventPass.toLowerCase()], (a: { count: string }) => +a.count);
         return eventsWithPass === 0;
     }
 

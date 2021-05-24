@@ -18,7 +18,7 @@ export class SetupPassStepHandler extends SetupAbstractHandler{
     }
 
     async handler(message: Message, eventState: EventState):Promise<string> {
-        const messageContent:string = message.content.trim();
+        const messageContent: string = message.content.trim();
         const passAvailable = await this.eventService.isPassAvailable(messageContent);
 
         if(!passAvailable){

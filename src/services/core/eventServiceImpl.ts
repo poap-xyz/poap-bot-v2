@@ -75,12 +75,12 @@ export class EventServiceImpl implements EventService{
     }
 
     isPassAvailable(messageContent: string): Promise<boolean> {
-        const eventPass = messageContent.trim().toLowerCase();
+        const eventPass = messageContent.trim();
         return this.eventDao.isPassAvailable(eventPass);
     }
 
     public async getEventByPass(messageContent: string): Promise<BotEvent | null>{
-        const eventPass = messageContent.trim().toLowerCase();
+        const eventPass = messageContent.trim();
         return await this.eventDao.getEventByPass(eventPass);
     }
 
