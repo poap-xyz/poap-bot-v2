@@ -53,7 +53,7 @@ Example:
 ## Modifying an existing POAP Event
 - _!addcodes {EVENT_ID}_ The user who created the event could add new codes sending a DM to the bot indicating the event ID (You can find it using the !status command) and attaching a new file with the new POAP codes.
 
-- _!replacecodes {EVENT_ID}_ In the event of wrong configuration, the user who created the event should replace the codes by sending a DM to the bot indicating the event ID as the first parameter and attaching a file with the POAP codes to replace the old ones.
+- _!replacecodes {EVENT_ID}_ In the case of wrong configuration, the user who created the event should replace the codes by sending a DM to the bot indicating the ID as the first parameter and attaching a file with the POAP codes to replace the old ones.
 
 Example:
 ![POAP-bot addcodes example](https://github.com/poap-xyz/poap-bot-v2/blob/images/docs/examples/add_codes_example.png?raw=true)
