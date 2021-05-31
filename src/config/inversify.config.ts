@@ -58,8 +58,12 @@ import {SubscribedChannelDaoImpl} from "../persistence/core/subscribedChannelDao
 let container = new Container();
 
 /* DB Binds */
+try{
 container.bind<pgPromise.IDatabase<any>>(TYPES.DB).toConstantValue(pgPromise()(DBConfig));
 container.bind<Redis>(TYPES.Cache).toConstantValue(new IORedis(RedisConfig));
+}catch (e){
+    process.exit(1);
+}
 
 /* Core binds */
 container.bind<Bot>(TYPES.Bot).to(Bot).inSingletonScope();

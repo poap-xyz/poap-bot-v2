@@ -28,7 +28,8 @@ export default class AddCodeCommand extends Command {
             {aliases: ['addcode', 'replacecodes', 'replacecode'],
                 commandType: {DMCommand: true, GuildCommand: false},
                 botPermissions: [],
-                memberPermissions: []})
+                memberPermissions: []},
+            2);
     }
 
     protected async execute(commandContext: CommandContext): Promise<Message | Message[]> {

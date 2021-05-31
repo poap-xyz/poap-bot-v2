@@ -17,16 +17,21 @@ export default class CheckCodeCommand extends Command{
     @lazyInject(TYPES.ChannelService) readonly channelService: ChannelService;
 
     constructor() {
+        /* This method call is expensive so it must be last in the execution priority */
         super("code",
             {aliases: [],
                 commandType: {DMCommand: true, GuildCommand: false},
                 botPermissions: [],
-                memberPermissions: []})
+                memberPermissions: []},
+                5);
     }
 
     public async isCommandCalledByMessage(message: Message): Promise<boolean>{
-        /* This method call is expensive so it must be last in the execution priority */
         const event = await this.eventService.getEventByPass(message.content);
+        /* This method is called last so if no event we react */
+        if(!event){
+            await message.react("❌");
+        }
         return !!event;
     }
 

@@ -1,11 +1,11 @@
 import {inject, injectable} from "inversify";
-import {CommandLoader} from "../loaders/commandLoader";
 import {TYPES} from "../../config/types";
 import {EventScheduleService} from "../../interfaces/services/schedule/eventScheduleService";
 import {MaintenanceDBService} from "../../interfaces/services/maintenance/maintenanceDBService";
 import {ContractService} from "../../interfaces/services/core/contract/contractService";
 import {TokenWorkerService} from "../../interfaces/services/queue/tokenWorkerService";
 import {SubscribedChannelService} from "../../interfaces/services/core/subscribedChannelService";
+import {CommandLoader} from "../loaders/commandLoader";
 
 @injectable()
 export class InitLoader {
@@ -14,12 +14,15 @@ export class InitLoader {
     private readonly subscribedChannelService: SubscribedChannelService;
     private readonly tokenWorkerService: TokenWorkerService;
     private readonly contractService: ContractService;
+    private readonly commandLoader: CommandLoader;
 
-    constructor(@inject(TYPES.EventScheduleService) eventScheduleService: EventScheduleService,
+    constructor(@inject(TYPES.CommandLoader) commandLoader: CommandLoader,
+                @inject(TYPES.EventScheduleService) eventScheduleService: EventScheduleService,
                 @inject(TYPES.MaintenanceDBService) maintenanceDBService: MaintenanceDBService,
                 @inject(TYPES.TokenWorkerService) tokenWorkerService: TokenWorkerService,
                 @inject(TYPES.SubscribedChannelService) subscribedChannelService: SubscribedChannelService,
                 @inject(TYPES.ContractService) contractService: ContractService) {
+        this.commandLoader = commandLoader;
         this.eventScheduleService = eventScheduleService;
         this.maintenanceDBService = maintenanceDBService;
         this.tokenWorkerService = tokenWorkerService;
@@ -28,6 +31,7 @@ export class InitLoader {
     }
 
     async init(){
+        this.commandLoader.init();
         await this.initDB();
         await this.eventScheduleService.schedulePendingEvents();
         await this.subscribedChannelService.initSubscribersService();
@@ -36,8 +40,9 @@ export class InitLoader {
     }
 
     private async initDB(){
-        if(!(await this.maintenanceDBService.isDBReady()))
+        if(!(await this.maintenanceDBService.isDBReady())){
             throw new Error("DB Not ready!");
+        }
 
         try {
             if (!(await this.maintenanceDBService.checkTablesCreated()))

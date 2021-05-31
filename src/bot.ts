@@ -3,8 +3,6 @@ import {inject, injectable} from "inversify";
 import {TYPES} from "./config/types";
 import {MessageHandler} from "./discord/events/messageHandler";
 import {logger} from "./logger";
-import * as pino from "pino";
-import * as path from "path";
 import {CommandLoader} from "./discord/loaders/commandLoader";
 import {InitLoader} from "./discord/events/initLoader";
 
@@ -14,18 +12,14 @@ export class Bot {
     private readonly token: string;
     private readonly messageHandler: MessageHandler;
     private readonly initHandler: InitLoader;
-    private readonly commandLoader: CommandLoader;
-
     constructor(@inject(TYPES.Client) client: Client,
                 @inject(TYPES.Token) token: string,
                 @inject(TYPES.MessageHandler) messageHandler: MessageHandler,
-                @inject(TYPES.InitLoader) initLoader: InitLoader,
-                @inject(TYPES.CommandLoader) commandLoader: CommandLoader) {
+                @inject(TYPES.InitLoader) initLoader: InitLoader) {
         this.client = client;
         this.token = token;
         this.messageHandler = messageHandler;
         this.initHandler = initLoader;
-        this.commandLoader = commandLoader;
     }
 
     public async init(){
@@ -34,16 +28,15 @@ export class Bot {
 
     private configBotEventListeners(): Promise<string> {
         this.client.on('ready', async () => {
-            this.commandLoader.init();
             await this.initHandler.init();
         });
 
         this.client.on('message', (message: Message) => {
             logger.info(`[MSG] DM ${message.channel.type} - ${message.content} from ${message.author.username}`);
             this.messageHandler.handle(message).then((m) => {
-                logger.debug(`Message responded, Content: ${m}`);
+                logger.info(`Message responded, Content: ${m}`);
             }).catch((e) => {
-                logger.debug(`Message not responded, Cause:${e}`);
+                logger.info(`Message not responded, Cause: ${e}`);
             })
         });
 

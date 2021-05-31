@@ -26,7 +26,8 @@ export default class StatusCommand extends Command{
             {aliases: ["stat", "stats", "schedule"],
                 commandType: {DMCommand: true, GuildCommand: true},
                 botPermissions: [Permissions.FLAGS.SEND_MESSAGES],
-                memberPermissions: [Permissions.FLAGS.MANAGE_GUILD]})
+                memberPermissions: [Permissions.FLAGS.MANAGE_GUILD]},
+            2);
     }
 
     protected async execute(commandContext: CommandContext): Promise<Message> {

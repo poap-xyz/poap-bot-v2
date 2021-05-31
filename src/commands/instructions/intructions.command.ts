@@ -8,7 +8,8 @@ export default class InstructionsCommand extends Command{
             {aliases: ["instruction", "help"],
                 commandType: {DMCommand: true, GuildCommand: true},
                 botPermissions: [Permissions.FLAGS.SEND_MESSAGES],
-                memberPermissions: []})
+                memberPermissions: []},
+            3)
     }
 
     protected execute(commandContext: CommandContext) {

@@ -42,7 +42,7 @@ export class MessageHandler {
     }
 
     private async getCommandByMessage(message: Message): Promise<Command | null> {
-        for (const [name, cmd] of this.commandLoader.commands) {
+        for (const cmd of this.commandLoader.commands) {
             if (await cmd.isCommandCalledByMessage(message))
                 return cmd;
         }

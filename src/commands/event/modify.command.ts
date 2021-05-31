@@ -12,7 +12,8 @@ export default class ModifyCommand extends EventABMAbstractCommand{
         super("modify", {aliases: ["modifyevent", "change", "changeevent"],
             commandType: {DMCommand: false, GuildCommand: true},
             botPermissions: [],
-            memberPermissions: [Permissions.FLAGS.MANAGE_GUILD]});
+            memberPermissions: [Permissions.FLAGS.MANAGE_GUILD]},
+            2);
         this.dmChannelCallback = new ModifyDMChannelCallback(this);
     }
 

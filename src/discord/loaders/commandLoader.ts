@@ -1,26 +1,25 @@
-import {inject, injectable} from "inversify";
+import {injectable} from "inversify";
 import {lstatSync, readdirSync} from "fs";
-import {TYPES} from "../../config/types";
 import {logger} from "../../logger";
 import * as path from "path";
 import {Command} from "../../commands/command";
 import {BotConfig} from "../../config/bot.config";
-import container from "../../config/inversify.config";
 
 const commandsPath = __dirname + `${path.sep}..${path.sep}..${path.sep}` + `commands` + path.sep;
 
 @injectable()
 export class CommandLoader{
-    private readonly _commands: Map<string, Command>;
+    private readonly _commands: Array<Command>;
     constructor() {
-        this._commands = new Map();
+        this._commands = new Array<Command>();
     }
 
     init(){
-        return this.loadCommandsFromDefaultPath();
+        this.loadCommandsFromDefaultPath();
+        this.commands.sort((a, b) => b.priority - a.priority);
     }
 
-    get commands(): Map<string, Command> {
+    get commands(): Array<Command> {
         return this._commands;
     }
 
@@ -31,10 +30,12 @@ export class CommandLoader{
         commandsFolder.forEach((commandFilePath) => {
             logger.info(`Loading ${commandFilePath} directory`);
             const commandsFiles = this.getCommandJSFiles(commandFilePath);
-            commandsFiles.forEach((cmd) => {
-                this.loadCommandFromPath(commandFilePath, cmd);
+            commandsFiles.forEach(async (cmd) => {
+                await this.loadCommandFromPath(commandFilePath, cmd);
             });
         });
+
+
     }
 
     private getCommandFolders(folderPath: string): string[]{
@@ -70,7 +71,7 @@ export class CommandLoader{
         }
 
         logger.info(`Loading Command: ${command.name}. 👌`);
-        this._commands.set(command.name, command);
+        this._commands.push(command);
         return command;
     }
 }

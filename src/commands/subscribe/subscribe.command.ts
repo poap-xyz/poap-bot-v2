@@ -20,7 +20,8 @@ export default class SubscribeCommand extends Command{
             {aliases: ["subs"],
                 commandType: {DMCommand: false, GuildCommand: true},
                 botPermissions: [Permissions.FLAGS.SEND_MESSAGES],
-                memberPermissions: [Permissions.FLAGS.MANAGE_GUILD]})
+                memberPermissions: [Permissions.FLAGS.MANAGE_GUILD]},
+            3);
     }
 
     protected async execute(commandContext: CommandContext) {

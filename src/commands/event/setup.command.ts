@@ -12,10 +12,12 @@ import {SetupDMChannelCallback} from "./handlers/callback/setupDMChannelCallback
 
 export default class SetupCommand extends EventABMAbstractCommand{
     constructor() {
-        super("setup", {aliases: ["createevent", "newevent"],
+        super("setup",
+            {aliases: ["createevent", "newevent"],
                         commandType: {DMCommand: false, GuildCommand: true},
                         botPermissions: [],
-                        memberPermissions: [Permissions.FLAGS.MANAGE_GUILD]});
+                        memberPermissions: [Permissions.FLAGS.MANAGE_GUILD]},
+            2);
         this.dmChannelCallback = new SetupDMChannelCallback(this);
     }
 

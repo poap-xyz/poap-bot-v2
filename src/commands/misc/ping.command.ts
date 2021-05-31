@@ -7,7 +7,8 @@ export default class PingCommand extends Command{
             {aliases: [],
                             commandType: {DMCommand: false, GuildCommand: true},
                             botPermissions: [],
-                            memberPermissions: []})
+                            memberPermissions: []},
+                4);
     }
 
     protected execute(commandContext: CommandContext) {

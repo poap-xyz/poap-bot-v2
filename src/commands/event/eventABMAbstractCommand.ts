@@ -22,8 +22,8 @@ export default abstract class EventABMAbstractCommand extends Command implements
     @lazyInject(TYPES.EventService) readonly eventService: EventService;
     @lazyInject(TYPES.ChannelService) readonly channelService: ChannelService;
     @lazyInject(TYPES.EventScheduleService) readonly eventScheduleService: EventScheduleService;
-    protected constructor(name: string, commandOptions: CommandOptions) {
-        super(name, commandOptions);
+    protected constructor(name: string, commandOptions: CommandOptions, priority: number) {
+        super(name, commandOptions, priority);
 
         /* Initialize static map */
         if(!EventABMAbstractCommand.setupUsers)

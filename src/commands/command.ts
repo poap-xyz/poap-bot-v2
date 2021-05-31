@@ -5,10 +5,12 @@ import {PermissionStatus} from "../_helpers/utils/permissionManager";
 export abstract class Command {
     readonly name: string;
     readonly commandOptions: CommandOptions;
+    readonly priority: number;
 
-    protected constructor(name: string, commandOptions: CommandOptions) {
+    protected constructor(name: string, commandOptions: CommandOptions, priority: number) {
         this.name = name;
         this.commandOptions = commandOptions;
+        this.priority = priority;
     }
 
     protected abstract execute(commandContext: CommandContext): Promise<Message | Message[]>;
