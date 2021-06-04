@@ -30,9 +30,10 @@ export default class CheckCodeCommand extends Command{
         const event = await this.eventService.getEventByPass(message.content);
         /* This method is called last so if no event we react */
         if(!event){
-            await message.react("❌");
+            //await message.react("❌"); // UNCOMMENT THIS WHEN LEGACY CHECK CODE IS DEPRECATED
         }
-        return !!event;
+
+        return this.channelService.getMessageChannel(message) === "DM_COMMAND" && !!event;
     }
 
     protected async execute(commandContext: CommandContext): Promise<Message>{
@@ -51,9 +52,9 @@ export default class CheckCodeCommand extends Command{
         return await commandContext.message.reply("Sorry there are no more POAPs available for this event!");
     }
 
-    private static setClaimInResponseMessage(event: BotEvent, claimCode: string){
+    static setClaimInResponseMessage(event: BotEvent, claimCode: string){
         let claimUrl = BotConfig.poapClaimUrl + claimCode;
-        if(claimCode.indexOf("http:") !== -1)
+        if(claimCode.indexOf("poap.xyz") !== -1)
             claimUrl = claimCode;
 
         return event.response_message.replace(BotConfig.responseMessageReplace, claimUrl);
