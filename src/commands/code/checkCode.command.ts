@@ -20,7 +20,7 @@ export default class CheckCodeCommand extends Command{
         /* This method call is expensive so it must be last in the execution priority */
         super("code",
             {aliases: [],
-                commandType: {DMCommand: true, GuildCommand: false},
+                commandType: {DMCommand: true, GuildCommand: true},
                 botPermissions: [],
                 memberPermissions: []},
                 5);

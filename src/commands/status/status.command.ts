@@ -67,21 +67,22 @@ export default class StatusCommand extends Command{
         const totalCodes = await this.codeService.countTotalCodes(event.id);
         const claimedCodes = await this.codeService.countClaimedCodes(event.id);
         const guild = await this.guildService.getGuildById(event.server);
-        const channel = await this.channelService.getChannelFromGuild(guild, event.channel);
+        const channel = await this.channelService.getTextChannel(event.server, event.channel);
 
         return StatusCommand.getStatusEmbed(event, guild, channel, timeToEvent, totalCodes, claimedCodes);
     }
 
     private static getStatusEmbed(event: BotEvent, guild: Guild, channel: GuildChannel, timeToEvent: TimeToEvent, totalCodes: number, claimedCodes: number){
         const eventStatus = StatusCommand.getEventStatus(event, timeToEvent);
-
+        const guildString = guild? `${guild.name} (${event.server})` : `${event.server}`;
+        const channelString = channel? `${channel.name} (${event.channel})` : `${event.channel}`;
         return new MessageEmbed()
             .setColor('#0099ff')
             .setTitle(`Event #${event.id}`)
             .setDescription(`Event status: ${eventStatus}`)
 
-            .addField('Guild', `${guild.name} (${event.server})`, false)
-            .addField('Channel', `${channel.name} (${event.channel})`, false)
+            .addField('Guild', guildString, false)
+            .addField('Channel', channelString, false)
             .addField('Start date', `${event.start_date}`, false)
             .addField('End date', `${event.end_date}`, false)
             .addField('Response to members', `${event.response_message}`, false)

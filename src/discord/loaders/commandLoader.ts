@@ -16,7 +16,7 @@ export class CommandLoader{
 
     init(){
         this.loadCommandsFromDefaultPath();
-        this.commands.sort((a, b) => b.priority - a.priority);
+        this.commands.sort((a, b) => a.priority - b.priority);
     }
 
     get commands(): Array<Command> {

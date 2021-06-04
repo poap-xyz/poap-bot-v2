@@ -1,5 +1,5 @@
 import {GuildService} from "../../interfaces/services/discord/guildService";
-import {Client, DMChannel, Guild, GuildChannel, Message, Snowflake, TextChannel, User} from "discord.js";
+import {Channel, Client, DMChannel, Guild, GuildChannel, Message, Snowflake, TextChannel, User} from "discord.js";
 import {inject, injectable} from "inversify";
 import {TYPES} from "../../config/types";
 import {ChannelService} from "../../interfaces/services/discord/channelService";
@@ -87,32 +87,25 @@ export class ChannelServiceImpl implements ChannelService{
         return 'UNKNOWN';
     }
 
-    getChannelFromGuild(guild: Guild, channelId: string | Snowflake): GuildChannel {
-        if(!guild || !channelId)
-            return undefined;
-
-        const stripChannelName = ChannelServiceImpl.stripChannel(channelId);
-
-        //TODO research this
-        return guild.channels.cache.find((channel => channel.id.toLowerCase() === stripChannelName));
+    async getTextChannel(guildId: string, channelId: string): Promise<TextChannel>{
+        const guild: Guild = await this.guildService.getGuildById(guildId);
+        return guild && this.getTextChannelFromGuild(guild, channelId);
     }
 
-    getTextChannelFromGuild(guild: Guild, channelId: string | Snowflake): TextChannel {
-        const channel = this.getChannelFromGuild(guild, channelId);
+    private async getTextChannelFromGuild(guild: Guild, channelId: string | Snowflake): Promise<TextChannel> {
+        const channel = await this.getChannelFromGuild(guild, channelId);
         if (!(guild && channel && channel instanceof TextChannel))
             return undefined;
 
         return <TextChannel>channel;
     }
 
-    async getGuildChannel(guildId: string, channelId: string): Promise<GuildChannel>{
-        const guild: Guild = await this.guildService.getGuildById(guildId);
-        return guild && this.getChannelFromGuild(guild, channelId);
-    }
+    private async getChannelFromGuild(guild: Guild, channelId: string | Snowflake): Promise<Channel> {
+        if(!guild || !channelId)
+            return undefined;
 
-    async getTextChannel(guildId: string, channelId: string): Promise<TextChannel>{
-        const guild: Guild = await this.guildService.getGuildById(guildId);
-        return guild && this.getTextChannelFromGuild(guild, channelId);
+        const lowercaseChannelId = channelId.toLowerCase();
+        return guild.channels.cache.find((channel => channel.id.toLowerCase() === lowercaseChannelId)) || await this.client.channels.fetch(channelId);
     }
 
     getChannelFromGuildByName(guild: Guild, channelName: string): GuildChannel {
@@ -120,8 +113,6 @@ export class ChannelServiceImpl implements ChannelService{
             return undefined;
 
         const stripChannelName = ChannelServiceImpl.stripChannel(channelName);
-
-        //TODO research this
         return guild.channels.cache.find((channel => channel.name.toLowerCase() === stripChannelName));
     }
 
