@@ -29,10 +29,10 @@ export default class CheckCodeLegacyCommand extends Command{
             6);
         try{
             this.db = pgPromise()({
-                host: process.env.DB_HOST || "localhost",
-                user: process.env.DB_USER || "postgres",
-                password: process.env.DB_PASSWORD || "postgres",
-                database: process.env.DB_DATABASE || "",
+                host: process.env.DB_HOST_V1 || "localhost",
+                user: process.env.DB_USER_V1 || "postgres",
+                password: process.env.DB_PASSWORD_V1 || "postgres",
+                database: process.env.DB_DATABASE_V1 || "",
             });
         }catch (e){
             logger.error(`[CheckCodeLegacy] Cant connect to legacy DB, error: ${e}`);
