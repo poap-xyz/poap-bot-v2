@@ -13,14 +13,14 @@ Example:
 
 ## Add @POAP-bot to your server.
 
-You can add to you discord server the @POAP-bot with this link:
+You can add the @POAP-bot to your discord server with this link:
 https://discord.com/oauth2/authorize?client_id=819190761437528124&scope=bot&permissions=2112
 
-It will open the discord.com site in a browser page. Once the user signs in (which may happen automatically if credentials have been cached), they can select the guild in which the bot is to operate, and approve the bot's permissions in that guild.
+It will open the discord.com site in a browser page. Once the user signs in (which may happen automatically if credentials have been cached), they can select the guild in which the bot is to operate, and approve the bot's permissions within that guild.
 
 The bot will appear as a new member of the server (check for __Poap Bot#2760__).
 
-## Setting up new POAP Event
+## Setting up a new POAP Event
 
 Administrators or users with a role called "POAP Master" may issue a command to the bot by mentioning it in __a Text Channel__, then adding the command in the message. 
 
@@ -61,12 +61,12 @@ Example:
 Note: You can find the event ID using the !status command
 
 ## Subscribing a channel to the Poap Feed
-- _!subscribe_ Administrators may issue this command to the bot by mentioning it in __a text channel__ and will automatically subscribe the channel to the feed in real-time of the claimed Poaps.
+- _!subscribe_ - Administrators may issue this command to the bot by mentioning it in __a text channel__ and will automatically subscribe the channel to the feed in real-time of the claimed Poaps.
 
 ![POAP-bot feed example](https://github.com/poap-xyz/poap-bot-v2/blob/images/docs/examples/subscribe_feed_example.png?raw=true)
 
 ## Subscribing a channel to the Poap Feed
-- _!unsubscribe_ Administrators may issue this command to the bot by mentioning it in __a text channel__ and will stop sending the embed messages to the channel. 
+- _!unsubscribe_ -  Administrators may issue this command to the bot by mentioning it in __a text channel__ and will stop sending the embed messages to the channel. 
 
 ## Setup
 
